@@ -1,0 +1,48 @@
+<svg width="2042" height="661" viewBox="0 0 2042 661" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_f_352_127008)">
+<path d="M62.8516 559.176L62.8515 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M142.125 559.176L142.125 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M221.398 559.176L221.398 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M300.672 559.176L300.672 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M379.945 559.176L379.945 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M459.223 559.176L459.223 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M538.496 559.176L538.496 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M617.77 559.176L617.769 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M697.043 559.176L697.043 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M776.32 559.176L776.32 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M855.594 559.176L855.594 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M934.867 559.176L934.867 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M62 22H935.559C957.65 22 975.559 39.9086 975.559 62V562.078H22V62C22 39.9086 39.9086 22 62 22Z" stroke="#A62217" stroke-width="20"/>
+<path d="M22.8828 544.648V648.703" stroke="#A62217" stroke-width="20"/>
+<path d="M973.258 544.648V648.703" stroke="#A62217" stroke-width="20"/>
+<g filter="url(#filter1_f_352_127008)">
+<path d="M1106.85 559.176L1106.85 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1186.12 559.176L1186.12 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1265.4 559.176L1265.4 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1344.67 559.176L1344.67 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1423.95 559.176L1423.95 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1503.22 559.176L1503.22 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1582.5 559.176L1582.5 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1661.77 559.176L1661.77 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1741.04 559.176L1741.04 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1820.32 559.176L1820.32 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1899.59 559.176L1899.59 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1978.87 559.176L1978.87 24.543" stroke="#CACACA" stroke-width="20"/>
+<path d="M1106 22H1979.56C2001.65 22 2019.56 39.9086 2019.56 62V562.078H1066V62C1066 39.9086 1083.91 22 1106 22Z" stroke="#A62217" stroke-width="20"/>
+<path d="M1066.88 544.648V648.703" stroke="#A62217" stroke-width="20"/>
+<path d="M2017.26 544.648V648.703" stroke="#A62217" stroke-width="20"/>
+</g>
+</g>
+<defs>
+<filter id="filter0_f_352_127008" x="0" y="0" width="2041.56" height="660.703" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="6" result="effect1_foregroundBlur_352_127008"/>
+</filter>
+<filter id="filter1_f_352_127008" x="1044" y="0" width="997.559" height="660.703" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="6" result="effect1_foregroundBlur_352_127008"/>
+</filter>
+</defs>
+</svg>

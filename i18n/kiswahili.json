@@ -1,0 +1,210 @@
+{
+  "_readme": "Kiswahili translations. Fill in any string below — leave a value as \"\" to keep showing the English text for that item until translated. Keys must match i18n/en.json exactly.",
+  "_altNote": "The 'alt' and 'sceneBeats' sections below are AI-drafted machine translations (not yet reviewed by Melchior Shukuru / Exuper Njau, credited for the rest of the Kiswahili translation). Treat as placeholders pending their proofread, same as the rest of this file.",
+  "ui": {
+    "resources": "",
+    "restart": "",
+    "scrollHint": "",
+    "sceneIntroDesc": "",
+    "s8PlazaSign": "UWANJA WA DHIKI",
+    "s12AvenueSign": "MTAA WA ALGORITHIMU",
+    "s26RevolutionSign": "BARABARA YA MAPINDUZI",
+    "s55HunikiSign": "SHIRIKISHO LA HUNIKI"
+  },
+  "alt": {
+    "truckMeta": "Lori la Meta likitoa moshi, likipita kwenye Algorithm Avenue",
+    "truckOpenai": "Lori la OpenAI likitoa moshi, likipita kwenye Algorithm Avenue",
+    "matatuOvertaken": "Matatu ya Prevailer, ikionekana ndogo kati ya malori makubwa ya kampuni za teknolojia",
+    "truckGoogle": "Lori la Google likitoa moshi, likipita kwenye Algorithm Avenue",
+    "busMicrosoft": "Basi la Microsoft likitoa moshi, likipita kwenye Algorithm Avenue",
+    "busEmpty": "Matatu ya Prevailer, tupu",
+    "busWithPeople": "Matatu ya Prevailer ikiwa na abiria wanaopanda",
+    "busFull": "Matatu ya Prevailer imejaa abiria",
+    "busWithPeople1": "Matatu ya Prevailer ikiwa na abiria wengine zaidi",
+    "busInterviewees": "Matatu ya Prevailer ikiwa na waliohojiwa ndani",
+    "busInside": "Mwonekano wa ndani ya Matatu ya Prevailer, viti na vishikizo",
+    "busMunicipal": "Matatu ya Prevailer imeegeshwa nje ya jengo la Municipal Federation",
+    "awaLyStanding": "Awa Ly amesimama ndani ya matatu",
+    "awaLyHandle": "Awa Ly akishikilia kishikizo cha matatu",
+    "portraitAsmelash": "Picha ya mchoro ya Asmelash Teka Hadgu",
+    "portraitAwaLy": "Picha ya mchoro ya Awa Ly",
+    "portraitChris": "Picha ya mchoro ya Chris Emezue",
+    "portraitKathleen": "Picha ya mchoro ya Kathleen Siminyu",
+    "portraitSadik": "Picha ya mchoro ya Sadik Shahadu",
+    "portraitSamuel": "Picha ya mchoro ya Samuel Rutunda",
+    "purpleManFigure": "Mchoro wa mtu amesimama kando ya barabara wakati matatu inapopita",
+    "logoIsoc": "Nembo ya Internet Society Foundation",
+    "logoWk": "Nembo ya Whose Knowledge?",
+    "logoDair": "Nembo ya DAIR — Taasisi ya Utafiti wa AI Uliogatuliwa"
+  },
+  "sceneBeats": {
+    "4": "Prevailer inakimbia kwa kasi katika savana iliyo wazi, ikiacha msitu nyuma.",
+    "5": "Prevailer inafika mjini, ikipita majengo na barabara zake kabla ya kusimama kwenye kituo cha basi chenye shughuli nyingi.",
+    "6": "Abiria kadhaa wanapanda basi na kuzungumza kuhusu lugha wanazotumia kila siku.",
+    "7": "Kwenye kituo cha basi, abiria wengine wanashiriki lugha wanazozungumza: bibi ambaye mama yake alizungumza Oshiwambo na baba yake Otjiherero, mwanaume anayezungumza Kifaransa, Kimandija na Kigbaya, na mwingine ambaye lugha yake ya asili ni Kifulfulde, pamoja na Kihausa kwa biashara na Kiarabu kwa elimu.",
+    "12": "Barabara inapanuka kuwa sehemu ndefu ya mji, Algorithm Avenue ikijitokeza mbele huku matatu, sasa ikiwa na abiria wengi zaidi, ikiendelea mbele.",
+    "26": "Matatu inafika kwenye barabara yenye shughuli nyingi, wachuuzi na bodaboda wakipita.",
+    "27": "Asmelash Teka Hadgu wa Lesan AI na Awa Ly wa Galsen AI wanapanda.",
+    "28": "Chris Emezue wa Lanfrica Labs na Kathleen Siminyu wa Masakane na DAIR wanapanda.",
+    "29": "Sadik Shahadu wa Dagbani Wikimedians User Group na Samuel Rutunda wa Digital Umuganda wanapanda.",
+    "32": "Sasa ndani ya matatu: abiria wa kawaida wanasafiri pamoja na waliohojiwa — mwanamke mzee, msichana kijana aliyezama kwenye simu yake, mwanamke mjamzito, na mtoto mwenye peremende — huku Samuel Rutunda, Asmelash Teka Hadgu na Sadik Shahadu kila mmoja akipata zamu ya kuzungumza.",
+    "44": "Mwonekano mpya unateleza kutoka juu: Toto Moto amesimama karibu na mlango, akishikilia vishikizo vya matatu.",
+    "45": "Zaidi ndani, Kathleen Siminyu anazungumza, huku Toto Moto, mwanamke aliyebeba mfuko mwekundu, na mwanaume anayetumia kiti cha magurudumu pia wakisafiri pamoja.",
+    "55": "Matatu inasimama na kuegeshwa nje ya jengo la Municipal Federation.",
+    "58": "Barabara inabaki nyuma huku mwonekano ukielekea juu angani wazi.",
+    "59": "Matatu inavuka daraja juu ya ziwa, lililozungukwa na miti na eneo la wazi la bustani.",
+    "60": "Watoto wanacheza mchezo wa kurushiana mpira kando ya njia, huku mwanaume aliyevaa zambarau amesimama karibu, na mwonekano ukirudi nyuma polepole.",
+    "63": "Matatu inatulia katika mwendo wa taratibu, usio na haraka, huku hadithi ikifikia mwisho wake.",
+    "72": "Hadithi inaishia hapa. Skrini hii ya mwisho inatoa rasilimali za kupakua: ripoti kamili ya utafiti, mwongozo wa mbinu bora za teknolojia ya lugha inayozingatia jamii, utafiti wetu wa awali kuhusu lugha za mtandaoni, na kiungo cha jukwaa la LesanAI.",
+    "73": "Skrini hii ya mwisho inatoa shukrani kwa kila mtu aliyewezesha mradi huu — ikiwa ni pamoja na Internet Society Foundation, Whose Knowledge?, na DAIR — inaonyesha jinsi ya kuwasiliana nasi, na kutoa taarifa za leseni.",
+    "_readme": "Funguo (keys) ni namba halisi za scene kutoka storyboard (ref-row-1/2/3) — sio namba za ndani za msimbo. Msururu kama \"8-11\" unamaanisha scene 8 hadi 11 zinaendelea kama sehemu moja endelevu bila mpaka mwingine wa scene katikati, hivyo maneno husemwa mara moja tu, mwanzoni mwa sehemu hiyo, na yanahusu sehemu yote.",
+    "1-3": "Prevailer inaingia kutoka nje ya skrini, inasafiri kando ya barabara inayopita katikati ya msitu mzito, na kusimama huku miti ikiizunguka.",
+    "8-11": "Abiria wengine wanne wanapita, kila mmoja akiwa na lebo ya lugha zinazozungumzwa nyuma yake na idadi ya wanaozizungumza — Kitwi, Kiswahili na Kiwolof wenye wazungumzaji milioni 230; Kifulfulde, Kihausa na Kiarabu wenye milioni 300; Kinyarwanda, Kigurune na Kiingereza wenye milioni 270; Kifaransa, Kidagbani na Kitigrinya wenye milioni 180. Kisha tukio linabadilika na kuwa uwanja wa ishara uliojaa watu — nyuso nyingi zisizohesabika zikiwakilisha kila lugha inayozungumzwa mtandaoni. Mwonekano unakaribia hadi lugha chache tu za kikoloni zilizotawala zibaki zikimulika, zilizobaki zikififia gizani.",
+    "13-20": "Abiria wengine watatu wanapita, kila mmoja akitaja lugha yake na ufikiaji wake — Kiswahili chenye wazungumzaji zaidi ya milioni 200, Kizulu milioni 12, Kiyoruba milioni 45. Mwonekano unakaribia sehemu hii ya barabara huku madirisha ibukizi yakieleza jinsi lugha nyingi za dunia zinavyobaki kutoonekana mtandaoni, na kwa nini.",
+    "21-25": "Mwonekano wa juu wa barabara: magari ya Meta, OpenAI, Google na Microsoft yanapita kwa kasi, yakifuatwa na lori dogo la usafirishaji.",
+    "30-31": "Awa Ly amesimama ndani kidogo ya matatu, akishikilia kishikizo cha darini, na kuinama kuzungumza.",
+    "34-43": "Abiria wengine wanaendelea kuja na kwenda wakati wa safari — mmoja anamkabidhi mwenzake kitu, mwanamke mjamzito anashiriki mawazo yake — kabla ya Sadik Shahadu kuzungumza karibu na mwisho wa sehemu hii.",
+    "47-54": "Abiria anayetumia kiti cha magurudumu anabaki karibu huku abiria wengine wakija na kwenda, huku Chris Emezue akizungumza karibu naye."
+  },
+  "panels": {
+    "panel-1-start": "<h3>Buruta basi ili kuanza",
+    "panel-1": "<h3>Panda matatu ya ‘Shujaa’! <strong>Twende!</strong></h3>",
+    "panel-2": "<p>Twendeni tusafiri kuona mandhari ya lugha za Afrika, tukichunguza na kubainisha udhalimu wa kidijiti unaowakumba watu wa Afrika kila siku.</p>",
+    "panel-3": "<p>Na katika safari hii, matatu yetu pia itachepukia kwenye njia ya mandhari yenye matumaini zaidi, ikifuatilia hadithi za jinsi akili unde inavyobadilishwa kutoka kuwa chombo cha unyonyaji wa kikoloni hadi kuwa njia ya kujitawala ambapo jamii za Afrika zinarejesha na kudai tena lugha zao mtandaoni.</p>",
+    "panel-5": "<h3>Wote panda<strong> Shujaa!</strong></h3><svg class=\"bubble__tail\" viewBox=\"0 0 330 108\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><polygon points=\"88.2,0 70.2,0 151.9,107.8\" /><line class=\"bubble__seam\" x1=\"88.2\" y1=\"0\" x2=\"70.2\" y2=\"0\" /><path d=\"M88.2 0 L151.9 107.8 L70.2 0\" /></svg>",
+    "panel-6": "<h3></h3><p></p>",
+    "panel-8": "<p>Lugha ni urithi wa msingi tuliorithi kutoka kwa mababu zetu, ni uhusiano hai tunaoshirikishana kati yetu na wale wanaotufuata. Ni kiini chenyewe cha namna tunavyofikiri, kuzungumza, kuwaza, na kuufahamu ulimwengu.</p>",
+    "panel-8a": "<p>Sawa, watu wangu! Kabla hatujaendelea, hebu turudi nyuma kidogo!</p><p>Kwa vizazi vingi, Afrika imekuwa sehemu zinapopatikana zaidi ya lugha 2,000 tofauti katika nchi 54— ni wingi mkubwa wa lugha unaoonyesha utofauti wa kina ambao ni tofauti sana na historia ya Ulaya ya kupendelea matumizi ya lugha moja. Mamlaka za kikoloni hazikupuuza tu utofauti huu; zilijaribu kuufuta kabisa, mara nyingi kwa ajili ya urahisi wa kiutawala, zikilazimisha sauti nyingi kuingizwa katika lugha moja \"iliyojumuishwa\".</p>",
+    "panel-8b": "<p>Sasa ngoja niwaoneshe utofauti.</p><p>Mifumo ya kikoloni pia ilipuuza mitandao ya usafiri wa umma. Lakini angalia —matatu hiyo unayoiona—ilijaza pengo hilo. Ni ya haraka na yenye kuendana na matakwa ya watu.</p><p>Siku hizi, matatu hutumika kubeba sehemu kubwa ya wasafiri wa Nairobi, hasa kuelekea maeneo ambayo barabara zilizojengwa enzi za ukoloni hazikuwahi kufika.</p>",
+    "panel-13a": "<p></p>",
+    "panel-9": "<h3></h3><p></p>",
+    "panel-12": "<p>Kwa 85% ya intaneti kutawaliwa na lugha kumi pekee, takriban watumiaji 9 kati ya 10 wa intaneti barani Afrika hulazimika kubadili kwenda kwenye lugha za kikoloni ili tu waweze kutumia mtandao.</p><p>Kadiri mwelekeo huu unavyojirudia duniani, mabilioni ya watu wanakumbana na ulimwengu wa kidijiti ambapo lugha zao za asili hazionekani zikitumika.</p>",
+    "panel-12b": "<p>Lugha za wenyeji zisipokuwa katika mfumo wa kidijiti, hazipotei tu kutoka kwenye intaneti—zinakuwa katika hatari ya kutoweka kabisa. Baadhi ya wasomi huita mchakato huu ‘epistemicide’ au kifo cha lugha kidijiti.</p>",
+    "panel-s21-meta-1": "<p>Leo hii, mustakabali wa lugha na kila kitu wanachowakilisha unaamuliwa na watu wachache. Kundi dogo la kampuni kubwa za  teknolojia—kama Google, Microsoft, Meta, na OpenAI—ndilo linaloshikilia ufunguo wa vituo vya data na mifumo ya msingi inayoendesha akili unde duniani.</p>",
+    "panel-s21-google-1": "<p>Ingawa Uchakataji wa Lugha Halisi una historia ndefu ya mbinu zisizo za akili unde, kasi na ukubwa wa maendeleo ya sasa ya akili unde unaziacha nyuma idadi kubwa ya lugha.</p>",
+    "panel-s21-meta-2": "<p>Tatizo kuu ni kwamba data ya mafunzo hujenga upendeleo wa kudumu na wa kina ndani ya mifumo ya msingi, jambo linalomaanisha kuwa miundo ya dhana za ndani za programu tumizi yoyote inayojengwa juu yake huwa hazipo sawa kimsingi.</p>",
+    "panel-s21-google-2": "<p>Kwa hiyo, programu tumizi inapojaribu kuchakata lugha yenye rasilimali chache mtandaoni, kama vile Twi au Ewe, haina muundo mzuri wa lugha hiyo au utamaduni wake. Badala yake, mfumo hujaribu kuifasiri lugha hiyo kwa kuiweka ndani ya mfumo uliopo wa kimagharibi.</p>",
+    "panel-s21-openai": "<p>Mifumo ya kampuni za teknolojia hutegemea uhandisi wa \"suluhisho moja kwa wote\" unaolenga faida kwanza. Huweka kipaumbele kwenye ukusanyaji mkubwa wa data na mifumo ya takwimu kuliko uelewa wa kina wa kiutamaduni au kiisimu. Hapa, lugha haichukuliwi kama maarifa yenye uhai; badala yake, hutazamwa kama rasilimali inayoweza kupimika na kuchukuliwa.</p>",
+    "panel-s21-microsoft": "<p>Hii inaashiria kwamba kampuni kubwa za teknolojia zinashughulikia sehemu ndogo sana ya utajiri wa lugha za binadamu kwa usahihi mkubwa. Kutengwa huku huimarishwa na mzunguko wa matatizo: kwa kuwa kampuni huwekeza tu pale ambapo kuna faida ya wazi, lugha zilizo na rasilimali chache kidijiti huwa na mvuto mdogo zaidi kibiashara.</p><p>Kisha, lugha inapochukuliwa kuwa haina faida kibiashara, kampuni kubwa za teknolojia hujiondoa tu—zikiacha maelefu ya lugha hatarini na kutengwa.</p>",
+    "panel-55": "<p>Tunahitaji kuifikiria mamlaka ya data&mdash;haki ya msingi ya jamii kuyatawala maarifa yake yenyewe&mdash;kama hitaji lisilohitaji majadala ili kuweza kujinasua kutoka kwenye mtego wa ufadhili.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-55b": "<p>Mamlaka ya data yamefafanuliwa na jamii za Wenyeji kama haki za asili za Mataifa ya Wenyeji za kusimamia, kudhibiti, kupata, na kunufaika na data inayotokana na watu wao, ardhi zao, na mifumo yao ya maarifa.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-56": "<p>Barani Afrika, mjadala kuhusu mamlaka ya kujitawala unaendelea kwa nguvu na umewekwa katika Azimio la Afrika kuhusu akili unde. Hapa, mamlaka ya kujitawala yanaeleweka kutoka mtazamo wa Afrika ya Pamoja.</p><p>Nchi na watu wake wanashirikiana kwa pamoja kujenga kile kinachohitajika kwa ajili ya mamlaka ya kidijiti&mdash;utafiti wa kiisimu na uundaji wa maudhui, mifumo ya sera, na miundombinu salama inayolindwa kisheria.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-57": "<p>Mustakabali wa teknolojia ya lugha unaandikwa katika jamii kupitia mazoea ya uangalizi na kujitawala, harakati inayoongozwa na wataalamu wa teknolojia wa Afrika. Kupitia fikra mpya za ubunifu, wanapiga hatua kubwa zaidi ya mgawanyiko wa uwili wa kutengwa kimfumo na kampuni kubwa za teknolojia au kulazimishwa kuingia katika mifumo yake ya kuiga.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-s13-1": "<p>Lugha hizi hazipatikani mtandaoni kwa sababu mbalimbali. Tatizo si tu ukosefu wa data za kutosha za lugha; embu itazame kwa karibu matatu hii, wasemaji wapo kwa wingi. Tatizo kubwa zaidi ni kwamba intaneti ilitengenezwa kwa ajili ya lugha katika maandishi, jambo ambalo limeweka pembeni kwa kiasi kikubwa utajiri wa mila za lugha za simulizi, za ishara na zile zenye utofauti wa namna mbalimbali za lugha za waliowengi ulimwenguni. Hili si kosa la kiufundi—ni la kihistoria.</p><p>Kwa lugha za simulizi, ukosefu wa hifadhidata za maandishi na maandishi ya kutosha umefanya lugha hizi kukosa upatikanaji rahisi wa data inayoweza kuhifadhiwa kidijiti na kusomeka katika kompyuta. Matokeo yake, zimeanza kuitwa na wasomi kutoka mataifa ya kaskazini mwa dunia kama \"lugha zenye rasilimali chache\".</p>",
+    "panel-s13-2": "<p>Upungufu huu wa rasilimali si wa bahati mbaya, bali ni matokeo ya mifumo iliyosababisha kuenea kwa mtazamo wa maarifa wa kimagharibi kama wa kimataifa. Kinyume chake, tunapendekeza kupanua muktadha na kutambua historia ya jinsi pengo hili lilivyotokea.</p><p>Kwa kuziita \"zilizopungukiwa rasilimali za kidijiti,\" tunaonesha kwamba changamoto ya kuziingiza lugha za Afrika mtandaoni si tatizo la kiufundi; bali ni la kihistoria na lenye mizizi mirefu katika athari za ukoloni.</p>",
+    "panel-s13-3": "<p>Lugha inapokosekana kwenye intaneti, historia na maarifa ya watu nayo pia hunyamazishwa. Bila rasilimali katika lugha zao wenyewe, kizazi kijacho hulazimika kupokea mitazamo inayotawala, na kupoteza mitazamo yao wenyewe.</p><p>Hata pale lugha za asili zinaporasimishwa, lugha za wenyeji zinazozungumzwa sana, kama vile Kiamhari na Kiswahili, zinaweza kuzizidi nguvu lugha nyingi nyingine zinazozungumzwa na idadi ndogo ya watu.</p><p>Shinikizo hili la mara kwa mara la kuikubali lugha inayotawala, iwe ya kikoloni au ya asili, ni moja ya sababu za kupungua sana kwa utajiri wa lugha tofauti tofauti, na kuzifanya lugha nyingi kuelekea kutoweka.</p>",
+    "panel-26-1": "<p>Safari ya kuelekea haki katika lugha haiishii hapa.</p><p>Kuna njia nyingi za kutengeneza teknolojia kwa namna tofauti ambazo tayari zinatumika—njia zinazojali utu na si faida, na zinazotokana na jamii zenyewe.</p><p>Kujua ni kwa namna gani tulivyokwenda moja kwa moja kwenye chanzo.</p>",
+    "panel-26-3": "<p>Je, ungependa kuwasikia na kujifunza jinsi wanavyojenga teknolojia inayolenga jamii na kubadilisha simulizi kuhusu namna teknolojia inaweza kutengenezwa?</p><p>Kwa kutumia Mbinu za Utafiti wa Wenyeji za Bagele Chilisa, mchakato wetu wa utafiti-katika-hatua unaweka kiini kwenye \"ontolojia ya uhusiano\" ya Kiafrika. Falsafa hii hutafsiri utambulisho kupitia uhusiano na walio hai, mababu, na mazingira, na huona uchukuaji wa data kama uvunjaji wa msingi utu wa mtu kabisa.</p>",
+    "panel-26-2": "<p>Tulizungumza na wataalamu wa teknolojia, wanaisimu, watafiti, na Wanawikimedia, kutoka Ethiopia, Senegali, Kenya, Ghana, Rwanda, na Nigeria miongoni mwa mataifa mengine.</p><p>Watu hawa wanafanya kazi katika lugha kama Kiamhari, Kitigrinya, Dagbani, Wolof, Twi, Ewe, Gurune, Kinyarwanda, na Kiswahili. Wanajenga teknolojia inayolenga jamii kupitia mipango kama Lesan AI, Galsen AI, Lanfrica Labs, Ghana NLP, Digital Umuganda, EthioNLP, na Hausa NLP.</p>",
+    "panel-29-welcome": "<p>Mambo! Pisha, pisha!</p>\n<p>Karibuni, karibuni, ndugu zangu, kwenye &lsquo;Shujaa&rsquo;&mdash;chombo cha kurejesha na kudai tena lugha za Afrika kwenye intaneti. Na matatu hii inaendeshwa na ninyi; utaalamu wenu na uangalizi wenu. Tunashukuru kwa kuwa pamoja nasi katika safari hii.</p>",
+    "panel-30-popup1": "<p>Wakiwa wamehamasishwa na mazingira ya kidijiti ambayo hayaonyeshi uwepo wao, watafiti hawa hawatengenezi nyenzo tu; wanajenga pia undugu.</p><p>Wanajamii wanapobuni teknolojia, mgawanyiko kati ya mtengenezaji na mtumiaji hutoweka. Mzungumzaji si tena mtumiaji anayechunguzwa, bali ni mshirika katika utengenezaji ambaye uzoefu wake halisi wa maisha huunda muundo wa mfumo wenyewe.</p>",
+    "panel-30-popup2": "<p>Mabadiliko haya hubadilisha akili unde kutoka kuwa chombo cha kinyang'anyina kuondolewa mamlaka hadi kuwa utendaji wa kujali na kujitawala.</p>",
+    "panel-30-awayly": "<p>&ldquo;Hii ndiyo sababu GalsenAI inajitahidi kufanyia kazi lugha zetu kwa kujaribu kujenga teknolojia za tafsiri za mashine au za kubadilisha usemi kuwa maandishi kwa ajili ya jamii zetu&mdash;kwa sababu sisi ndio tuna fahamu jinsi lugha yetu inavyozungumzwa, sisi ndio tunaojua mahitaji ya lugha hiyo. Hatutaki kukaa hapa tukingoja Wamarekani au wengine waje kufanya hili kwa niaba yetu.&rdquo;</p>",
+    "panel-32-intro": "<p>Wataalamu wa teknolojia wa Afrika wenyewe ni wanajamii wa jamii wanazozihudumia. Wanajenga mashirika yao, mbinu zao, na mifumo yao kutoka kwenye msingi wa uhusiano wa asili na historia ya kijamii ya eneo lao.</p>\n<p>Katika kutafuta suluhisho si tu la matatizo ya kiufundi bali pia mienendo changamano ya kijamii, wataalamu hawa wa teknolojia wanafanya zaidi ya uwakilishi pekee na kuelekea kujenga haki ya kufikiri, kuunda nadharia, na kutafsiri ulimwengu wa mtazamo wa Kiafrika.</p>",
+    "panel-32-umuganda": "<p>Mpango wa Digital Umuganda unaonesha kikamilifu mbinu inayolenga jamii. Unachota moja kwa moja kutoka kwenye falsafa ya Kinyarwanda ya Umuganda&mdash;ikimaanisha &ldquo;kukusanyika pamoja kwa lengo moja&rdquo;&mdash;ambapo jamii hukutana kwa kazi ya pamoja ya umma, ikifuatiwa na majadiliano ya wazi.</p>",
+    "panel-32-lesan": "<p>Badala ya kubaki tu nyuma, wataalamu wa teknolojia wanaolenga jamii huweka kipaumbele kwenye mazoea ya moja kwa moja katika jamii&mdash;kukutana ana kwa ana na kutumia muda pamoja na wanajamii ili kuelewa mienendo ya mamlaka, kukusanya data za moja kwa moja, na kujenga uaminifu wa pande zote. Kwa kweli, Lesan AI imeunda baadhi ya mifumo bora ya tafsiri ya kompyuta kwa Kitigrinya kupitia mbinu hizi.</p>",
+    "panel-32-samuel": "<p>&ldquo;Kwahiyo waasisi wa &lsquo;Digital Umuganda&rsquo;, ambao walikuwa Audace na Ali, waliketi chini, wakaitazama Rwanda na wakaitazama &lsquo;Digital Umuganda&rsquo;, kisha wakatambua kwamba huo ndiyo mfumo uliokuwa na mantiki &mdash; kuwaleta watu wa jamii pamoja kwa kuwafanya waelewe tunachojaribu kukifanikisha na kuwawezesha kuchangia. Kilichobaki ni historia.&rdquo;</p>",
+    "panel-32-asmelash": "<p>&ldquo;Watu wengi huenda wasijue namna ya kutumia mtandao, au huenda hawana uwezo wa kupata mtandao kwa urahisi. Lakini hatutaki kuizuia michango kwa wale tu wanaoweza kufikia mtandao kwa urahisi. Kwa hivyo, tunaweka watu pia katika jamii moja kwa moja, kisha tunawagawia kazi hizi wachangiaji ambao si lazima watumie mtandao. Tungekwenda maeneo ya mbali na vijijini tukiwa na vifaa vyetu vya kurekodi ili kukusanya data za sauti, kisha tuwafidie na kurudi. Hii inafanya data yetu kuwa ya kina na yenye utofauti.&rdquo;</p>",
+    "panel-32-asmelash2": "<p>Hapa, ukusanyaji wa data ni kitendo cha tafakuri ya pamoja.</p>\n<p>Kila nukta ya data ni matokeo ya uzoefu wa kihistoria wa jamii, unaofanywa kwa namna inayoiwezesha jamii kwa pamoja badala ya kumtumia mtu binafsi kwa manufaa ya wengine. Kwa kuwa data hizi inatokana na mazungumzo halisi badala ya kukusanywa kwa kuchambua mtandaoni, zana zinazotokana nayo huwa na kina na uelewa wa hali halisi kwa kiwango kikubwa zaidi.</p>\n<p>Mbinu hii ya kimahusiano inaweza hata kuondoa upendeleo wa kikabila, kijinsia, na wa kimfumo ambao mara nyingi huathiri programu kuu za teknolojia ya lugha.</p>",
+    "panel-32-pregnant-up": "<p>Miundo mikubwa ya akili unde inakumbwa na upendeleo mkubwa usiowafaidia watu wengi. Kwa mfano, hufanya makosa zaidi inapochakata lafudhi za kikanda kuliko inapochakata hotuba &ldquo;sanifu,&rdquo; na pia inaweza kuimarisha mitazamo potofu ya kijinsia kwa kutumia viwakilishi vya jinsi kama chaguo la kawaida katika tafsiri.</p>",
+    "panel-32-pregnant-down": "<p>Wanaharakati wa lugha na wataalamu wa teknolojia hutumia kwa makusudi majukwaa ya maarifa huria kama Wikimedia.</p>\n<p>Kwa mfano, wanaharakati wa lugha ya Dagbani walianza kwa kurekodi sauti za lugha kwenye Wikimedia Commons, jambo ambalo baadaye lilisababisha ushirikiano na wataalamu wa teknolojia ya lugha wenye ujuzi wa kuchakata lugha asilia.</p>\n<p>Mchanganyiko huu wenye nguvu wa maarifa ya jamii na utaalamu wa kiufundi ni muhimu katika kujenga zana za teknolojia ya lugha zenye maana.</p>",
+    "panel-32-sadik": "<p>&ldquo;Tulitambua kwamba data za kileksikografia za Wikidata zingeweza kutumika vizuri sana kwa kuongeza matamshi ya sauti kwenye leksemu (mzizi/kiini cha neno). Wakati NLP Ghana ilipowasiliana nasi, tulitambua kwamba kulikuwa na fursa nzuri ya kushirikiana. Tuliweza kutumia data yetu ya Wikimedia kufundisha mfumo wao wa akili unde ili kuunda safu ya kwanza ya utambuzi wa otomatiki wa usemi wa lugha wa Dagbani katika programu ya Khaya. Tulipoona kwamba ilihitaji data zaidi, Kikundi cha watumiaji wa Wikimedia cha Dagbani kilianza kuunda sentensi na vifungu vifupi vya maneno kwa kutumia makala za Wikipedia peke yake. Na hatua hii ya pili ilitumika kuboresha ubora wa tafsiri katika programu ya Khaya. Na hivyo ndivyo tulivyojikuta tukisafiri kutoka Wikimedia hadi NLP. Sasa programu ya Khaya inasaidia kikamilifu tafsiri ya maandishi ya Dagbani na utambuzi wa otomatiki wa usemi. Sasa tunanakili mchakato huu kwa lugha nyingine za Mabia.&rdquo;</p>",
+    "panel-44-1": "<p>Lakini, licha ya ubunifu wao, mipango ya Afrika inakumbwa na changamoto kubwa ya ufadhili. Pengo kubwa la rasilimali mara nyingi hulazimisha jamii kuweka kipaumbele kwenye malengo ya wafadhili kutoka mataifa ya kaskazini mwa dunia badala ya mahitaji ya jamii, mbinu bora zinazofaa, na mahitaji ya haraka ya watu wao wenyewe.</p>",
+    "panel-45-kathleen": "<p>&ldquo;Kazi ya kutengeneza hifadhidata ni ghali sana. Ingekuwa maalum kuwalipa watu kufanya kazi hiyo. Katika baadhi ya miradi, tumekuwa na watu wanaojitolea kwa hiari kuifanya kazi hii. Lakini ingekuwa bora kuwa na fedha za kuwalipa watu, kwani ni kazi yenye thamani kubwa sana.&rdquo;</p>",
+    "panel-45-totomoto": "<p>Tunatumia nauli ya basi si tu kujipatia riziki, bali pia kutunza matatu yenyewe na kuchangia barabara tunazozitegemea sote. Uchumi huu wa ndani unanufaisha jamii kwa ujumla.</p>\n<p>Matatu zimepangwa kwa ustadi mkubwa kupitia mtandao changamano wa vyama. Huainishwa kama huduma za umma, zikiwa zaidi zinamilikiwa na watu binafsi, lakini daima husimamiwa kwa pamoja.</p>",
+    "panel-45-redlady": "<p>Kuna haja ya haraka ya kubadilisha mfumo wa ufadhili wa maendeleo ya teknolojia ya lugha kuelekea mifumo endelevu, yenye usawa, inayoongozwa na jamii na inayochochewa ndani ya maeneo husika, ambayo inanufaisha moja kwa moja jamii kwa kuunda ajira, kukuza uchumi wa ndani, na kuchochea maendeleo endelevu ya teknolojia.</p>\n<p>Kama ilivyo kwa mfumo wa matatu, mipango mingi mipya inaibuka ili kushughulikia tatizo la mifumo ya ufadhili isiyo na usawa na isiyo endelevu. Kwa mfano, juhudi moja ya pamoja ni kuviunganisha vikundi vya teknolojia ya lugha vinavyoongozwa na jamii barani Afrika chini ya shirika mwamvuli, kama vile Shirikisho la Huniki.</p>",
+    "panel-46-huniki": "<p>Shirikisho la Huniki linalenga kuunda sekta binafsi imara huku likifanya kazi chini ya mfumo wa dhamira ya kijamii, kupunguza utegemezi wa ufadhili kutoka mashirika yasiyo ya faida na kampuni kubwa za teknolojia, na badala yake kuwekeza moja kwa moja katika jamii mahalia. Hii inawakilisha mbinu mpya ya umoja wa Afrika ya kufikia kujitawala kidijiti.</p>",
+    "panel-46-bigtech": "<p>Ukosefu huu wa rasilimali za kiuchumi huongezwa uzito na uhodhi wa kampuni kubwa za teknolojia: kampuni mara nyingi hutumia hifadhidata huria za wazi kufundishia mifumo yao bila kurudisha chochote kwa jamii zilizoiandaa kwa matumizi hayo.</p>",
+    "panel-47-newguy": "<p>&ldquo;Nadhani watu wanapoelewa zaidi kuhusu leseni za data na ushirikishwaji wa data, inawasaidia kufanya maamuzi bora zaidi. Sio tena swala la chanzo huria dhidi ya chanzo kisicho huria pekee. Kwa sababu hata chanzo huria ni jambo tata sana. Lina nyanja nyingi ndani yake.&rdquo;</p>",
+    "panel-59": "<p>Mustakabali wa lugha kwenye intaneti si uhaba, bali wa wingi, ukiwa na mizizi katika maelfu ya sauti tofauti zinazofafanua historia yetu ya pamoja ya binadamu.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-60": "<p>Je, ungependa kujifunza zaidi? Ripoti yetu kamili, inayojumuisha matokeo yote ya mchakato wetu wa utafiti-katika-hatua, pamoja na rasilimali nyingine, zinapatikana kwa kupakuliwa hapa chini.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-61": "<p>Je, ungependa kujifunza zaidi? Ripoti yetu kamili, inayojumuisha matokeo yote ya mchakato wetu wa utafiti-katika-hatua, pamoja na rasilimali nyingine, zinapatikana kwa kupakuliwa hapa chini.</p><svg class=\"bubble__tail\" viewBox=\"0 0 330 108\" preserveAspectRatio=\"none\" aria-hidden=\"true\"><polygon points=\"88.2,0 70.2,0 151.9,107.8\" /><line class=\"bubble__seam\" x1=\"88.2\" y1=\"0\" x2=\"70.2\" y2=\"0\" /><path d=\"M88.2 0 L151.9 107.8 L70.2 0\" /></svg>",
+    "panel-purple-man": "<p>Pamoja tunaweza kujenga ulimwengu ambapo kila lugha inapata makazi yake halali na yenye uhai mtandaoni.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>",
+    "panel-language-justice": "<p>Haki katika lugha ndiyo kiini chenyewe cha mustakabali huu.</p><svg class=\"popup-tail\" width=\"40\" height=\"36\" aria-hidden=\"true\"><polygon fill=\"#FFFFFFF2\" points=\"8,0 32,0 20,32\" /><path fill=\"none\" stroke=\"#9F2222\" stroke-width=\"2.5\" stroke-linejoin=\"round\" d=\"M8 0 L20 32 L32 0\" /></svg>"
+  },
+  "chars": {
+    "s7-red-girl": {
+      "dialogue": "Afrika, tuna lugha nyingi sana! Mimi nazungumza Kitwi, Kipidgin na ninaelewa  Kifante."
+    },
+    "s7-granny": {
+      "dialogue": "Mama yangu anazungumza Kiwambo, na baba yangu Kiherero. Nimejifunza zote mbili na pia ninazungumza Kiingereza."
+    },
+    "s7-orange-man": {
+      "dialogue": "Ninazungumza Kifaransa, Kimandjia na Kigbaya."
+    },
+    "s7-green-man": {
+      "dialogue": "Kifula kwangu ni lugha mama. Ninatumia Hausa katika biashara, na Kiarabu kwenye elimu."
+    },
+    "s8-purple-man": {
+      "stat": "Twi, Kiswahili, Wolof — zaidi ya wazungumzaji milioni 230",
+      "lang": ""
+    },
+    "s8-blue-girl": {
+      "stat": "Fulfulde, Hausa, Kiarabu — zaidi ya wazungumzaji milioni 300",
+      "lang": ""
+    },
+    "s8-lime-man": {
+      "stat": "Kinyarwanda, Gurune, Kiingereza — zaidi ya wazungumzaji milioni 270",
+      "lang": ""
+    },
+    "s8-green-man": {
+      "stat": "Kifaransa, Dagbani, Tigrinya — zaidi ya wazungumzaji milioni 180",
+      "lang": ""
+    },
+    "s12-green-man": {
+      "stat": "wazungumzaji milioni 14",
+      "lang": "Shona"
+    },
+    "s12-blue-man": {
+      "stat": "wazungumzaji milioni 60",
+      "lang": "Hausa"
+    },
+    "s12-pink-lady": {
+      "stat": "wazungumzaji milioni 44",
+      "lang": "Igbo"
+    },
+    "s27-asmelash": {
+      "stat": "Asmelash Teka Hadgu",
+      "lang": "Lesan AI"
+    },
+    "s27-awayly": {
+      "stat": "Awa Ly",
+      "lang": "Galsen AI"
+    },
+    "s28-chris": {
+      "stat": "Chris Emezue",
+      "lang": "Lanfrica Labs"
+    },
+    "s28-kathleen": {
+      "stat": "Kathleen Siminyu",
+      "lang": "Masakane and DAIR"
+    },
+    "s29-sadik": {
+      "stat": "Sadik Shahadu",
+      "lang": "Dagbani Wikimedians User Group"
+    },
+    "s29-samuel": {
+      "stat": "Samuel Rutunda",
+      "lang": "Digital Umuganda"
+    }
+  },
+  "captions": {
+    "chrisName": "Chris Emezue",
+    "chrisRole": "Mwanzilishi — Lanfrica Labs",
+    "kathleenName": "Kathleen Siminyu",
+    "kathleenRole": "Mtafiti — Masakane &amp; DAIR",
+    "totoName": "Toto Moto",
+    "totoRole": "Bus<br> Conductor",
+    "samuelName": "Samuel Rutunda",
+    "samuelRole": "Mkurugenzi Mkuu wa Teknolojia - Digital Umuganda",
+    "asmelashName": "Asmelash Teka Hadgu",
+    "asmelashRole": "Mwasisi Mwenza na Mkurugenzi Mkuu wa Teknolojia - Lesan AI",
+    "sadikName": "Sadik Shahadu",
+    "sadikRole": "Mtumiaji wa Wikimedia",
+    "awalyName": "Awa Ly",
+    "awalyRole": "Galsen AI"
+  },
+  "images": {
+    "billboard5558": "assets/s55-s58/billaboard-kisw.svg"
+  }
+}

@@ -1,0 +1,1140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prevailer Matatu Journey</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;500&family=Noto+Sans+Ethiopic:wght@400&display=swap">
+<link rel="stylesheet" href="https://use.typekit.net/diu6bwx.css">
+<link rel="stylesheet" href="style.css?v=2">
+<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+</head>
+<body>
+
+<a href="#storyPrevBtn" class="sr-only-focusable-link">Skip to story navigation</a>
+
+<div id="navbar-wrap">
+  <nav class="navbar">
+    <div class="brand">
+      <img class="brand-icon" src="assets/icon_coffee.svg" alt="">
+      <h1 class="brand-name">THE PREVAILER</h1>
+    </div>
+    <div class="nav-track">
+      <div class="nav-track-fill" id="navProgressFill"></div>
+    </div>
+  </nav>
+  <div class="nav-actions">
+    <button class="nav-btn" id="restartBtn">RESOURCES</button>
+    <div class="lang-wrapper" id="langWrapper">
+      <button class="nav-btn lang-btn" id="langToggle">
+        <span id="langLabel">ENGLISH</span>
+        <span class="caret" aria-hidden="true"></span>
+      </button>
+      <div class="lang-menu" id="langMenu"></div>
+    </div>
+  </div>
+</div>
+
+<div id="progress-bar" aria-hidden="true"></div>
+
+<!-- Screen-reader-only live region — the only accessible path through the story; scroll.js
+     writes the active panel's text here (everything else below is aria-hidden). -->
+<div class="sr-only" data-i18n="ui.sceneIntroDesc">The Prevailer matatu bus drives along a jungle road throughout this introduction,
+   taking a scenic detour as the story begins.</div>
+<div id="narration-live" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+
+<div class="sr-only-focusable">
+  <button type="button" id="storyPrevBtn">Previous part of story</button>
+  <button type="button" id="storyNextBtn">Next part of story</button>
+</div>
+
+<!-- ===== SCENE 21 (pre-#pinned-wrap): road preview + vehicles + clouds, same overlay class as the popups below ===== -->
+<div class="scene-21-overlay" aria-hidden="true">
+  <!-- Road preview — revealed when s12-s15-bg fades out. -->
+  <div id="s21-preview" aria-hidden="true">
+    <img src="assets/s21-s23/Road.svg" alt="">
+  </div>
+
+  <!-- Vehicle overlay — position:fixed z:3, all 4 vehicles move right. -->
+  <div id="s21-vehicles" aria-hidden="true">
+    <lottie-player id="s21v-meta"      src="assets/lottie/Meta%20Truck.json"       background="transparent" speed="1" loop></lottie-player>
+    <img id="s21v-matatu" src="assets/s21-s23/Matatu%20top.svg" alt="The Prevailer matatu, dwarfed by the Big Tech trucks around it" data-i18n-alt="alt.matatuOvertaken">
+    <lottie-player id="s21v-google"    src="assets/lottie/google%20struck.json"    background="transparent" speed="1" loop></lottie-player>
+    <lottie-player id="s21v-microsoft" src="assets/lottie/Microsoft%20Truck.json"  background="transparent" speed="1" loop></lottie-player>
+    <lottie-player id="s21v-openai"    src="assets/lottie/Open%20AI.json"          background="transparent" speed="1" loop></lottie-player>
+  </div>
+
+  <div id="s21-clouds" aria-hidden="true">
+    <lottie-player id="s21c-lottie" src="assets/lottie/cloud%20lottie.json" background="transparent"></lottie-player>
+  </div>
+</div><!-- /scene-21-overlay -->
+
+<!-- Pinned viewport — aria-hidden: see live-region note above -->
+<div id="pinned-wrap" aria-hidden="true">
+  <div id="scroll-x">
+
+    <!-- ===== SCENE 1-4: Jungle intro + savanna transition — see .scene-1-4-overlay for the bus/trees ===== -->
+    <!-- Single wide background spanning scenes 1–3 (300vw) -->
+    <section id="s1-s3-bg">
+      <img class="s1s3-road"   src="assets/s1-s3/Road%20Extended.svg"          alt="">
+      <img class="s1s3-broad"  src="assets/s1-s3/Bottom%20trees%20Extended.svg" alt="">
+      <img class="s1s3-troad"  src="assets/s1-s3/Top%20trees%20Extended.svg"    alt="">
+    </section>
+
+    <!-- SCENE 1: Jungle - Intro -->
+    <section class="scene jungle scene-1">
+      <div class="layer layer-matatu">
+        <img src="assets/s1/matatu-top.svg" alt="">
+      </div>
+      <!-- Opening beat, shown before panel-1 while the bus drives in — see panel1Start. -->
+      <div class="text-panel" id="panel-1-start" aria-hidden="true">
+        <h3>Scroll to get started!</h3>
+      </div>
+      <div class="text-panel" id="panel-1" aria-hidden="true">
+        <h3>Hop on the The Prevailer<br/> matatu! <strong>TWENDE!</strong></h3>
+      </div>
+    </section>
+
+    <!-- SCENE 2: Jungle - Story -->
+    <section class="scene jungle scene-2">
+      <div class="layer layer-matatu">
+        <img src="assets/s2/matatu-top.svg" alt="">
+      </div>
+      <div class="text-panel" id="panel-2" aria-hidden="true">
+        <p>Let's ride through Africa's language landscapes, mapping the digital injustices faced by its people every day.</p>
+      </div>
+    </section>
+
+    <!-- SCENE 3: Jungle - Detail -->
+    <section class="scene jungle scene-3">
+      <div class="layer layer-matatu">
+        <img src="assets/s3/matatu-top.svg" alt="">
+      </div>
+      <div class="text-panel" id="panel-3" aria-hidden="true">
+        <p>And along the way, our matatu will also make a scenic, more hopeful detour, tracing stories of how AI is being transformed from a tool of colonial extraction into a practice of self-determination by African communities who are reclaiming their languages online.</p>
+      </div>
+    </section>
+
+    <!-- SCENE 4: Savanna - Transition -->
+    <section class="scene savanna scene-4">
+      <div class="layer layer-s4-road">
+        <img src="assets/s4/road%20extended.svg" alt="">
+      </div>
+      <div class="layer layer-s4-clouds">
+        <img src="assets/s4/clouds.svg" alt="">
+      </div>
+      <div class="s4-extend">
+        <div class="layer layer-s4-trees">
+          <img src="assets/s4/trees.svg" alt="">
+        </div>
+      </div>
+    </section>
+    <!-- ===== END SCENE 1-4 (in #scroll-x) ===== -->
+
+    <!-- ===== SCENE 5-8: City arrival through Problem Plaza =====
+         Companions/popups live in .scene-5-8-overlay (search it) — can't nest here, see that div's own comment. ===== -->
+    <!-- Single wide background spanning scenes 5–8 (400vw, starts at left: 400vw) -->
+    <section id="s5-s8-bg">
+      <img class="s5s8-clouds"    src="assets/s5-s8/Clouds%20extended.svg"       alt="">
+      <img class="s5s8-buildings" src="assets/s5-s8/Buildings%20Extended.svg"    alt="">
+      <img class="s5s8-road"      src="assets/s5-s8/road%20extended.svg"   alt="">
+      <!-- Trees tiled across the whole 400vw wrapper (scenes 5-8), separate from #city-trees-5. -->
+      <div class="s5s8-trees"></div>
+    </section>
+
+    <!-- SCENE 5: City - Arrival -->
+    <div class="scene city scene-5"></div>
+
+    <!-- SCENE 6: same CSS layout as scene 5, own assets -->
+   
+
+    <!-- SCENE 7: City – Characters at the bus stop -->
+    <div class="scene city scene-7"></div>
+
+    <!-- SCENE 8: City – Problem Plaza -->
+    <div class="scene city scene-8"></div>
+    <!-- ===== END SCENE 5-8 (in #scroll-x) ===== -->
+
+    <!-- SCENE 9: City – Language Reveal (bus zoom) -->
+    <div class="scene city scene-9"></div>
+
+    <!-- ===== SCENE 12-15: Wide city stops (+13) — see .scene-12-15-overlay ===== -->
+    <!-- Single wide background spanning scenes 12–15 (400vw, starts at left: 800vw) -->
+    <section id="s12-s15-bg">
+      <img class="s1215-clouds"    src="assets/s12-s15/Clouds%20Extended.svg"         alt="">
+      <img class="s1215-buildings" src="assets/s12-s15/Buildings%20extended.svg"      alt="">
+      <img class="s1215-road"      src="assets/s12-s15/road%20extended.svg"           alt="">
+    </section>
+
+    <!-- SCENE 12: Wide city – first stop (scroll index 8) -->
+    <div class="scene city scene-12"></div>
+
+    <!-- SCENE 13: Wide city – second stop (scroll index 9) -->
+    <div class="scene city scene-13"></div>
+    <!-- ===== END SCENE 12-15 (in #scroll-x) ===== -->
+
+    <!-- SCENE 21: Top-down road — see .scene-21-overlay (2 places, search it) for vehicles/popups. -->
+    <section class="scene city scene-21">
+      <div class="layer layer-s21-road"><img src="assets/s21-s23/Road.svg" alt=""></div>
+    </section>
+
+    <!-- ===== SCENE 26-30: Street arrival through interviewees aboard — see .scene-26-30-overlay ===== -->
+    <!-- Wide background spanning scenes 26–30 (600vw, absolute at left:1465vw) -->
+    <section id="s26-s30-bg">
+      <img class="s2630-clouds"    src="assets/s26-s30/Clouds%20extended.svg"         alt="">
+      <img class="s2630-buildings" src="assets/s26-s30/Group%20883.svg"               alt="">
+      <img class="s2630-road"      src="assets/s26-s30/road%20extended.svg"            alt="">
+      <img class="s2630-trees"     src="assets/s26-s30/trees.svg"                      alt="">
+      <img class="s2630-fence"     src="assets/s26-s30/front%20tree%20and%20fence.svg" alt="">
+      <!-- Same technique/style as #s12-avenue-sign — painted on the building, moves with it. -->
+      <div id="s26-revolution-sign" data-i18n="ui.s26RevolutionSign" aria-hidden="true">REVOLUTION ROAD</div>
+      <!-- Nested here (not a separate overlay) so these track the building art in perfect sync. -->
+      <lottie-player class="char-s26-fruitlady2" src="assets/lottie/fruit-lady.json" background="transparent" speed="1" loop autoplay></lottie-player>
+      <img class="char-s26-oldman" src="assets/s26-s30/old%20man.svg" alt="">
+      <lottie-player class="char-s26-pigeons1" src="assets/lottie/Pigeon-flying.json" background="transparent" speed="1" loop autoplay></lottie-player>
+    </section>
+
+    <!-- SCENE 26: Street arrival (scroll index 11) -->
+    <div class="scene city scene-26"></div>
+
+    <!-- SCENE 27: Asmelash Teka Hadgu & Away Ly (scroll index 12) -->
+    <div class="scene city scene-27"></div>
+
+    <!-- SCENE 28: Chris Emezue & Kathleen Siminyu (scroll index 13) -->
+    <div class="scene city scene-28"></div>
+
+    <!-- SCENE 29: Sadik Shahadu & Samuel Rutunda (scroll index 14) -->
+    <div class="scene city scene-29"></div>
+
+    <!-- SCENE 30: All interviewees aboard (scroll index 15) -->
+    <div class="scene city scene-30"></div>
+    <!-- ===== END SCENE 26-30 (in #scroll-x) ===== -->
+
+    <!-- ===== SCENE 32-44: Inside the matatu, ambient passengers — see .scene-32-44-overlay ===== -->
+    <!-- Wide background spanning scenes 32-43 (1300vw) — ambient bus interior. -->
+    <section id="s32-s43-bg">
+      <img class="s3243-interior" src="assets/s32-s43/Interior%20bg.svg"  alt="">
+      <div class="s3243-handles"></div>
+      <img class="s3243-seats"    src="assets/s32-s43/Seats.svg"          alt="">
+    </section>
+
+    <div class="scene city scene-32"></div>
+    <div class="scene city scene-33"></div>
+    <div class="scene city scene-34"></div>
+
+    <!-- Placeholder — #s44-overlay slides down over scene-34 as you scroll (see animateS44). -->
+    <div class="scene city scene-44"></div>
+    <!-- ===== END SCENE 32-44 (in #scroll-x) ===== -->
+
+    <!-- ===== SCENE 45-48: self-contained (bg + passengers + popups together, unlike
+         #city-overlay-32/-26) — see .scene-45-48-overlay for the one root-required companion. -->
+    <section id="s45-s48-bg">
+      <!-- Own inner wrapper so the scene-46 pin-zoom only scales visuals, not the popups below. -->
+      <div id="s45-s48-visual">
+        <div class="s4548-interior"></div>
+        <div class="s4548-handles"></div>
+        <div class="s4548-seats"></div>
+        <img class="char-s45-kathleen"    src="assets/s45-s52/Kathleen%20Siminyu.svg"   alt="">
+        <!-- Toto moto/red lady/wheelchair man step in next, in turn, within scene 45's pinned window. -->
+        <img class="char-s45-totomoto"   src="assets/s45-s52/toto%20moto.svg"   alt="">
+        <img class="char-s45-redlady"    src="assets/s45-s52/red%20lady%20with%20bag.svg" alt="">
+        <img class="char-s45-wheelchair" src="assets/s45-s52/wheelchair%20man.svg" alt="">
+        <!-- PLACEHOLDER for scene 47's second person — swap for real artwork once decided. -->
+        <div class="char-s47-newguy"></div>
+
+        <!-- Chris Emezue's quote + sound caption, same pan/scale treatment as the box above. -->
+        <div class="text-panel" id="panel-47-newguy" aria-hidden="true">
+          <div data-i18n-panel-text>
+            <p>&ldquo;I think when people understand more about data licensing and sharing, it helps them make better decisions. It&rsquo;s no longer just open source versus non-open source. Because even open source is a very complex thing. It has different aspects of it.&rdquo;</p>
+          </div>
+          <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <polygon points="72,0 48,0 10,90" />
+            <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+            <path d="M72 0 L10 90 L48 0" />
+          </svg>
+        </div>
+        <div class="sound-caption-s32" id="sound-caption-s47newguy">
+          <span class="sound-caption-s32-name" data-i18n="captions.chrisName">CHRIS EMEZUE</span>
+          <span class="sound-caption-s32-role" data-i18n="captions.chrisRole" data-i18n-html>Founder -<br> Lanfrica Labs</span>
+          <button class="sound-icon-s32 sound-icon-chris" aria-label="Play audio" data-sound-state="landing"
+            data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Chris_Emezue.mp3"
+            data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Chris_Emezue.mp3"
+            data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Chris_Emezue.mp3">
+            <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+            <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+            <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+          </button>
+        </div>
+      </div>
+
+      <!-- Kathleen Siminyu's quote — shown once she's been visible a moment, see animateS45S48 -->
+      <div class="text-panel" id="panel-45-kathleen" aria-hidden="true">
+        <div data-i18n-panel-text>
+          <p>&ldquo;Data set building is very expensive. It would be great to pay people to do it. In some projects we&rsquo;ve had people volunteer to do it, but I wish we had the money to pay people well to do this work because it&rsquo;s actually very valuable work.&rdquo;</p>
+        </div>
+        <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polygon points="72,0 48,0 10,90" />
+          <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+          <path d="M72 0 L10 90 L48 0" />
+        </svg>
+      </div>
+
+      <!-- Name plate, shown/hidden alongside panel-45-kathleen — see animateS45S48. -->
+      <div class="sound-caption-s32" id="sound-caption-kathleen">
+        <span class="sound-caption-s32-name" data-i18n="captions.kathleenName">KATHLEEN SIMINYU</span>
+        <span class="sound-caption-s32-role" data-i18n="captions.kathleenRole" data-i18n-html>Researcher -<br> Masakane &amp; DAIR</span>
+        <button class="sound-icon-s32 sound-icon-kathleen" aria-label="Play audio" data-sound-state="landing"
+          data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Kathleen_Siminyu.mp3"
+          data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Kathleen_Siminyu.mp3"
+          data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Kathleen_Siminyu.mp3">
+          <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+          <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+          <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+        </button>
+      </div>
+
+      <!-- Toto moto's name plate — same style, no sound icon. -->
+      <div class="sound-caption-s32 sound-caption-no-icon" id="sound-caption-totomoto">
+        <span class="sound-caption-s32-name" data-i18n="captions.totoName">TOTO MOTO</span>
+        <span class="sound-caption-s32-role" data-i18n="captions.totoRole" data-i18n-html>Bus<br> Conductor</span>
+      </div>
+
+      <!-- Red lady's quote — shown once she's been visible a moment, see animateS45S48 -->
+      <div class="text-panel" id="panel-45-redlady" aria-hidden="true">
+        <div data-i18n-panel-text class="popup-scroll">
+          <p>There is a critical need to shift the funding paradigm for language technology development towards sustainable, equitable, community-led and locally-driven models that directly benefit the community by creating jobs, boosting local economies, and stimulating continuous tech development.</p>
+          <p>Much like the matatu system, numerous new initiatives are emerging to address the problem of inequitable and unsustainable funding structures. For example, one collective effort is to unify community-centred language technology groups across Africa under an umbrella organisation, such as the Huniki Federation.</p>
+        </div>
+      </div>
+
+      <!-- Toto moto's quote — shown after red lady's popup, see animateS45S48 -->
+      <div class="text-panel" id="panel-45-totomoto" aria-hidden="true">
+        <div data-i18n-panel-text>
+          <p>We use the bus fare not only to make a living, but also to maintain the matatu itself and contribute to the roads we all rely on. This local economy benefits the community as a whole.</p>
+          <p>Matatus are highly organised through a complex network of associations. They are categorised as public services, mostly privately owned, but always collectively managed.</p>
+        </div>
+        <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <polygon points="28,0 52,0 90,90" />
+          <line class="bubble__seam" x1="28" y1="0" x2="52" y2="0" />
+          <path d="M28 0 L90 90 L52 0" />
+        </svg>
+      </div>
+
+      <!-- Wheelchair man's quote, scene 46 — outside #s45-s48-visual so the zoom doesn't stretch it. -->
+      <div class="text-panel" id="panel-46-huniki" aria-hidden="true">
+        <p>The Huniki Federation aims to create a robust private sector while operating under a social-mission model, reducing dependency on funding from non-profit organisations and Big Tech, and instead investing directly in local communities. This represents a novel, Pan-Africanist approach to achieving digital self-determination.</p>
+        <svg class="popup-tail" width="40" height="36" aria-hidden="true">
+          <polygon fill="#FFFFFFF2" points="8,0 32,0 20,32" />
+          <path fill="none" stroke="#9F2222" stroke-width="2.5" stroke-linejoin="round" d="M8 0 L20 32 L32 0" />
+        </svg>
+      </div>
+
+      <!-- Wheelchair man's second quote — queues in once the Huniki popup fades out. -->
+      <div class="text-panel" id="panel-46-bigtech" aria-hidden="true">
+        <p>The lack of economic resources is compounded by Big Tech appropriation: corporations often use open-source datasets to train their models without ever giving back to the communities that curated them.</p>
+        <svg class="popup-tail" width="40" height="36" aria-hidden="true">
+          <polygon fill="#FFFFFFF2" points="8,0 32,0 20,32" />
+          <path fill="none" stroke="#9F2222" stroke-width="2.5" stroke-linejoin="round" d="M8 0 L20 32 L32 0" />
+        </svg>
+      </div>
+
+    </section>
+
+    <!-- SCENES 45–48: Inside the matatu — ambient passengers continue (scroll indices 20–23) -->
+    <div class="scene city scene-45"></div>
+    <div class="scene city scene-46"></div>
+    <div class="scene city scene-47"></div>
+
+    <!-- ===== SCENE 55-58: Street scene, matatu parked outside the Municipal Federation
+         building — see .scene-55-58-overlay (3 places) for the root-required companions. -->
+    <div class="scene city scene-55"></div>
+    <div class="scene city scene-56"></div>
+    <div class="scene city scene-57"></div>
+    <div class="scene city scene-58"></div>
+
+    <!-- Single wide background spanning scenes 55-58, like #s45-s48-bg. -->
+    <section id="s55-s58-bg">
+      <img class="s5558-clouds"    src="assets/s55-s58/Clouds%20Sailing.svg"         alt="">
+      <img class="s5558-buildings" src="assets/s55-s58/Group%20887.svg"              alt="">
+      <div class="s5558-road"></div>
+      <img class="s5558-pedestrians" src="assets/s55-s58/Group%20885.svg"        alt="">
+      <!-- Billboard swaps per language — see images.billboard5558 in i18n/*.json. -->
+      <img class="s5558-billboard" data-i18n-src="images.billboard5558" src="assets/s55-s58/billaboard-eng.svg" alt="">
+
+    </section>
+
+    <!-- ===== SCENE 59-61: Closing chapter, park/lake path + zoom-out to the story's end.
+         One continuous #s59-s73-bg wrapper — see .scene-59-61-overlay (2 places) for the rest. -->
+    <div class="scene city scene-59"></div>
+    <div class="scene city scene-60"></div>
+    <div class="scene city scene-61"></div>
+    <div class="scene city scene-62"></div>
+    <div class="scene city scene-63"></div>
+
+    <!-- Background spanning scenes 59-61 only (300vw). Ground/bridge-trees/trees-top are
+         tiled via CSS background-repeat, not <img>, since there isn't enough unique art. -->
+    <section id="s59-s73-bg">
+      <!-- Background art only, NOT the popups below — scales for the scene-59 zoom-out. -->
+      <div id="s5973-bg-art">
+        <div class="s5973-ground"></div>
+        <img class="s5973-prop905"      src="assets/s59-s73/Group%20905.svg"                     alt="">
+        <!-- Bridge lives only as the root-level #s5973-bridge-front element, not here. -->
+        <img class="s5973-lake"         src="assets/s59-s73/Lake.svg"                              alt="">
+        <div class="s5973-trees-top"></div>
+        <img class="s5973-shadow"       src="assets/s59-s73/Group%20904.svg"                     alt="">
+        <img class="s5973-purple-man"   src="assets/s59-s73/Purple%20man.png"                     alt="Illustrated figure standing by the roadside as the matatu passes" data-i18n-alt="alt.purpleManFigure">
+        <img class="s5973-small-boy"    src="assets/s59-s73/small%20boy.svg"                       alt="">
+        <img class="s5973-small-girl"   src="assets/s59-s73/small%20girl.svg"                      alt="">
+        <!-- Ambient groups: 897 = wheelchair man/elderly woman/pregnant woman trio, 898 = kids
+             playing catch, 899 = fruit vendors. -->
+        <img class="s5973-group897"     src="assets/s59-s73/Group%20897.svg"                       alt="">
+        <img class="s5973-group898"     src="assets/s59-s73/Group%20898.svg"                       alt="">
+        <img class="s5973-group899"     src="assets/s59-s73/Group%20899.svg"                       alt="">
+        <!-- Fade in with the bus/background zoom-out (s61PostZoomT) — see s60ZoomExtras in scroll.js. -->
+        <img class="s60-zoom-extra s60-matatu5"  src="assets/s59-s73/Matatu%205.svg" alt="">
+        <img class="s60-zoom-extra s60-matatu8"  src="assets/s59-s73/Matatu%208.svg" alt="">
+        <img class="s60-zoom-extra s60-group898" src="assets/s59-s73/person on bike.svg" alt="">
+        <img class="s60-zoom-extra s60-group89-blue" src="assets/s59-s73/Matatu-12.svg" alt="">
+      </div>
+
+      <!-- Popups, dynamically centered via positionCenteredPopup — see animateS5973Popups. -->
+      <div class="text-panel" id="panel-59" aria-hidden="true"></div>
+      <div class="text-panel" id="panel-60" aria-hidden="true"></div>
+      <div class="text-panel" id="panel-purple-man" aria-hidden="true"></div>
+      <div class="text-panel" id="panel-language-justice" aria-hidden="true"></div>
+    </section>
+
+  </div><!-- /scroll-x -->
+
+  <!-- ===== GLOBAL/SHARED (scene-independent anchors used across the whole site) ===== -->
+  <div class="global-shared-overlay" aria-hidden="true">
+    <!-- City bus — z:5, above regular city scenes but below scene-4 savanna (z:11). -->
+    <div id="city-bus">
+      <img id="city-bus-empty"    src="assets/s5/matatu.svg"                                   alt="The Prevailer matatu, empty" data-i18n-alt="alt.busEmpty">
+      <img id="city-bus-people"   src="assets/Matatu-with-people.svg"                          alt="The Prevailer matatu with passengers boarding" data-i18n-alt="alt.busWithPeople">
+      <img id="city-bus-full"     src="assets/s12-s15/Matatu%20with%20full%20toto%20moto.svg"  alt="The Prevailer matatu full of passengers" data-i18n-alt="alt.busFull">
+      <img id="city-bus-people1"  src="assets/s12-s15/Matatu%20with%20people1.svg"             alt="The Prevailer matatu with more passengers aboard" data-i18n-alt="alt.busWithPeople1">
+      <img id="city-bus-s26"      src="assets/s26-s30/Matatu%20with%20interviewees.svg"        alt="The Prevailer matatu with the interviewees aboard" data-i18n-alt="alt.busInterviewees">
+      <img id="city-bus-inside"   src="assets/s32-s43/Matatu-inside.svg"                       alt="Inside view of the Prevailer matatu, seats and handles" data-i18n-alt="alt.busInside">
+      <img id="city-bus-s55"      src="assets/s55-s58/Matatu%20with%20Full%20Bus.svg"          alt="The Prevailer matatu parked outside the Municipal Federation building" data-i18n-alt="alt.busMunicipal">
+    </div>
+
+    <!-- Scene 55-58 companion cars — trail the bus, transform driven in sync (see animateCityBus). -->
+    <lottie-player id="s5558-car" src="assets/lottie/toyota-probox.json" background="transparent" speed="1" loop autoplay aria-hidden="true"></lottie-player>
+    <img id="s5558-car3" src="assets/s55-s58/toyota%20probox.svg" alt="" aria-hidden="true">
+  </div><!-- /global-shared-overlay -->
+  <!-- ===== END GLOBAL/SHARED ===== -->
+
+  <!-- ===== SCENE 45-48 (Tier A — still inside #pinned-wrap): scene-47 crossing tail =====
+       KNOWN BUG: should be true root-level like #s5558-transition-frame-front, not yet moved. -->
+  <div class="scene-45-48-overlay" aria-hidden="true">
+    <img id="s47-crossing-matatu" src="assets/s45-s52/Matatu-12.svg" alt="" aria-hidden="true">
+    <img id="s47-crossing-frame"  src="assets/s45-s52/frame.svg" alt="" aria-hidden="true">
+  </div><!-- /scene-45-48-overlay -->
+
+  <!-- ===== SCENE 55-58 (Tier A — matches SCENE 55-58 in #scroll-x, search .scene-55-58-overlay
+       for the Tier B piece): stacking-context-escape companions + static popups. ===== -->
+  <div class="scene-55-58-overlay" aria-hidden="true">
+    <img id="s5558-seller-front" src="assets/s55-s58/blue%20man%20seller.svg" alt="" aria-hidden="true">
+    <img id="s5558-cones-front" src="assets/s55-s58/Traffic%20cones.svg" alt="" aria-hidden="true">
+    <div class="text-panel" id="panel-55" aria-hidden="true"></div>
+    <div class="text-panel" id="panel-55b" aria-hidden="true"></div>
+    <div class="text-panel" id="panel-56" aria-hidden="true"></div>
+    <div class="text-panel" id="panel-57" aria-hidden="true"></div>
+    <div id="s55-huniki-sign" data-i18n="ui.s55HunikiSign" aria-hidden="true">THE HUNIKI FEDERATION</div>
+  </div>
+
+  <!-- ===== SCENE 59-61 (Tier A — matches SCENE 59-61 in #scroll-x, search .scene-59-61-overlay
+       for the rest): bridge/trees, root-level so they beat #city-bus's z-index. ===== -->
+  <div class="scene-59-61-overlay" aria-hidden="true">
+    <img id="s5973-bridge-front" src="assets/s59-s73/Bridge%20extended.svg" alt="" aria-hidden="true">
+    <div id="s5973-trees-front" aria-hidden="true"></div>
+  </div>
+
+  <!-- ===== SCENES 62-64: "content" screens — root-level position:fixed, full-viewport,
+       NOT part of #scroll-x — switches screen-by-screen (crossfade), see _s6263* in scroll.js. -->
+  <div id="s62-s63-bg" aria-hidden="true">
+    <!-- SCENE 62 — Resources. Wired via data-i18n/data-i18n-html, keyed under s6263.* in i18n/<lang>.json. -->
+    <div class="s6263-slide s6263-slide-0">
+      <div class="s6263-clouds"></div>
+      <img class="s6263-bird1" src="assets/s62-s63/Group%20812.svg" alt="">
+      <div class="s6263-content-panel" id="panel-62" aria-hidden="true">
+        <div class="s6263-wrap">
+          <section class="s6263-resources">
+            <h2 class="s6263-heading" data-i18n="s6263.resourcesHeading">RESOURCES</h2>
+            <div class="s6263-resource-columns">
+              <ul>
+                <li data-i18n-html="s6263.resourceItem1">Download our comprehensive report <a href="#" target="_blank" rel="noopener">"African Languages and Digital Justice: A Mapping Study on Community-Centered Language Technologies"</a></li>
+                <li data-i18n-html="s6263.resourceItem2">Download our <a href="#" target="_blank" rel="noopener">"Community-Centered Language Technology: Best Practices Guideline"</a> to explore how this kind of tech work can be adopted and expanded by others</li>
+                <li data-i18n-html="s6263.resourceItem5">We fine-tuned Meta's Massively Multilingual Speech (MMS) on the Mozilla Common Voice Kiswahili dataset to create highly specialized, domain-adapted automatic speech recognition (ASR) models for Swahili. <a href="#" target="_blank" rel="noopener">You can download the model here.</a></li>
+                <li data-i18n-html="s6263.resourceItem6">We fine-tuned OpenAI's Whisper on the Mozilla Common Voice Kiswahili dataset to create highly specialized, domain-adapted automatic speech recognition (ASR) models for Swahili. <a href="#" target="_blank" rel="noopener">You can download the model here.</a></li>
+              </ul>
+              <ul>
+                <li data-i18n-html="s6263.resourceItem3">Read our past, foundational research-in-action about the internet's languages online: <a href="https://internetslanguages.org" target="_blank" rel="noopener">internetslanguages.org</a></li>
+                <li data-i18n-html="s6263.resourceItem4">Explore the <a href="#" target="_blank" rel="noopener">LesanAI</a> platform, an AI startup dedicated to developing machine translation tools with a focus on Ethiopian and Eritrean languages.</li>
+                <li data-i18n-html="s6263.resourceItem7">Tigrinya content creators were able to create 62 articles on DAIR's Wiki using a combination of machine translation and automatic speech recognition tooling. <a href="#" target="_blank" rel="noopener">The list of articles can be viewed here.</a></li>
+                <li data-i18n-html="s6263.resourceItem8">Kiswahili content creators were able to create 46 articles on DAIR's Wiki using a combination of machine translation and automatic speech recognition tooling. <a href="#" target="_blank" rel="noopener">The list of articles can be viewed here.</a></li>
+              </ul>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 63 — Credits. -->
+    <div class="s6263-slide s6263-slide-1">
+      <div class="s6263-clouds"></div>
+      <img class="s6263-bird2" src="assets/s62-s63/Group%20813.svg" alt="">
+      <div class="s6263-content-panel" id="panel-63" aria-hidden="true">
+        <div class="s6263-wrap">
+          <section class="s6263-credits">
+            <h2 class="s6263-heading" data-i18n="s6263.creditsHeading">CREDITS</h2>
+            <!-- Left column: sponsor/written-by + website/dev/translation credits, org marks beneath. -->
+            <div class="s6263-credits-columns">
+              <div>
+                <p data-i18n-html="s6263.creditsCol1Item1">This work was made possible through the generous support of The Internet Society Foundation (<a href="#" target="_blank" rel="noopener">ISOC</a>).</p>
+                <p data-i18n-html="s6263.creditsCol1Item2">Research-in-action process conducted by <a href="#" target="_blank" rel="noopener">Whose Knowledge?</a> and the Distributed AI Research Institute (<a href="#" target="_blank" rel="noopener">DAIR</a>).</p>
+                <p data-i18n="s6263.creditsCol1Item3">Written by Claudia Pozo and Maari Zwick-Maitreyi with edits from Grusha Dhawan</p>
+                <p data-i18n-html="s6263.creditsCol2Item1">Website by <a href="#" target="_blank" rel="noopener">Studio Ping Pong</a></p>
+                <p data-i18n-html="s6263.creditsCol2Item2">Development by <a href="#" target="_blank" rel="noopener">House of Katha</a></p>
+                <p data-i18n="s6263.creditsCol2Item3">Creative representation advisory by Anisa Ali</p>
+                <p data-i18n="s6263.creditsCol2Item4">Tigrinya translation and proofreading by Berhane Achame and Fekadu Gebregziabher.</p>
+                <p data-i18n="s6263.creditsCol2Item5">Kishwahili translation and proofreading by Melchior Shukuru and Exuper Njau</p>
+
+                <!-- Org logos — sit under the left column only, not spanning the full width. -->
+                <div class="s6263-org-marks">
+                  <img src="assets/s62-s63/InternetSociety_Foundation_Logo_Primary_GroundNavy_RGB%201.png" alt="Internet Society Foundation logo" data-i18n-alt="alt.logoIsoc">
+                  <img src="assets/s62-s63/Whose_Knowledge__secondary_logo_-_coffee%201.png" alt="Whose Knowledge? logo" data-i18n-alt="alt.logoWk">
+                  <img src="assets/s62-s63/dair-institute-logo%201.png" alt="DAIR — Distributed AI Research Institute — logo" data-i18n-alt="alt.logoDair">
+                </div>
+              </div>
+              <div>
+                <p data-i18n="s6263.creditsInterviewsIntro">This report is profoundly indebted to the many interviewees who generously shared their time, expertise, and lived experiences. Their insights are the heart of these findings. We feature some of them below:</p>
+                <p data-i18n-html="s6263.creditsInterviewees">Alexander Andrason, University of Cape Town<br>Amrit Sufi, Wikimedian<br>Anushah Hossain, Script Encoding Initiative (SEI)<br>Asmelash Teka Hadgu, LesanAI<br>Awa Ly, GalsenAI<br>Digital Umuganda<br>E.M Lewis-Jong, Mozilla Data Collective<br>Eddie Avila, Rising Voices<br>EthioNLP<br>Kalika Bali, Microsoft Research India<br>Kathleen Siminyu, Distributed AI Research (DAIR)<br>Lanfrica Labs<br>Mariana Fossatti, Whose Knowledge?<br>Meseret Alemayehu, RDLS Ethiopia<br>Pau Giner, Wikimedia Foundation<br>Paul Azunre, GhanaNLP<br>Sadik Shahadu, Dagbani Wikimedians User Group<br>Seid Muhie Yimam, EthioNLP<br>Shamsuddeen Hassan Muhammad, HausaNLP<br>Subhashish Panigrahi, Openspeaks</p>
+              </div>
+            </div>
+
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 64 — Contact, the story's true final screen (3rd carousel slide). -->
+    <div class="s6263-slide s6263-slide-2">
+      <div class="s6263-clouds"></div>
+      <img class="s6263-bird1" src="assets/s62-s63/Group%20812.svg" alt="">
+      <img class="s6263-bird2" src="assets/s62-s63/Group%20813.svg" alt="">
+      <div class="s6263-content-panel" id="panel-64" aria-hidden="true">
+        <div class="s6263-wrap s6263-contact-standalone-wrap">
+          <section class="s6263-contact-standalone">
+            <h2 class="s6263-heading" data-i18n="s6263.contactHeading">CONTACT US</h2>
+            <p data-i18n="s6263.contactIntro">Reach out to give us feedback and share your thoughts, let us know of African/Global Majority initiatives working on these issues, or recommend someone we should be in conversation with!</p>
+            <div class="s6263-contact-links s6263-contact-links-centered">
+              <a href="mailto:languages@whoseknowledge.org" data-i18n="s6263.contactEmail">languages@whoseknowledge.org</a>
+              <a href="https://whoseknowledge.org" target="_blank" rel="noopener" data-i18n="s6263.contactSite">whoseknowledge.org</a>
+            </div>
+          </section>
+
+          <div class="s6263-credits-footer">
+            <p class="s6263-license" data-i18n-html="s6263.licenseText"><a href="#" target="_blank" rel="noopener">Unless otherwise stated</a>, this work is licensed under a <a href="#" target="_blank" rel="noopener">Creative Commons Attribution-ShareAlike 4.0 International License.</a> 2026</p>
+            <!-- Social icons — already colored to match the site's accent, no wrapper needed. -->
+            <div class="s6263-social-row">
+              <a href="#" aria-label="YouTube"><img src="assets/s62-s63/Vector%20(2).svg" alt=""></a>
+              <a href="#" aria-label="Instagram"><img src="assets/s62-s63/Group%20(1).svg" alt=""></a>
+              <a href="#" aria-label="Mastodon"><img src="assets/s62-s63/Logo-Mastodon--Streamline-Ionic-Filled.svg" alt=""></a>
+              <a href="#" aria-label="X"><img src="assets/s62-s63/Group%20(2).svg" alt=""></a>
+              <a href="#" aria-label="LinkedIn"><img src="assets/s62-s63/Linkedin-Logo--Streamline-Logos-Block.svg" alt=""></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /pinned-wrap -->
+
+<!-- ===== GLOBAL/SHARED — do not nest into any scene section ===== -->
+<!-- Spacer creates scroll length -->
+<div id="scroll-spacer"></div>
+<!-- ===== END GLOBAL/SHARED ===== -->
+
+<!-- ===== SCENE 1-4 (true document-root level): fixed companions =====
+     Matches SCENE 1-4 in #scroll-x — grouped here since position:fixed needs root level. -->
+<div class="scene-1-4-overlay" aria-hidden="true">
+  <!-- Fixed bus riding continuously across jungle scenes 1-3. -->
+  <div id="jungle-bus" aria-hidden="true">
+    <img src="assets/s1/matatu-top.svg" alt="">
+  </div>
+
+  <!-- Fixed trees for scene 4 — z:11 keeps it above #jungle-bus (z:10). -->
+  <div id="s4-trees" aria-hidden="true">
+    <lottie-player id="s4-trees-player" src="assets/lottie/tree%20lottie.json" background="transparent" speed="1" loop aria-hidden="true"></lottie-player>
+  </div>
+</div><!-- /scene-1-4-overlay -->
+
+<!-- ===== SCENE 5-8 (true document-root level, matches SCENE 5-8 in #scroll-x) ===== -->
+<div class="scene-5-8-overlay" aria-hidden="true">
+  <!-- z-index 16 keeps it above #city-bus (z:15) -->
+  <div id="city-trees-5" aria-hidden="true">
+    <img src="assets/s5-s8/trees.svg" alt="">
+  </div>
+
+  <!-- Root-level so its z-index beats #city-overlay-7/8 — see s5s8FenceFront in scroll.js. -->
+  <img id="s5s8-fence-front" src="assets/s5-s8/fence%20extended.svg" alt="" aria-hidden="true">
+
+  <!-- Scene-5 popup, position:fixed tracking #city-bus's rect — must stay root-level. -->
+  <div class="text-panel" id="panel-5" aria-hidden="true">
+  <h3>All aboard — <strong>THE PREVAILER!</strong></h3>
+  <svg class="bubble__tail" viewBox="0 0 330 108" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="88.2,0 70.2,0 151.9,107.8" />
+    <line class="bubble__seam" x1="88.2" y1="0" x2="70.2" y2="0" />
+    <path d="M88.2 0 L151.9 107.8 L70.2 0" />
+  </svg>
+</div>
+
+<!-- Fixed overlays for scenes 7 & 8: characters only (trees moved into scene layers) -->
+<!-- Edit left/bottom/height in style.css to reposition each figure -->
+<div id="city-overlay-7" aria-hidden="true">
+  <div class="char-wrap char-s7-red-girl">
+    <img src="assets/s7/red%20girl.svg" alt="">
+    <button class="cross-btn" data-popup="s7-red-girl" data-dir="right" aria-label="Show what the girl in red says about her languages"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s7-granny">
+    <img src="assets/s7/granny.svg" alt="">
+    <button class="cross-btn" data-popup="s7-granny" data-dir="right" aria-label="Show what the grandmother says about her languages"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s7-orange-man">
+    <img src="assets/s7/orange%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s7-orange-man" data-dir="left" aria-label="Show what the man in orange says about his languages"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s7-green-man">
+    <img src="assets/s7/Green%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s7-green-man" data-dir="left" aria-label="Show what the man in green says about his languages"><img src="assets/cross.svg" alt=""></button>
+  </div>
+</div>
+<div class="text-panel" id="panel-8" aria-hidden="true">
+  <p>Language is the foundational inheritance passed down from our ancestors, a living connection we share with each other and those who follow us.</p>
+  <p>It is the very essence of how we think, speak, imagine, and experience the world. It sits at the core of our identity and culture, enabling us to share our stories and collective knowledge.</p>
+</div>
+<div id="city-overlay-8" aria-hidden="true">
+  <div id="s8-plaza-sign" data-i18n="ui.s8PlazaSign" aria-hidden="true">PROBLEM PLAZA</div>
+  <div class="char-wrap char-s8-purple-man">
+    <img src="assets/s8/purple%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s8-purple-man" data-dir="right" aria-label="Show the languages spoken by the man in purple"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s8-blue-girl">
+    <img src="assets/s8/blue%20girl.svg" alt="">
+    <button class="cross-btn" data-popup="s8-blue-girl" data-dir="left" aria-label="Show the languages spoken by the girl in blue"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s8-lime-man">
+    <img src="assets/s8/lime%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s8-lime-man" data-dir="right" aria-label="Show the languages spoken by the man in lime green"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s8-green-man">
+    <img src="assets/s8/green%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s8-green-man" data-dir="left" aria-label="Show the languages spoken by the man in green"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="text-panel s8-pop" id="panel-8a" aria-hidden="true">
+    <div data-i18n-panel-text>
+      <p>Alright, my people! Before we go ahead, let's take it back a bit!</p>
+      <p>For aeons, Africa has been home to over 2,000 distinct languages across 54 countries — a profound pluralism that stands in sharp contrast to the European historical preference for linguistic uniformity.</p>
+      <p>Colonial powers didn't just ignore this diversity; they sought to erase it, often for administrative efficiency, forcing a multitude of voices into single, "unified" languages.</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,56 0,80 90,28" /><line class="bubble__seam" x1="0" y1="56" x2="0" y2="80" /><path d="M0 56 L90 28 L0 80" /></svg>
+  </div>
+  <div class="text-panel s8-pop" id="panel-8b" aria-hidden="true">
+    <div data-i18n-panel-text>
+      <p>Now let me draw you a comparison.</p>
+      <p>Colonial systems neglected public transport networks too. But look around you — this matatu — it filled that gap.</p>
+      <p>Fast, flexible, for the people.</p>
+      <p>Today, matatus carry most of Nairobi's commuters, especially into the neighbourhoods colonial roads never reached.</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><polygon points="0,56 0,80 90,28" /><line class="bubble__seam" x1="0" y1="56" x2="0" y2="80" /><path d="M0 56 L90 28 L0 80" /></svg>
+  </div>
+  <div class="text-panel s8-pop" id="panel-13a" aria-hidden="true">
+    <p>Algorithm Avenue — where the road ahead is written in your own language.</p>
+  </div>
+</div>
+</div><!-- /scene-5-8-overlay -->
+<!-- ===== END SCENE 5-8 ===== -->
+
+<!-- ===== SCENE 12-15 (true document-root level): overlay + scene-13 popups =====
+     Matches SCENE 12-15 in #scroll-x — grouped here since position:fixed/z-index-escape
+     elements need root level. -->
+<div class="scene-12-15-overlay" aria-hidden="true">
+  <img id="s1215-trees-front" src="assets/s12-s15/Trees%20front%20extended.svg" alt="" aria-hidden="true">
+
+  <div id="city-overlay-12" aria-hidden="true">
+  <div id="s12-avenue-sign" data-i18n="ui.s12AvenueSign" aria-hidden="true">ALGORITHM AVENUE</div>
+  <div class="char-wrap char-s12-green-man">
+    <img src="assets/s12-s15/green%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s12-green-man" data-dir="left" aria-label="Show the languages spoken by the man in green"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s12-blue-man">
+    <img src="assets/s12-s15/light%20blue%20man.svg" alt="">
+    <button class="cross-btn" data-popup="s12-blue-man" data-dir="right" aria-label="Show the languages spoken by the man in blue"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="char-wrap char-s12-pink-lady">
+    <img src="assets/s12-s15/pink%20top%20lady.svg" alt="">
+    <button class="cross-btn" data-popup="s12-pink-lady" data-dir="right" aria-label="Show the languages spoken by the woman in pink"><img src="assets/cross.svg" alt=""></button>
+  </div>
+  <div class="text-panel" id="panel-12" aria-hidden="true">
+    <p>With 85% of the internet dominated by just ten languages, about 9 out of 10 African internet users are forced to switch to a colonial language simply to engage online.</p>
+    <p>As this pattern repeats globally, billions of people face a digital world where their local languages are functionally invisible.</p>
+  </div>
+  <div class="text-panel" id="panel-12b" aria-hidden="true">
+    <p>When local languages are not digitised, they do not just fade from the internet—they risk total extinction. Some scholars call this process 'epistemicide' or digital language death.</p>
+  </div>
+</div>
+
+<!-- Scene 13 popups -->
+<div class="text-panel s8-pop" id="panel-s13-1" aria-hidden="true">
+  <div data-i18n-panel-text>
+    <p>These languages are invisible online for multiple reasons. The problem isn't just a lack of sufficient corpora; look around this matatu, the speakers are there in abundance. The deeper problem is that the internet was built for written text, effectively marginalising the rich oral, signed and multivariate language traditions of the Global Majority.</p>
+    <p>This isn't a technical failure—it's a historical one.</p>
+    <p>For oral languages, insufficient written and textual corpora have meant that their languages do not have easy access to digitisable and machine-readable data. As a result, they have come to be termed "low-resource languages" by scholars of the Global North.</p>
+  </div>
+  <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="0,28 0,52 90,5" />
+    <line class="bubble__seam" x1="0" y1="28" x2="0" y2="52" />
+    <path d="M0 28 L90 5 L0 52" />
+  </svg>
+</div>
+<div class="text-panel s8-pop" id="panel-s13-2" aria-hidden="true">
+  <div data-i18n-panel-text>
+    <p>This under-resourcing is not accidental, but an outcome of the systems that led to the universalisation of Western epistemics. By contrast, we propose to expand on context and identify the histories of how this gap came to be.</p>
+    <p>By naming them "digitally under-resourced," we point to the fact that the struggle to bring African languages online is not a technical problem; it is a historical one, deeply rooted in the legacy of colonialism.</p>
+  </div>
+  <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="0,28 0,52 90,5" />
+    <line class="bubble__seam" x1="0" y1="28" x2="0" y2="52" />
+    <path d="M0 28 L90 5 L0 52" />
+  </svg>
+</div>
+<div class="text-panel s8-pop" id="panel-s13-3" aria-hidden="true">
+  <p>When a language is excluded from the internet, people's history and knowledge are also silenced. Without resources in their own languages, the next generation is forced to adopt dominant viewpoints, losing their own in the process.</p>
+  <p>Even when indigenous languages are instituted, widely spoken local languages, such as Amharic and Kiswahili, can overshadow a multitude of languages spoken by a smaller number of people.</p>
+  <p>This constant pressure to adopt the dominant language, colonial or local, is one of the causes of a profound reduction in linguistic diversity, pushing many languages towards extinction.</p>
+</div>
+</div><!-- /scene-12-15-overlay -->
+<!-- ===== END SCENE 12-15 ===== -->
+
+<!-- ===== SCENE 21 (true document-root level): truck popups, matches SCENE 21 in #scroll-x ===== -->
+<div class="scene-21-overlay" aria-hidden="true">
+  <!-- Meta/Google phase-1 (trucks resting) + phase-2 (after Microsoft/OpenAI swap in) — see animateS21Vehicles. -->
+  <div class="text-panel" id="panel-s21-meta-1" aria-hidden="true">
+    <p>Today, the future of languages and all they represent is being decided by a select few. A small group of Big Tech giants&mdash;like Google, Microsoft, Meta, and OpenAI&mdash;holds the keys to the data centres and foundation models that power the world&rsquo;s AI.</p>
+  </div>
+  <div class="text-panel" id="panel-s21-google-1" aria-hidden="true">
+    <p>While Natural Language Processing (NLP) has a long history of non-AI methods, the current scale and pace of AI development is leaving a significant number of languages behind.</p>
+  </div>
+  <div class="text-panel" id="panel-s21-meta-2" aria-hidden="true">
+    <p>The main problem is that the training data imbues foundation models with a permanent, deep-seated bias, meaning the internal conceptual maps of any applications built upon it are fundamentally skewed.</p>
+  </div>
+  <div class="text-panel" id="panel-s21-google-2" aria-hidden="true">
+    <p>Therefore, when an application tries to process a language with fewer online resources, such as Twi or Ewe, it doesn't have a good map for that language or culture. Instead, the model tries to interpret that language by mapping it onto an existing Western framework.</p>
+  </div>
+  <div class="text-panel" id="panel-s21-openai" aria-hidden="true">
+    <p>Big Tech models rely on &ldquo;one-size-fits-all&rdquo;, profit-first engineering. They prioritise massive-scale data scraping and statistical patterns over deep cultural or linguistic understanding. Here, language is not treated as embodied knowledge; it is treated as a quantifiable resource to be extracted.</p>
+  </div>
+  <div class="text-panel" id="panel-s21-microsoft" aria-hidden="true">
+    <p>This implies that Big Tech covers only a tiny sliver of human linguistic diversity with high accuracy. This exclusion is cemented by a vicious cycle: because companies invest only where there is a clear return, digitally under-resourced languages become less viable for business.</p>
+    <p>Then, when a language is deemed unprofitable, Big Tech simply walks away&mdash;leaving thousands of languages endangered and excluded.</p>
+  </div>
+</div><!-- /scene-21-overlay -->
+
+<!-- ===== SCENE 26-30 (true document-root level): zoom companion + overlay =====
+     Matches SCENE 26-30 in #scroll-x — grouped here since these need root level. -->
+<div class="scene-26-30-overlay" aria-hidden="true">
+  <!-- Scene-30 zoom "come and go" people, separate from #city-bus so it can hold more than
+       one passenger later — shown/hidden alongside panel-30-awayly in animateCityBus. -->
+  <div id="s30-zoom-people" aria-hidden="true">
+    <img id="city-awayly-handle" src="assets/s32-s43/Away%20Ly-stand.svg"                    alt="Awa Ly holding onto the matatu's handle strap" data-i18n-alt="alt.awaLyHandle">
+  </div>
+
+  <!-- Scene 26-30 overlay — 500vw wide, translates in sync with the strip. -->
+  <div id="city-overlay-26" aria-hidden="true">
+  <div class="text-panel s8-pop" id="panel-26-1" aria-hidden="true">
+    <p>The road to language justice doesn't end here.</p>
+    <p>There are many ways to make technology differently that are already in practice&mdash;ways that are people-centred, not profit-centred, and that come from communities.</p>
+    <p>To hear how, we went directly to the source.</p>
+  </div>
+  <div class="text-panel s8-pop" id="panel-26-2" aria-hidden="true">
+    <p>We interviewed technologists, linguists, researchers, and Wikimedians, from Ethiopia, Senegal, Kenya, Ghana, Rwanda, and Nigeria among others.</p>
+    <p>These are people working in languages like Amharic, Tigrinya, Dagbani, Wolof, Twi, Ewe, Gurune, Kinyarwanda, and Kiswahili. They are building community-centred technology through initiatives like Lesan AI, Galsen AI, Lanfrica Labs, Ghana NLP, Digital Umuganda, EthioNLP, and Hausa NLP.</p>
+  </div>
+  <!-- Positioned near the 5 interviewees standing (asmelash/awayly/chris/samuel/sadik,
+       left ~86-112vw in this overlay's coordinate space). -->
+  <div class="text-panel s8-pop" id="panel-26-3" aria-hidden="true">
+    <div data-i18n-panel-text class="popup-scroll">
+      <p>Would you like to hear from them and learn how they are building community-centred technology and changing the narrative on how tech can be made?</p>
+      <p>Using Bagele Chilisa's Indigenous Research Methodologies, our research-in-action process centres on an African 'relational ontology.' This philosophy defines identity through connections to the living, the ancestors, and the environment, and sees data extraction as a fundamental violation of a person's very being.</p>
+    </div>
+  </div>
+  <!-- Ambient street characters (scene-26 area, 0–100vw) -->
+  <img class="char-s26-basket"     src="assets/s26-s30/vendor%20basket.svg"             alt="">
+  <img class="char-s26-moto"       src="assets/s26-s30/Motorcycle%20guy.svg"            alt="">
+  <!-- Pair s27: Asmelash (behind) + Awa Ly (front) -->
+  <div class="people-group1">
+    <div class="char-wrap char-s27-asmelash">
+      <img src="assets/s26-s30/Asmelash_Teka_Hadgu.svg" alt="Portrait illustration of Asmelash Teka Hadgu" data-i18n-alt="alt.portraitAsmelash">
+      <button class="plus-btn" data-popup="s27-asmelash" data-dir="right" aria-label="Show info about Asmelash Teka Hadgu, Lesan AI"><img src="assets/cross.svg" alt=""></button>
+    </div>
+    <div class="char-wrap char-s27-awayly">
+      <img src="assets/s26-s30/Away%20Ly.svg" alt="Portrait illustration of Awa Ly" data-i18n-alt="alt.portraitAwaLy">
+      <button class="plus-btn" data-popup="s27-awayly" data-dir="right" aria-label="Show info about Awa Ly, Galsen AI"><img src="assets/cross.svg" alt=""></button>
+    </div>
+
+    <div class="char-wrap char-s28-chris">
+      <img src="assets/s26-s30/Chris_Emezue.svg" alt="Portrait illustration of Chris Emezue" data-i18n-alt="alt.portraitChris">
+      <button class="plus-btn" data-popup="s28-chris" data-dir="right" aria-label="Show info about Chris Emezue, Lanfrica Labs"><img src="assets/cross.svg" alt=""></button>
+    </div>
+    <div class="char-wrap char-s28-kathleen">
+      <img src="assets/s26-s30/Kathleen_Siminyu.svg" alt="Portrait illustration of Kathleen Siminyu" data-i18n-alt="alt.portraitKathleen">
+      <button class="plus-btn" data-popup="s28-kathleen" data-dir="right" aria-label="Show info about Kathleen Siminyu, Masakane and DAIR"><img src="assets/cross.svg" alt=""></button>
+    </div>
+
+    <div class="char-wrap char-s29-sadik">
+      <img src="assets/s26-s30/Sadik_Shahadu.svg" alt="Portrait illustration of Sadik Shahadu" data-i18n-alt="alt.portraitSadik">
+      <button class="plus-btn" data-popup="s29-sadik" data-dir="right" aria-label="Show info about Sadik Shahadu, Dagbani Wikimedians User Group"><img src="assets/cross.svg" alt=""></button>
+    </div>
+    <div class="char-wrap char-s29-samuel">
+      <img src="assets/s26-s30/Samuel_Rutunda.svg" alt="Portrait illustration of Samuel Rutunda" data-i18n-alt="alt.portraitSamuel">
+      <button class="plus-btn" data-popup="s29-samuel" data-dir="right" aria-label="Show info about Samuel Rutunda, Digital Umuganda"><img src="assets/cross.svg" alt=""></button>
+    </div>
+  </div>
+<div class="people-group2">
+  <!-- name cards — direct children so position:absolute still works -->
+  <img class="char-s28-chris-1"    src="assets/s26-s30/Chris_Emezue-1.svg"           alt="">
+  <img class="char-s28-kathleen-1" src="assets/s26-s30/Kathleen_Siminyu-1.svg"      alt="">
+  <img class="char-s29-samuel-1"   src="assets/s26-s30/Samuel_Rutunda-1.svg"         alt="">
+  <img class="char-s27-awayly-1"   src="assets/s26-s30/Away%20Ly-1.svg"              alt="">
+  <img class="char-s27-asmelash-1" src="assets/s26-s30/Asmelash_Teka_Hadgu-1.svg"   alt="">
+  <img class="char-s29-sadik-1"    src="assets/s26-s30/Sadik_Shahadu-1.svg"          alt="">
+  </div>
+  <img class="char-s30-matatu"     src="assets/s26-s30/Matatu%20with%20interviewees.svg" alt="">
+
+</div>
+
+<!-- Conductor's welcome — shown during the bus-full crossfade at the end of scene 29
+     (busSwapT), as the last interviewees board — standalone root-level fixed element,
+     controlled directly in animateCityBus. -->
+<div class="text-panel" id="panel-29-welcome" aria-hidden="true">
+  <div data-i18n-panel-text>
+    <p>Mambo! Make room, make room!</p>
+    <p>Welcome, welcome, my brothers and sisters, to The Prevailer&mdash;a vessel for reclaiming African languages on the internet. And this matatu is fuelled by you; your expertise, your care. We are grateful for your company on this journey.</p>
+  </div>
+  <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="28,0 52,0 90,90" />
+    <line class="bubble__seam" x1="28" y1="0" x2="52" y2="0" />
+    <path d="M28 0 L90 90 L52 0" />
+  </svg>
+</div>
+
+<!-- Scene-30 zoom popups — open together once the zoom-in settles (before Awa Ly's own
+     entrance), same fixed/top style as #panel-29-welcome. -->
+<div class="text-panel" id="panel-30-popup1" aria-hidden="true">
+  <p>Motivated by a digital landscape where they cannot see themselves, these researchers don't just build tools; they build kinship.</p>
+  <p>When community members design the technology, the developer/user divide dissolves. The speaker is no longer a consumer to be studied, but a co-creator whose lived experience shapes the machine's framework.</p>
+</div>
+<div class="text-panel" id="panel-30-popup2" aria-hidden="true">
+  <p>This shift transforms AI from a tool of dispossession into a practice of care and self-determination.</p>
+</div>
+
+<!-- Scene-30 zoom popup — Awa Ly's message, shown during the interior "stay" hold —
+     standalone root-level fixed element, controlled directly in animateCityBus. -->
+<div class="text-panel" id="panel-30-awayly" aria-hidden="true">
+  <div data-i18n-panel-text>
+    <h3>AWA LY — GALSEN AI</h3>
+    <p>&ldquo;This is why GalsenAI is trying to work on our languages by trying to build machine translations or speech to text technologies for our communities&mdash;because we are the ones who know how our language is spoken, we are the ones who know what the language needs. We don&rsquo;t want to be here waiting for some Americans or any others to come and do this for us.&rdquo;</p>
+  </div>
+  <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+    <polygon points="72,0 48,0 10,90" />
+    <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+    <path d="M72 0 L10 90 L48 0" />
+  </svg>
+</div>
+
+<!-- Awa Ly's name plate + sound icon, shown/hidden alongside panel-30-awayly (see animateCityBus). -->
+<div class="sound-caption-s32 sound-caption-awayly" id="sound-caption-awayly" aria-hidden="true">
+  <span class="sound-caption-s32-name" data-i18n="captions.awalyName">AWA LY</span>
+  <span class="sound-caption-s32-role" data-i18n="captions.awalyRole">Galsen AI</span>
+  <button class="sound-icon-s32 sound-icon-awayly" aria-label="Play audio" data-sound-state="landing"
+    data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Awa_Ly.mp3"
+    data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Awa_Ly.mp3"
+    data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Awa_Ly.mp3">
+    <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+    <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+    <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+  </button>
+</div>
+</div><!-- /scene-26-30-overlay -->
+<!-- ===== END SCENE 26-30 ===== -->
+
+<!-- ===== SCENE 32-44 (true document-root level): overlay + scene-44 reveal =====
+     Matches SCENE 32-44 in #scroll-x — grouped here since #city-overlay-32 is position:fixed
+     with its own live JS transform (translateX), needs root level. -->
+<div class="scene-32-44-overlay" aria-hidden="true">
+  <!-- Ambient passengers + panel-32-intro (lives here, not standalone, so it pans with the scene). -->
+  <div id="city-overlay-32" aria-hidden="true">
+  <!-- Ambient passengers live in their own scaled wrapper so they scale/shift in sync
+       with the seats in #s32-s43-bg during the zoom (see animateS32S43) — popups below
+       stay outside this wrapper so they never get scaled, only panned. -->
+  <div id="s32-people">
+    <img class="char-s32-oldlady"   src="assets/s32-s43/Old%20lady.svg"                  alt="">
+    <lottie-player class="char-s33-girlphone" src="assets/lottie/Small-girl-with-phone.json" background="transparent" speed="1" loop autoplay></lottie-player>
+    <img class="char-s39-samuel"    src="assets/s32-s43/Samuel%20Rutunda.svg"            alt="">
+    <img class="char-s37-asmelash"  src="assets/s32-s43/Asmelash_Teka_Hadgu.svg"         alt="">
+    <!-- Same asset, mirrored, further along the strip — shown after the 5th popup
+         hides (local 0.55+), see animateS32S43 in scroll.js. -->
+    <img class="char-s37-asmelash2" src="assets/s32-s43/Asmelash_Teka_Hadgu.svg"         alt="">
+    <img class="char-s35-pregnant"  src="assets/s32-s43/Pregnant%20woman.svg"            alt="">
+    <!-- Last man in this sequence — shown once the zoom-out finishes, see animateS32S43 -->
+    <img class="char-s32-sadik"     src="assets/s32-s43/Sadik%20Shahadu.svg"             alt="">
+
+    <img class="char-s34-kid1"      src="assets/s32-s43/Kid%20with%20lollipop.svg"       alt="">
+    <!-- <img class="char-s36-kid2"      src="assets/s32-s43/Kid%20with%20lollipop%20(1).svg" alt="">
+    <img class="char-s38-awayly"    src="assets/s32-s43/Away%20Ly.svg"                   alt=""> -->
+  </div>
+
+  <div class="text-panel" id="panel-32-intro" aria-hidden="true">
+    <p>African technologists are themselves members of the communities they serve. They build their organisations, methods and models from a place of indigenous relationality and local social history.</p>
+    <p>In working out solutions to not just technical problems but complex social dynamics, these technologists are moving beyond mere representation to build the right to think, theorise, and interpret the world from an African perspective.</p>
+  </div>
+
+  <!-- Shown near old lady / girl-with-phone, before the zoom finishes — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-umuganda" aria-hidden="true">
+    <p>The Digital Umuganda initiative perfectly exemplifies a community-centred approach. It draws directly on the Rwandan philosophy of Umuganda&mdash;meaning &lsquo;coming together with purpose&rsquo; in Kinyarwanda&mdash;a practice in which communities gather for collective public work followed by open discussion.</p>
+  </div>
+
+  <!-- Shown near Samuel Rutunda, after he fades in post zoom-out — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-samuel" aria-hidden="true">
+    <div data-i18n-panel-text>
+      <p>&ldquo;So the founders of Digital Umuganda, who were Audace and Ali, sat down, looked at Rwanda and they looked at Digital Umuganda and realised that&rsquo;s the model that made sense, bringing together the community by making them understand what we are trying to achieve and have them contribute. The rest is history.&rdquo;</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="72,0 48,0 10,90" />
+      <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+      <path d="M72 0 L10 90 L48 0" />
+    </svg>
+  </div>
+
+  <!-- Name plate — pans with the strip (same coordinate space as panel-32-samuel), sits
+       directly under the quote bubble. Shown/hidden alongside panel-32-samuel — see
+       animateS32S43 in scroll.js. -->
+  <div class="sound-caption-s32" id="sound-caption-s32">
+    <span class="sound-caption-s32-name" data-i18n="captions.samuelName">SAMUEL RUTUNDA</span>
+    <span class="sound-caption-s32-role" data-i18n="captions.samuelRole" data-i18n-html>CTO - Digital<br> Umuganda</span>
+    <button class="sound-icon-s32 sound-icon-samuel" aria-label="Play audio" data-sound-state="landing"
+      data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Samuel_Rutunda.mp3"
+      data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Samuel_Rutunda.mp3"
+      data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Samuel_Rutunda.mp3">
+      <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+      <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+      <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+    </button>
+  </div>
+
+  <!-- 4th popup — shown after Samuel's quote (3rd) hides, local 0.85+ — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-lesan" aria-hidden="true">
+    <p>Instead of staying behind a screen, community-centred technologists prioritise on-the-ground practices&mdash;physically meeting and spending time with community members to navigate power dynamics, collect on-ground data, and foster mutual trust. In fact, Lesan AI has built some of the best machine translation models for Tigrinya through these methods.</p>
+    <svg class="popup-tail" width="40" height="36" aria-hidden="true">
+      <polygon fill="#FFFFFFF2" points="8,0 32,0 20,32" />
+      <path fill="none" stroke="#9F2222" stroke-width="2.5" stroke-linejoin="round" d="M8 0 L20 32 L32 0" />
+    </svg>
+  </div>
+
+  <!-- 5th popup — near Asmelash's head, shown one scroll after he becomes visible — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-asmelash" aria-hidden="true">
+    <div data-i18n-panel-text>
+      <p>&ldquo;Many people may not know how to use the Internet or they may not have easy access to it. But we don&rsquo;t want to limit contributions to just people who have easy access to the Internet. So we also put people on the ground and then distribute these tasks to contributors who don&rsquo;t necessarily use the Internet. We would go to remote areas and villages with our recording devices to collect audio data and then compensate them and return. This makes our data representative and diverse.&rdquo;</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="72,0 48,0 10,90" />
+      <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+      <path d="M72 0 L10 90 L48 0" />
+    </svg>
+  </div>
+
+  <!-- Name plate for Asmelash — same style as Samuel's, positioned near panel-32-asmelash.
+       Shown/hidden alongside it — see animateS32S43 in scroll.js. -->
+  <div class="sound-caption-s32" id="sound-caption-asmelash">
+    <span class="sound-caption-s32-name" data-i18n="captions.asmelashName">ASMELASH TEKA HADGU</span>
+    <span class="sound-caption-s32-role" data-i18n="captions.asmelashRole" data-i18n-html>Co-founder &amp;<br> CTO - Lesan AI</span>
+    <button class="sound-icon-s32 sound-icon-asmelash" aria-label="Play audio" data-sound-state="landing"
+      data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Asmelash_Teka_Hagdu.mp3"
+      data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Asmelash_Teka_Hadgu.mp3"
+      data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Asmelash_Teka_Hagdu.mp3">
+      <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+      <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+      <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+    </button>
+  </div>
+
+  <!-- 6th popup — near the flipped Asmelash (char-s37-asmelash2), shown after the 5th
+       popup hides, local 0.55+ — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-asmelash2" aria-hidden="true">
+    <div data-i18n-panel-text class="popup-scroll">
+      <p>Here, data collection is an act of shared reflection.</p>
+      <p>Every data point is an outcome of the community&rsquo;s historical experience, captured in a way that empowers the collective rather than exploiting the individual. Because this data comes from real conversations rather than internet scraping, the resulting tools are inherently more nuanced.</p>
+      <p>This relational approach can even filter out the racial, gendered, and systemic biases that often plague mainstream language tech applications.</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="72,0 48,0 10,90" />
+      <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+      <path d="M72 0 L10 90 L48 0" />
+    </svg>
+  </div>
+
+  <!-- 7th popup — above the pregnant woman, shown first — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-pregnant-up" aria-hidden="true">
+    <p>Major AI models suffer from significant biases that disadvantage many people. For example, they make more errors when processing regional accents than when processing &ldquo;standard&rdquo; speech, and they can reinforce gender stereotypes by defaulting to male pronouns in translations.</p>
+    <svg class="popup-tail" width="40" height="36" aria-hidden="true">
+      <polygon fill="#FFFFFFF2" points="8,0 32,0 20,32" />
+      <path fill="none" stroke="#9F2222" stroke-width="2.5" stroke-linejoin="round" d="M8 0 L20 32 L32 0" />
+    </svg>
+  </div>
+
+  <!-- 8th popup — below the pregnant woman, shown after scrolling past the 7th — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-pregnant-down" aria-hidden="true">
+    <p>Language activists and technologists strategically use open knowledge platforms like Wikimedia.</p>
+    <p>For example, Dagbani language activists began by recording language audio on Wikimedia Commons, which eventually led to a collaboration with language technologists with NLP skills.</p>
+    <p>This powerful combination of community knowledge and technical expertise is key for building meaningful language technology tools.</p>
+  </div>
+
+  <!-- 9th popup — near Sadik, the last man in this sequence, shown after the zoom-out
+       finishes — see animateS32S43 -->
+  <div class="text-panel" id="panel-32-sadik" aria-hidden="true">
+    <div data-i18n-panel-text class="popup-scroll">
+      <p>&ldquo;We realised that Wikidata lexicographical data would make a very good use of the data by adding audio pronunciation to lexemes. When NLP Ghana reached out to us, we realised there was a good opportunity to collaborate. We were able to use our Wikimedia data to train their AI model to create the first layer for Dagbani automatic speech recognition in the Khaya application. Seeing it needed more data, Dagbani Wikimedia User Group then began creating sentences and short phrases using solely Wikipedia articles. And this second stage was used to improve the quality of translation on the Khaya application. And that&rsquo;s how we found ourselves from Wikimedia to NLP. Now the Khaya application fully supports Dagbani text translation and automatic speech recognition. We are now replicating this process for other Mabia languages.&rdquo;</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="72,0 48,0 10,90" />
+      <line class="bubble__seam" x1="72" y1="0" x2="48" y2="0" />
+      <path d="M72 0 L10 90 L48 0" />
+    </svg>
+  </div>
+
+  <!-- Name plate for Sadik — same style as Samuel's/Asmelash's, positioned near panel-32-sadik.
+       Shown/hidden alongside it — see animateS32S43 in scroll.js. -->
+  <div class="sound-caption-s32" id="sound-caption-sadik">
+    <span class="sound-caption-s32-name" data-i18n="captions.sadikName">SADIK SHAHADU</span>
+    <span class="sound-caption-s32-role" data-i18n="captions.sadikRole">Wikimedian</span>
+    <button class="sound-icon-s32 sound-icon-sadik" aria-label="Play audio" data-sound-state="landing"
+      data-audio-en="assets/English-CLT-Audio/English CLT Audio Quotes/[EN]_Sadik_Shahadu.mp3"
+      data-audio-sw="assets/Kiswahili-CLT-Audio/Kiswahili CLT Audio Quotes/[KS]_Sadik_Shahadu.mp3"
+      data-audio-ti="assets/Tigrinya-CLT-Audio/Tigrinya CLT Audio Quotes/[TG]_Sadik_Shahadu.mp3">
+      <img class="sound-icon-state sound-icon-landing" src="assets/sound-landing.svg" alt="">
+      <img class="sound-icon-state sound-icon-play" src="assets/sound-play.svg" alt="">
+      <img class="sound-icon-state sound-icon-pause" src="assets/sound-pause.svg" alt="">
+    </button>
+  </div>
+</div>
+
+<!-- Scene 44 — slides down from the top over scene-34 as you scroll through its local
+     range, instead of panning in horizontally like every other scene. See animateS44
+     in scroll.js. -->
+<div id="s44-overlay" aria-hidden="true">
+  <img class="s44-bg" src="assets/s44/Interior%20front%20view%20bg.svg" alt="">
+  <img class="s44-toto-moto" src="assets/s44/toto%20moto.svg" alt="">
+  <img class="s44-handles" src="assets/s44/handle%20bus.svg" alt="">
+  <div class="text-panel" id="panel-44-1" aria-hidden="true">
+    <div data-i18n-panel-text>
+      <p>But, despite their innovation, African initiatives face a staggering funding trap. Huge resource gaps often force local teams to prioritise the goals of Global North donors over community needs, ideal methods, and the urgent needs of their own people.</p>
+    </div>
+    <svg class="bubble__tail" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      <polygon points="0,56 0,80 90,28" />
+      <line class="bubble__seam" x1="0" y1="56" x2="0" y2="80" />
+      <path d="M0 56 L90 28 L0 80" />
+    </svg>
+  </div>
+</div>
+</div><!-- /scene-32-44-overlay -->
+
+<!-- ===== SCENE 55-58 (Tier B, true root-level): clouds+birds transition frame, same
+     scene-55-58-overlay class as the Tier A pieces (search it). ===== -->
+<div class="scene-55-58-overlay" aria-hidden="true">
+  <div id="s5558-transition-frame-front" aria-hidden="true">
+    <lottie-player id="s5558-transition-frame-lottie" src="assets/lottie/Brown_cloud_lottie.json" background="transparent"></lottie-player>
+  </div>
+</div>
+
+<!-- ===== SCENE 59-61 (Tier B, true root-level): popup + cloud cover, same
+     scene-59-61-overlay class as the Tier A bridge/trees piece (search it). ===== -->
+<div class="scene-59-61-overlay" aria-hidden="true">
+  <div class="text-panel" id="panel-61" aria-hidden="true"></div>
+  <div id="s5973-clouds" aria-hidden="true">
+    <lottie-player id="s5973-clouds-lottie" src="assets/lottie/Brown_cloud_lottie-last.json" background="transparent"></lottie-player>
+  </div>
+</div>
+
+<!-- ===== GLOBAL/SHARED (debug HUD + the shared character speech-bubble mechanism
+     used by scenes 7/8/12's cross-btn characters) ===== -->
+<div class="global-shared-overlay" aria-hidden="true">
+  <!-- Debug scale — remove when done tuning -->
+  <div id="debug-scale" aria-hidden="true">
+    <span id="dbg-scene">scene 1</span>
+    <span id="dbg-time">0.0s</span>
+    <span id="dbg-bus">bus: –</span>
+    <div id="dbg-bar"><div id="dbg-cursor"></div></div>
+  </div>
+
+  <!-- Character speech bubble — repositioned by JS on each cross-btn click -->
+  <div id="char-bubble" aria-hidden="true">
+    <svg class="char-bubble-tail-stat" width="110" height="70" viewBox="0 0 55 35" aria-hidden="true"><polygon points="55,10 55,20 38,33" fill="#000000" /></svg>
+    <svg class="char-bubble-tail-dialogue" width="110" height="70" viewBox="0 0 55 35" aria-hidden="true"><polygon points="55,10 55,20 38,33" fill="#FFFFFFF2" /><line class="char-bubble-seam" x1="55" y1="10" x2="55" y2="20" /><path d="M55 10 L38 33 L55 20" fill="none" stroke="#9F2222" stroke-width="0.3" stroke-linejoin="round" /></svg>
+    <span class="char-bubble-stat"></span>
+    <span class="char-bubble-lang"></span>
+  </div>
+</div><!-- /global-shared-overlay -->
+<!-- ===== END GLOBAL/SHARED ===== -->
+
+<script src="i18n.js"></script>
+<script src="scroll.js"></script>
+<script>
+  (function () {
+    const wrapper = document.getElementById('langWrapper');
+    const toggle  = document.getElementById('langToggle');
+    const label   = document.getElementById('langLabel');
+    const menu    = document.getElementById('langMenu');
+
+    // Build the language list from I18N_LABELS (i18n.js) — add a language
+    // there + a matching i18n/<code>.json file and it appears here automatically.
+    const saved = localStorage.getItem('prevailerLang') || 'en';
+    Object.keys(I18N_LABELS).forEach(function (code) {
+      const opt = document.createElement('button');
+      opt.className = 'lang-option' + (code === saved ? ' active' : '');
+      opt.dataset.lang = code;
+      opt.textContent = I18N_LABELS[code];
+      menu.appendChild(opt);
+    });
+    label.textContent = I18N_LABELS[saved] || I18N_LABELS.en;
+
+    toggle.addEventListener('click', function (e) {
+      e.stopPropagation();
+      wrapper.classList.toggle('open');
+    });
+
+    menu.addEventListener('click', function (e) {
+      const opt = e.target.closest('.lang-option');
+      if (!opt) return;
+      const lang = opt.dataset.lang;
+      setLanguage(lang);
+      label.textContent = I18N_LABELS[lang] || I18N_LABELS.en;
+      menu.querySelectorAll('.lang-option').forEach(function (o) { o.classList.remove('active'); });
+      opt.classList.add('active');
+      wrapper.classList.remove('open');
+    });
+
+    document.addEventListener('click', function () {
+      wrapper.classList.remove('open');
+    });
+
+  })();
+</script>
+</body>
+</html>
