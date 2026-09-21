@@ -1679,7 +1679,7 @@ div#panel-1-start {
   left: 40vw;
   right: auto;
   transform: none;
-  transition: none;
+  transition: opacity 0.35s ease;
   background: #FFFFFFF2;
   border-color: #9F2222;
   box-shadow: 0px 4px 6px 0px #0000004D;
@@ -1689,12 +1689,12 @@ div#panel-1-start {
 }
 #panel-26-2 {
   position: absolute;
-  top: auto;
-  bottom: 10%;
-  left: 37vw;
+  top: 16vh;
+  bottom: auto;
+  left: 67vw;
   right: auto;
   transform: none;
-  transition: none;
+  transition: opacity 0.35s ease;
   background: #FFFFFFF2;
   border-color: #9F2222;
   box-shadow: 0px 4px 6px 0px #0000004D;
@@ -1707,10 +1707,10 @@ div#panel-1-start {
   position: absolute;
   bottom: 63%;
   top: auto;
-  left: 110vw;
+  left: 143vw;
   right: auto;
   transform: none;
-  transition: none;
+  transition: opacity 0.35s ease;
   background: #FFFFFFF2;
   border-color: #9F2222;
   box-shadow: 0px 4px 6px 0px #0000004D;
@@ -2160,22 +2160,22 @@ div#panel-1-start {
 }
 
 /* Scene-27: Asmelash Teka Hadgu & Away Ly */
-.char-s27-asmelash   { width: 5vw;   height: auto; bottom: 12vh; top: auto; left: 126vw; }
-.char-s27-asmelash-1 { width: 4vw;   height: auto; bottom: 8vh;  top: auto; left: 144vw; }
-.char-s27-awayly     { width: 7vw;   height: auto; bottom: 14vh; top: auto; left: 105vw;  }
-.char-s27-awayly-1   { width: 4vw;   height: auto; bottom: 17vh; top: auto; left: 144vw; }
+.char-s27-asmelash   { width: 5vw;   height: auto; bottom: 12vh; top: auto; left: 159vw; }
+.char-s27-asmelash-1 { width: 4vw;   height: auto; bottom: 8vh;  top: auto; left: 177vw; }
+.char-s27-awayly     { width: 7vw;   height: auto; bottom: 14vh; top: auto; left: 138vw;  }
+.char-s27-awayly-1   { width: 4vw;   height: auto; bottom: 17vh; top: auto; left: 177vw; }
 
 /* Scene-28: Chris Emezue & Kathleen Siminyu */
-.char-s28-chris      { width: 5vw;   height: auto; bottom: 10vh; top: auto; left: 119vw;  }
-.char-s28-chris-1    { width: 4.3vw; height: auto; bottom: 24vh; top: auto; left: 147vw; }
-.char-s28-kathleen   { width: 6vw;   height: auto; bottom: 10vh; top: auto; left: 280vw; }
-.char-s28-kathleen-1 { width: 5vw;   height: auto; bottom: 0vh;  top: auto; left: 147vw; }
+.char-s28-chris      { width: 5vw;   height: auto; bottom: 10vh; top: auto; left: 152vw;  }
+.char-s28-chris-1    { width: 4.3vw; height: auto; bottom: 24vh; top: auto; left: 180vw; }
+.char-s28-kathleen   { width: 6vw;   height: auto; bottom: 10vh; top: auto; left: 313vw; }
+.char-s28-kathleen-1 { width: 5vw;   height: auto; bottom: 0vh;  top: auto; left: 180vw; }
 
 /* Scene-29: Sadik Shahadu & Samuel Rutunda */
-.char-s29-sadik      { width: 5vw;   height: auto; bottom: 8vh;  top: auto; left: 132vw; }
-.char-s29-sadik-1    { width: 5vw;   height: auto; bottom: -8vh; top: auto; left: 144vw; }
-.char-s29-samuel     { width: 5vw;   height: auto; bottom: 10vh; top: auto; left: 114vw;  }
-.char-s29-samuel-1   { width: 4vw;   height: auto; bottom: 24vh; top: auto; left: 144vw; }
+.char-s29-sadik      { width: 5vw;   height: auto; bottom: 8vh;  top: auto; left: 165vw; }
+.char-s29-sadik-1    { width: 5vw;   height: auto; bottom: -8vh; top: auto; left: 177vw; }
+.char-s29-samuel     { width: 5vw;   height: auto; bottom: 10vh; top: auto; left: 147vw; }
+.char-s29-samuel-1   { width: 4vw;   height: auto; bottom: 24vh; top: auto; left: 177vw; }
 
 /* Scene-30: Matatu with all interviewees aboard (400–500vw in overlay) */
 .char-s30-matatu     { height: 58vh; bottom: 10vh; top: auto; left: 415vw; }

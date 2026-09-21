@@ -103,6 +103,15 @@ const S45S48_BG_LEFT_VW = 2250; // must match #s45-s48-bg's `left` in style.css
 const S45S48_BG_WIDTH_VW = 520; // must match #s45-s48-bg's `width` in style.css
 const S46_CHAR_CENTER_VW = 250.5; // .char-s45-wheelchair center, within #s45-s48-bg
 
+// Scenes 26-30: strip freezes at this vw offset past #s26-s30-bg's stripX once the bus parks
+// (see S2630_FREEZE_TRIGGER below), holding all interviewees on screen through scene 29. Was
+// 0.77 (matched the natural pan exactly at the trigger point, for a seamless snap-to-freeze);
+// now shifted further right, so S2630_FREEZE_EASE_START/TRIGGER below ease into it instead of
+// snapping, or moving this value creates a visible jump right at the freeze-engage point.
+const S2630_FREEZE_VW = 1.10;
+const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in begins
+const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen — unchanged
+
 // ---- DOM ----
 const pinnedWrap  = document.getElementById('pinned-wrap');
 const scrollX     = document.getElementById('scroll-x');
@@ -139,7 +148,6 @@ const panelS13_3 = document.getElementById('panel-s13-3');
 const panel26_1 = document.getElementById('panel-26-1');
 const panel26_2 = document.getElementById('panel-26-2');
 const panel26_3 = document.getElementById('panel-26-3');
-let _s26EnterTs = null; // timestamp scene 26 was last (re)entered — opens both popups 1s later
 const panelS21Meta1     = document.getElementById('panel-s21-meta-1');
 const panelS21Google1   = document.getElementById('panel-s21-google-1');
 const panelS21Meta2     = document.getElementById('panel-s21-meta-2');
@@ -414,6 +422,9 @@ let _s46ZoomT0 = null; // wall-clock timestamp when the wheelchair-man hold was 
 let _s46HoldReleased = false; // true the instant the zoom-in finishes — pan starts releasing right away, no extra scroll wait
 let _s46ReleaseStartLocal = null; // sceneLocal captured at the exact moment of release, so the release-ease math has a valid start point
 
+let _panel26_1Shown = false; // scroll-freeze-on-open tracker, scene-26 popups
+let _panel26_2Shown = false;
+let _s2630BusDampedX = null; // damped bus X for scenes 26-30, see animateCityBus
 let _panel55Shown = false; // same, for panel-55/55b/56/57 (scenes 55-57)
 let _panel55bShown = false;
 let _panel56Shown = false;
@@ -891,21 +902,29 @@ function frame(ts) {
     // Scene 21 needs exactly (300vw - 100vw) = 2vw of pan across sceneLocal 0-1 to reveal
     // edge-to-edge with no overshoot — 3vw overshoots into scene-26's empty marker div.
     effectiveTx = -(SCROLL_MAP[10].stripX + sceneLocal * 2 * _vw);
+  } else if (SCROLL_MAP[11] && currentScene === 11 && sceneLocal >= S2630_FREEZE_EASE_START && sceneLocal < S2630_FREEZE_TRIGGER) {
+    // Eases from the natural continuous pan into the frozen target below — S2630_FREEZE_VW no
+    // longer matches the natural tx at the trigger point, so this bridges the gap smoothly
+    // instead of snapping (see S2630_FREEZE_VW's own comment for why).
+    const naturalTx = -(SCROLL_MAP[11].stripX + sceneLocal * _vw);
+    const frozenTx  = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw);
+    const easeT = easeInOutCubic((sceneLocal - S2630_FREEZE_EASE_START) / (S2630_FREEZE_TRIGGER - S2630_FREEZE_EASE_START));
+    effectiveTx = naturalTx + easeT * (frozenTx - naturalTx);
   } else if (SCROLL_MAP[11] && (
-    (currentScene === 11 && sceneLocal >= 0.77) ||
+    (currentScene === 11 && sceneLocal >= S2630_FREEZE_TRIGGER) ||
     (currentScene >= 12 && currentScene <= 13) ||
     (currentScene === 14 && sceneLocal < 0.85)
   )) {
     // Scene 26 (after bus parks) through scene 29: strip frozen so all interviewees
     // stay on screen while they swap in, two at a time per scene
-    effectiveTx = -(SCROLL_MAP[11].stripX + 0.77 * _vw);
+    effectiveTx = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw);
   } else if (SCROLL_MAP[11] && currentScene === 14 && sceneLocal >= 0.85) {
-    effectiveTx = -(SCROLL_MAP[11].stripX + 0.77 * _vw);
+    effectiveTx = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw);
   } else if (SCROLL_MAP[11] && currentScene === 15 && sceneLocal < 0.18) {
     // Scene 30's first stretch: the bus keeps genuinely driving forward (real strip pan,
     // not just a timing delay) before the 2 new popups open and the zoom takes over — eases
     // from wherever scene 29 left off to a bit further down the road.
-    const s29Freeze  = -(SCROLL_MAP[11].stripX + 0.77 * _vw);
+    const s29Freeze  = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw);
     const s30DriveEnd = s29Freeze - 0.5 * _vw;
     const dT = easeInOutCubic(Math.min(1, sceneLocal / 0.18));
     effectiveTx = s29Freeze + dT * (s30DriveEnd - s29Freeze);
@@ -913,7 +932,7 @@ function frame(ts) {
     // Frozen through the rest of scene 30 — any strip movement gets amplified by the
     // pinnedWrap zoom (4x-8x). Jumps to scene-32's position once it begins, but by then
     // #city-bus/Awa Ly are already faded out, so nothing visible jumps.
-    effectiveTx = -(SCROLL_MAP[11].stripX + 0.77 * _vw) - 0.5 * _vw;
+    effectiveTx = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw) - 0.5 * _vw;
   } else if (currentScene === 16 && sceneLocal >= S32_ZOOM_HOLD) {
     // Auto-playing zoom-out + Samuel reveal (wall-clock, see samuelT/s32Scale in animateS32S43).
     // Pan stays frozen for the same duration so it reads as a fixed-point animation.
@@ -1652,6 +1671,7 @@ function animateMatatu(scene, local, tx, junglePhase, opacity) {
 // ---- City bus: starts entering when 30% of scene 4 (savanna) has passed ----
 function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   if (!cityBus) return;
+  if (scene < 11 || scene > 15) _s2630BusDampedX = null; // out of range — clear so no stale lag carries in next time
   const vw     = getVw();
   const vh     = window.innerHeight;
   const CENTER = 0.225 * vw;  // bus width 55vw → left edge at 22.5vw, dead-centered
@@ -1837,20 +1857,38 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       // Drive from off-screen left to center over first 40% of scene 26
       const t = easeInOutCubic(Math.min(1, local / 0.4));
       busX = ENTRY + t * (CENTER - ENTRY);
-      if (_s26EnterTs == null) _s26EnterTs = ts;
     } else {
       busX = CENTER;
-      _s26EnterTs = null;
     }
-    // First two scene-26 popups open together, 1s after the bus enters
-    const show26 = scene === 11 && _s26EnterTs != null && (ts - _s26EnterTs) >= 1000;
+    // Damps choppy scroll input (mouse-wheel/trackpad ticks) into a smooth glide instead of
+    // snapping straight to the raw scroll-driven target every frame — scoped to this scene
+    // range only (_s2630BusDampedX resets to null outside it, at the top of this function).
+    if (_s2630BusDampedX === null) _s2630BusDampedX = busX;
+    _s2630BusDampedX += (busX - _s2630BusDampedX) * 0.25;
+    busX = _s2630BusDampedX;
+    // Scene-26 popups are scroll-position driven, not wall-clock — neither can appear just from
+    // sitting still, only from the user actually scrolling further in. Each has its own
+    // independent start/end (edit these 4 numbers directly) with a gap of "dummy" scroll
+    // between them where neither shows.
+    const PANEL26_1_START = 0.1,  PANEL26_1_END = 0.25;
+    const PANEL26_2_START = 0.3,  PANEL26_2_END = 0.45;
+    const show26_1 = scene === 11 && local >= PANEL26_1_START && local < PANEL26_1_END;
+    const show26_2 = scene === 11 && local >= PANEL26_2_START && local < PANEL26_2_END;
+    // Freezes scroll briefly on open so a fast scroll can't skip past the window — shorter than
+    // the shared POPUP_SCROLL_FREEZE_MS (700ms) since these windows are already fairly wide and
+    // a full 700ms hard stop read as glitchy here.
+    const S26_POPUP_FREEZE_MS = 300;
+    if (show26_1 && !_panel26_1Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
+    if (show26_2 && !_panel26_2Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
+    _panel26_1Shown = show26_1;
+    _panel26_2Shown = show26_2;
     if (panel26_1) {
-      panel26_1.style.opacity = show26 ? '1' : '0';
-      panel26_1.classList.toggle('visible', show26);
+      panel26_1.style.opacity = show26_1 ? '1' : '0';
+      panel26_1.classList.toggle('visible', show26_1);
     }
     if (panel26_2) {
-      panel26_2.style.opacity = show26 ? '1' : '0';
-      panel26_2.classList.toggle('visible', show26);
+      panel26_2.style.opacity = show26_2 ? '1' : '0';
+      panel26_2.classList.toggle('visible', show26_2);
     }
     if (panel26_3) {
       // Shows a bit earlier now — during the tail of scene 27, ahead of the 2nd pair (Chris &
