@@ -4402,7 +4402,11 @@ bottom: 64%;
   }
   .text-panel h3, .text-panel p { font-size: 14px; }
   .text-panel .bubble__tail { display: none !important; }
-  .text-panel::before {
+  /* Opt-in, not opt-out: only the popups tied to the bus during its zoom sequences (scene 8's
+     panel-8a/8b, scene 13's panel-s13-1/2), plus panel-5 ("All aboard"), get the straight-down
+     arrow. Everything else (panel-12, panel-12b, panel-s13-3, the truck popups, etc.) gets
+     none by default. */
+  #panel-8a::before, #panel-8b::before, #panel-s13-1::before, #panel-s13-2::before, #panel-5::before {
     content: '';
     position: absolute;
     left: 50%;
@@ -4414,7 +4418,7 @@ bottom: 64%;
     border-right: 12px solid transparent;
     border-top: 70px solid #9F2222;
   }
-  .text-panel::after {
+  #panel-8a::after, #panel-8b::after, #panel-s13-1::after, #panel-s13-2::after, #panel-5::after {
     content: '';
     position: absolute;
     left: 50%;
@@ -4426,16 +4430,11 @@ bottom: 64%;
     border-right: 11px solid transparent;
     border-top: 68px solid #FFFFFF;
   }
-  #panel-12::before, #panel-12::after,
-  #panel-12b::before, #panel-12b::after,
-  #panel-s13-3::before, #panel-s13-3::after,
-  #panel-s21-meta-1::before, #panel-s21-meta-1::after,
-  #panel-s21-google-1::before, #panel-s21-google-1::after,
-  #panel-s21-meta-2::before, #panel-s21-meta-2::after,
-  #panel-s21-google-2::before, #panel-s21-google-2::after,
-  #panel-s21-openai::before, #panel-s21-openai::after,
-  #panel-s21-microsoft::before, #panel-s21-microsoft::after {
-    display: none !important;
+   #panel-5::after, #panel-5::before {
+    left: 58%;
+    border-left: 11px solid transparent;
+    border-right: 11px solid transparent;
+    border-top: 40px solid #FFFFFF;
   }
   /* "These languages are invisible..." popup (scene 13) — long text, add its own internal
      scroll rather than growing the box past a readable size. pointer-events:auto is required
@@ -4448,6 +4447,7 @@ bottom: 64%;
   }
   .scene-1 .text-panel{
     width: auto !important;
+            min-width: auto !important;
   }
   .scene-1 .text-panel,
   .scene-2 .text-panel,
@@ -4460,6 +4460,8 @@ bottom: 64%;
     }
     #panel-5{
               left: 14vw !important;
+              width: auto !important;
+        min-width: auto !important;
     }
 
   .s1s3-troad { height: calc(100% / 3 - 2%); scale: 1.5; }
