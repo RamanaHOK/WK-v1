@@ -78,7 +78,7 @@ const S8_EXIT          = 0.77;  // legacy ref kept for nearBusClose offset
 const ZOOM_END         = 0.36;  // zoom-in phase ends here
 const S8_PAN_MAX       = 0.40;  // vw units the background strip pans left during zoom
 const BUS_CLOSE        = 0.75;  // bus close-up zoom starts here (after second popup)
-const BUS_SCROLL_START = 0.88;  // bus slides off right from here; strip transitions to scene 11
+const BUS_SCROLL_START = 0.80;  // bus slides off right from here; strip transitions to scene 11
 const BUS_CLOSE_MULT   = 0.6;     // ← tune this: how many × zoomMax the bus zooms during close-up
 
 // Scene 45's own local range for the scene-44 exit zoom fade (see animateS44's exitT).
@@ -103,14 +103,49 @@ const S45S48_BG_LEFT_VW = 2250; // must match #s45-s48-bg's `left` in style.css
 const S45S48_BG_WIDTH_VW = 520; // must match #s45-s48-bg's `width` in style.css
 const S46_CHAR_CENTER_VW = 250.5; // .char-s45-wheelchair center, within #s45-s48-bg
 
-// Scenes 26-30: strip freezes at this vw offset past #s26-s30-bg's stripX once the bus parks
-// (see S2630_FREEZE_TRIGGER below), holding all interviewees on screen through scene 29. Was
-// 0.77 (matched the natural pan exactly at the trigger point, for a seamless snap-to-freeze);
-// now shifted further right, so S2630_FREEZE_EASE_START/TRIGGER below ease into it instead of
-// snapping, or moving this value creates a visible jump right at the freeze-engage point.
-const S2630_FREEZE_VW = 1.10;
-const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in begins
-const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen — unchanged
+// Scenes 26-30: strip freezes at this vw offset past #s26-s30-bg's stripX once the bus parks,
+// holding all interviewees on screen through scene 29. Desktop keeps the original 0.77 (which
+// matches the natural pan exactly at the trigger point, for a seamless snap-to-freeze, so no
+// easing is needed there); mobile uses a shifted value with an eased entry instead of a snap
+// (see S2630_FREEZE_EASE_START/TRIGGER, computed per-frame in frame() below).
+const S2630_FREEZE_VW_DESKTOP = 0.77;
+const S2630_FREEZE_VW_MOBILE = 1.10;
+
+// Scene 7 (mobile only) — strip freezes at scene entry so the 4 interviewees stay on screen
+// while their quotes stack up (appear and stay, never hidden again) as the user keeps
+// scrolling; desktop keeps its original click-to-open '+' icons and natural pan, untouched
+// (see _isMobile gate below).
+//
+// Mobile's scroll budget for this scene is widened well past SCENE_SCROLL[6] (see
+// S7_MOBILE_SCROLL_MULT in buildScrollMap) so each of the 4 reveals below needs a genuinely
+// deliberate scroll, not a single flick's momentum. Tried hard-freezing scrollY between
+// reveals first (like the wheel-based freezes elsewhere in this file) but that fights an
+// *active* touch-drag on real iOS Safari — the drag keeps trying to move scrollY while the
+// per-frame pin snaps it back, and scrolling can get stuck entirely. A wider budget has no
+// such risk: it never fights the browser's own scroll, it just asks for more of it.
+const S7_STACK_ORDER  = ['s7-red-girl', 's7-granny', 's7-orange-man', 's7-green-man'];
+const S7_STACK_STARTS = [0.10, 0.30, 0.50, 0.70]; // sceneLocal each quote appears at, and stays past
+// One more "dummy scroll" (same 0.20 spacing as between reveals) past the 4th quote's own
+// start (0.70) before all 4 hide together — self-contained in scene 6, no dependency on
+// scene 8's bus-zoom constants (BUS_SCROLL_START etc.), which have their own, unrelated job.
+const S7_STACK_HIDE_AT = 0.90;
+const S7_FREEZE_RELEASE_START = 0.80; // sceneLocal where the freeze starts easing back to natural pan
+const S7_FREEZE_RELEASE_END   = 0.90; // sceneLocal where natural pan fully resumes
+const S7_MOBILE_SCROLL_MULT = 5.0; // mobile-only scene-7 length (desktop keeps SCENE_SCROLL[6]=1.5)
+
+// Scene 12 (mobile only) — same short-scene problem as scene 7 originally had: SCENE_SCROLL[8]
+// = 1.5 is only ~585px of scroll on a 390-wide phone, so the bus driving in and all 3
+// characters panning into view happen almost immediately. Widened here, desktop unaffected
+// (keeps SCENE_SCROLL[8] = 1.5) — see S7_MOBILE_SCROLL_MULT's comment for the same pattern.
+const S12_MOBILE_SCROLL_MULT = 8.0;
+
+// Scene 13 (mobile only) — this is where the actual zoom + 3 dialogue popups live (scene 12
+// just drives the bus in beforehand). SCENE_SCROLL[9] = 11.0 is already fairly long, but the
+// zoom/popup sequence packs several distinct beats into fractions of that range, so it still
+// reads as rushed on mobile. Widened here; desktop unaffected (keeps SCENE_SCROLL[9] = 11.0).
+const S13_MOBILE_SCROLL_MULT = 35.0; // bumped from 20 — the freeze fractions below compress
+// the 2nd zoom/exit/slide-up into a smaller share of the scene, so more total length keeps
+// their absolute on-screen duration from feeling rushed.
 
 // ---- DOM ----
 const pinnedWrap  = document.getElementById('pinned-wrap');
@@ -163,6 +198,19 @@ const dbgScene  = document.getElementById('dbg-scene');
 const dbgTime   = document.getElementById('dbg-time');
 const dbgBus    = document.getElementById('dbg-bus');
 const dbgCursor = document.getElementById('dbg-cursor');
+
+// Dev-only manual scrollbar — see index.html/style.css comments. Dragging it jumps straight
+// to that fraction of TOTAL_SCROLL; kept in sync with real scroll position in frame() below,
+// with a flag so the sync doesn't fight the user while they're actively dragging it.
+const devScrollbar = document.getElementById('dev-scrollbar');
+let _devScrollbarDragging = false;
+if (devScrollbar) {
+  devScrollbar.addEventListener('pointerdown', () => { _devScrollbarDragging = true; });
+  devScrollbar.addEventListener('pointerup',   () => { _devScrollbarDragging = false; });
+  devScrollbar.addEventListener('input', () => {
+    window.scrollTo(0, (devScrollbar.value / 1000) * TOTAL_SCROLL);
+  });
+}
 
 // Single fixed bus that rides across city scenes 5–6
 const cityBus       = document.getElementById('city-bus');
@@ -272,6 +320,9 @@ const char34Kid1       = document.querySelector('.char-s34-kid1'); // lollipop k
 const s4TreesOverlay = document.getElementById('s4-trees');
 const s4TreesPlayer  = document.getElementById('s4-trees-player');
 let _s4TreesPlaying  = false;
+// Reverted per request — was forcing preserveAspectRatio to "slice" (crops sides to fill top/
+// bottom with no gap); now left at its default "meet" (shows the full uncropped image, relying
+// on style.css's overflow:visible so the letterboxed excess isn't clipped instead).
 // Fixed trees overlay for scene 5 — sits above #city-bus in root stacking context
 const cityTrees5    = document.getElementById('city-trees-5');
 const s1215TreesFront = document.getElementById('s1215-trees-front');
@@ -422,9 +473,10 @@ let _s46ZoomT0 = null; // wall-clock timestamp when the wheelchair-man hold was 
 let _s46HoldReleased = false; // true the instant the zoom-in finishes — pan starts releasing right away, no extra scroll wait
 let _s46ReleaseStartLocal = null; // sceneLocal captured at the exact moment of release, so the release-ease math has a valid start point
 
-let _panel26_1Shown = false; // scroll-freeze-on-open tracker, scene-26 popups
+let _panel26_1Shown = false; // scroll-freeze-on-open tracker, scene-26 popups (mobile)
 let _panel26_2Shown = false;
-let _s2630BusDampedX = null; // damped bus X for scenes 26-30, see animateCityBus
+let _s26EnterTs = null; // desktop only: timestamp scene 26 was last (re)entered — opens both popups 1s later
+let _s2630BusDampedX = null; // damped bus X for scenes 26-30, mobile only, see animateCityBus
 let _panel55Shown = false; // same, for panel-55/55b/56/57 (scenes 55-57)
 let _panel55bShown = false;
 let _panel56Shown = false;
@@ -617,10 +669,18 @@ let TOTAL_SCROLL = 0;
 
 function buildScrollMap() {
   const vw = getVw();
+  const isMobile = vw <= 768;
   SCROLL_MAP   = [];
   TOTAL_SCROLL = 0;
   for (let i = 0; i < SCENES; i++) {
-    const len    = SCENE_SCROLL[i] * vw;
+    // Scene 6 (scene-7, interviewee stack) needs a much longer mobile scroll budget than
+    // desktop — see S7_MOBILE_SCROLL_MULT's comment. stripX below is purely index-based, not
+    // derived from this length, so widening it here cannot shift any other scene's position.
+    const sceneScrollMult = (isMobile && i === 6) ? S7_MOBILE_SCROLL_MULT
+      : (isMobile && i === 8) ? S12_MOBILE_SCROLL_MULT
+      : (isMobile && i === 9) ? S13_MOBILE_SCROLL_MULT
+      : SCENE_SCROLL[i];
+    const len    = sceneScrollMult * vw;
     // Scene 21 (i=10): real DOM start is 1165vw (1000vw base + margin-left:165vw) — the extra
     // 165vw fudge below accounts for that offset; i>10 keeps everything after in sync.
     const stripX = i * vw
@@ -865,6 +925,13 @@ function frame(ts) {
   const junglePhase = Math.min(scrollY / jungleScrollLen, 1);
 
   const _vw = getVw();
+  const _isMobile = _vw <= 768; // matches style.css's @media (max-width:768px) breakpoint
+
+  // Scenes 26-30 freeze position — see S2630_FREEZE_VW_DESKTOP/MOBILE's own comment. Desktop's
+  // original value needs no easing (already seamless); mobile's shifted value does.
+  const S2630_FREEZE_VW = _isMobile ? S2630_FREEZE_VW_MOBILE : S2630_FREEZE_VW_DESKTOP;
+  const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in begins (mobile only)
+  const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen
 
   // Smooth cursor parallax — 4 tiers, each at a different lerp speed.
   // Active across all city scenes (5–19); lerp target goes to 0 just before the bus exits.
@@ -877,10 +944,22 @@ function frame(ts) {
   prlxX3 += (tgtX - prlxX3) * 0.12;  prlxY3 += (tgtY - prlxY3) * 0.12;
   prlxX4 += (tgtX - prlxX4) * 0.20;  prlxY4 += (tgtY - prlxY4) * 0.20;
 
+  // Scene 7 (mobile only): freeze strip at scene entry through the interviewee stack, then
+  // ease back into natural pan (see S7_STACK_STARTS/updateS7Stack below for the popups).
+  let effectiveTx;
+  if (_isMobile && currentScene === 6 && SCROLL_MAP[6]) {
+    const frozenTx = -SCROLL_MAP[6].stripX;
+    if (sceneLocal < S7_FREEZE_RELEASE_START) {
+      effectiveTx = frozenTx;
+    } else if (sceneLocal < S7_FREEZE_RELEASE_END) {
+      const releaseT = easeInOutCubic((sceneLocal - S7_FREEZE_RELEASE_START) / (S7_FREEZE_RELEASE_END - S7_FREEZE_RELEASE_START));
+      effectiveTx = frozenTx + releaseT * (tx - frozenTx);
+    } else {
+      effectiveTx = tx;
+    }
   // Scene 8: freeze strip during zoom + popup phases; stay frozen during exit so the
   // next scene does not bleed in from the right while the bus is still leaving.
-  let effectiveTx;
-  if (currentScene === 7 && SCROLL_MAP[7]) {
+  } else if (currentScene === 7 && SCROLL_MAP[7]) {
     const freezeX = -SCROLL_MAP[7].stripX;
     const holdX   = freezeX + S8_PAN_MAX * _vw;
     if (sceneLocal <= ZOOM_END) {
@@ -902,10 +981,11 @@ function frame(ts) {
     // Scene 21 needs exactly (300vw - 100vw) = 2vw of pan across sceneLocal 0-1 to reveal
     // edge-to-edge with no overshoot — 3vw overshoots into scene-26's empty marker div.
     effectiveTx = -(SCROLL_MAP[10].stripX + sceneLocal * 2 * _vw);
-  } else if (SCROLL_MAP[11] && currentScene === 11 && sceneLocal >= S2630_FREEZE_EASE_START && sceneLocal < S2630_FREEZE_TRIGGER) {
-    // Eases from the natural continuous pan into the frozen target below — S2630_FREEZE_VW no
-    // longer matches the natural tx at the trigger point, so this bridges the gap smoothly
-    // instead of snapping (see S2630_FREEZE_VW's own comment for why).
+  } else if (_isMobile && SCROLL_MAP[11] && currentScene === 11 && sceneLocal >= S2630_FREEZE_EASE_START && sceneLocal < S2630_FREEZE_TRIGGER) {
+    // Mobile only — desktop's S2630_FREEZE_VW matches the natural tx exactly at the trigger
+    // point (no drift, no easing needed), so this branch is skipped there entirely and it
+    // falls through to plain natural panning, same as it always has. Mobile's shifted
+    // freeze value doesn't match, so this bridges the gap smoothly instead of snapping.
     const naturalTx = -(SCROLL_MAP[11].stripX + sceneLocal * _vw);
     const frozenTx  = -(SCROLL_MAP[11].stripX + S2630_FREEZE_VW * _vw);
     const easeT = easeInOutCubic((sceneLocal - S2630_FREEZE_EASE_START) / (S2630_FREEZE_TRIGGER - S2630_FREEZE_EASE_START));
@@ -1095,6 +1175,7 @@ function frame(ts) {
   // -- Horizontal strip --
   scrollX.style.transform = `translateX(${effectiveTx.toFixed(1)}px)`;
 
+
   // -- Scene-4 trees overlay: 140vw wide, starts 20vw left of scene 4 (mirrors .s4-extend) --
   if (s4TreesOverlay && SCROLL_MAP[3]) {
     const s4vx = SCROLL_MAP[3].stripX + effectiveTx - 0.20 * _vw;
@@ -1173,6 +1254,7 @@ function frame(ts) {
     cityOverlay7.style.opacity = show7 ? '1' : '0';
     cityOverlay7.style.transform = `translateX(${s7vx.toFixed(1)}px)`;
   }
+  updateS7Stack(currentScene, sceneLocal, _isMobile);
   if (cityOverlay8 && SCROLL_MAP[7]) {
     const s8vx = SCROLL_MAP[7].stripX + effectiveTx;
     const show8overlay = (s8vx < _vw && s8vx > -_vw) ? '1' : '0';
@@ -1247,7 +1329,7 @@ function frame(ts) {
   }
 
   // Scene 21 preview: fade in road behind pinned-wrap as s12-s15-bg fades out during close-up
-  if (currentScene === 9 && sceneLocal >= 0.70) {
+  if (currentScene === 9 && sceneLocal >= 0.10) {
     const tFade = Math.min(1, (sceneLocal - 0.70) / 0.22); // 70%→92%
     if (s12s15bg)   s12s15bg.style.opacity   = (1 - tFade).toFixed(3);
     if (s21Preview) s21Preview.style.opacity = tFade.toFixed(3);
@@ -1278,7 +1360,13 @@ function frame(ts) {
   // Positioned on the bus's live screen rect (same technique as panelS13_3/panel-8a/8b) — a
   // static top/left would only line up at one specific zoom/scroll state.
   if (panelS13_1) {
-    const show = currentScene === 9 && sceneLocal >= 0.64 && sceneLocal < 0.70;
+    // Mobile: stretched from the original 0.06-wide window (0.64-0.70) to 0.14 — desktop's
+    // popups already had a natural pace at 1x scroll speed; mobile's own pacing work elsewhere
+    // (S13_MOBILE_SCROLL_MULT) doesn't change these fractions, so they still felt rushed on
+    // their own — widened here on top of that.
+    const show = _isMobile
+      ? (currentScene === 9 && sceneLocal >= 0.64 && sceneLocal < 0.78)
+      : (currentScene === 9 && sceneLocal >= 0.64 && sceneLocal < 0.70);
     const WIN_X = 0.64; // ← horizontal fraction of bus image (0=left, 1=right)
     const WIN_Y = 0.35; // ← vertical fraction of bus image (0=top, 1=bottom)
     if (_busRect && show) {
@@ -1290,7 +1378,11 @@ function frame(ts) {
     panelS13_1.classList.toggle('visible', show);
   }
   if (panelS13_2) {
-    const show = currentScene === 9 && sceneLocal >= 0.70 && sceneLocal < 0.72;
+    // Mobile: original window was only 0.02 wide (0.70-0.72) — barely a moment. Widened to
+    // 0.10, starting right where popup 1's mobile window now ends (0.78), so they don't overlap.
+    const show = _isMobile
+      ? (currentScene === 9 && sceneLocal >= 0.78 && sceneLocal < 0.86)
+      : (currentScene === 9 && sceneLocal >= 0.70 && sceneLocal < 0.72);
     const WIN_X = 0.64; // ← horizontal fraction of bus image (0=left, 1=right)
     const WIN_Y = 0.36; // ← vertical fraction of bus image (0=top, 1=bottom)
     if (_busRect && show) {
@@ -1302,7 +1394,11 @@ function frame(ts) {
     panelS13_2.classList.toggle('visible', show);
   }
   if (panelS13_3) {
-    const show = currentScene === 9 && sceneLocal >= 0.88;
+    // Mobile: starts at 0.93, right after the (mobile-shifted) exit shift finishes at 0.93 —
+    // see the ZOOM2_START/EXIT_START shift in animateCityBus's scene===9 block.
+    const show = _isMobile
+      ? (currentScene === 9 && sceneLocal >= 0.93)
+      : (currentScene === 9 && sceneLocal >= 0.88);
     // Position popup on the bus's second window using live bus screen rect
     // Tune WIN_X (0–1 = left→right across bus) and WIN_Y (0–1 = top→bottom) to hit the window
     const WIN_X = 0.36; // ← horizontal fraction of bus image where second window is
@@ -1363,6 +1459,7 @@ function frame(ts) {
   if (dbgTime)   dbgTime.textContent   = `${secs}s`;
   if (dbgBus)    dbgBus.textContent    = `bus: ${busVw}vw`;
   if (dbgCursor) dbgCursor.style.left  = `${Math.min(((currentScene + sceneLocal) / SCENES) * 100, 96).toFixed(2)}%`;
+  if (devScrollbar && !_devScrollbarDragging) devScrollbar.value = Math.round(scrollPct * 1000);
 
   // -- Savanna / city layer reveals --
   animateLayerReveals(currentScene, sceneLocal);
@@ -1372,10 +1469,17 @@ function frame(ts) {
 
   // -- Text panel visibility -- each panel opens/closes at its own sceneLocal fraction
   // (0-1). Optional `preShow` lets a panel appear near the end of the PREVIOUS scene instead.
+  // Mobile-only retuning for panels 2/3 (see below) — desktop keeps its original values
+  // untouched. Everything else in PANEL_TIMING is shared/unchanged. (_isMobile declared
+  // earlier in this function, near _vw.)
   const PANEL_TIMING = {
     1: { start: 0.15, end: 0.92 }, // "Hop on the Prevailer matatu! TWENDE!"
-    2: { start: 0.01, end: 0.92, preShow: 0.5 }, // also shows from the center of scene 1 onward
-    3: { start: 0.01, end: 0.92, preShow: 0.5 }, // also shows from the center of scene 2 onward
+    2: _isMobile
+      ? { start: -1.1, end: 0.52 } // mobile: only opens once scene 1 has fully scrolled past, with a small gap first
+      : { start: 0.01, end: 0.92, preShow: 0.5 }, // desktop original: also shows from the center of scene 1 onward
+    3: _isMobile
+      ? { start: 0.01, end: 0.92, preShow: 0.75 } // mobile: also shows once scene 2 has scrolled 75%
+      : { start: 0.01, end: 0.92, preShow: 0.5 }, // desktop original: also shows from the center of scene 2 onward
     5: { start: 0.075, end: 0.92 }, // synced to the city bus's START position — it's already parked at ENTRY by scene-5's local:0 (drive-in happens during scene 4's final 40%, see animateCityBus scene===3 block), then eases ENTRY→CENTER over local 0-0.15 (scene===4 block) — this opens right as that move begins, not after it finishes.
     6: { start: 0.3, end: 0.92 },
     9: { start: 0.3, end: 0.92 },
@@ -1674,7 +1778,12 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   if (scene < 11 || scene > 15) _s2630BusDampedX = null; // out of range — clear so no stale lag carries in next time
   const vw     = getVw();
   const vh     = window.innerHeight;
-  const CENTER = 0.225 * vw;  // bus width 55vw → left edge at 22.5vw, dead-centered
+  const _isMobileCityBus = vw <= 768;
+  // Desktop: bus width 55vw, left edge at 22.5vw, dead-centered. Mobile: bus is 200vw wide
+  // (#city-bus img mobile override) — only 30% (60vw) shows, front (right/leading) side,
+  // flush at the screen's left edge, instead of fully centered. Used as the bus's resting
+  // position across every scene that parks it (5,6,7,8,9,11-15,22-29), not just on entry.
+  const CENTER = _isMobileCityBus ? -1.40 * vw : 0.225 * vw;
   const ENTRY  = -0.1 * vw; // off-screen left (right edge at 0)
 
   let busY = 0; // vertical offset (px) applied to translateY — tune per-scene
@@ -1702,16 +1811,29 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   let zoom = 1;
 
   if (scene === 3) {
-    // Savanna (scene 4): city bus drives in from off-screen left in the final 40% of the scene
-    // so it arrives at the left edge just as scene 5 begins — no fade, just a drive-in
-    const t = easeInOutCubic(Math.min(1, Math.max(0, (local - 0.6) / 0.4)));
-    busX = -0.6 * vw + t * (ENTRY - (-0.6 * vw));
-    eff  = t > 0 ? opacity : 0;
+    if (_isMobileCityBus) {
+      // Mobile: ENTRY/-0.6vw below are calibrated for the desktop 55vw bus — with the mobile
+      // 200vw bus they'd show far more than 30%, lurching before settling at CENTER. Hold
+      // steady at the final 30%-visible position instead, no drive-in animation.
+      busX = CENTER;
+      eff  = local >= 0.6 ? opacity : 0;
+    } else {
+      // Savanna (scene 4): city bus drives in from off-screen left in the final 40% of the
+      // scene so it arrives at the left edge just as scene 5 begins — no fade, just a drive-in
+      const t = easeInOutCubic(Math.min(1, Math.max(0, (local - 0.6) / 0.4)));
+      busX = -0.6 * vw + t * (ENTRY - (-0.6 * vw));
+      eff  = t > 0 ? opacity : 0;
+    }
   } else if (scene === 4) {
-    // 10% of peak speed exactly at popup trigger (local=0.30): PARK_AT=0.356
-    const t = easeInOutCubic(Math.min(1, local / 0.15));
-    busX = ENTRY + t * (CENTER - ENTRY);
-    eff  = opacity;
+    if (_isMobileCityBus) {
+      busX = CENTER; // see scene===3's mobile branch above
+      eff  = opacity;
+    } else {
+      // 10% of peak speed exactly at popup trigger (local=0.30): PARK_AT=0.356
+      const t = easeInOutCubic(Math.min(1, local / 0.15));
+      busX = ENTRY + t * (CENTER - ENTRY);
+      eff  = opacity;
+    }
   } else if (scene === 5) {
     eff = opacity;
   } else if (scene === 6) {
@@ -1731,7 +1853,12 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       targetZoom = zoomMax;
     }
     if (pinnedWrap) {
-      pinnedWrap.style.transformOrigin = `75% ${busCenterY().toFixed(1)}%`;
+      // Desktop: bus sits centered (visible span ~22.5%-77.5% of viewport), so 75% frames a
+      // point inside it. Mobile: only the front 30% (viewport span 0%-60%) is visible at all —
+      // zooming around 75% pulled that whole slice off the left edge. Use a mobile-specific
+      // origin inside that visible slice so the zoom grows it in place instead.
+      const zoomOriginX = _isMobileCityBus ? 30 : 75;
+      pinnedWrap.style.transformOrigin = `${zoomOriginX}% ${busCenterY().toFixed(1)}%`;
       pinnedWrap.style.transform = targetZoom > 1.001 ? `scale(${targetZoom.toFixed(3)})` : '';
     }
     // Quick swap empty → people at local 0.15 (completes in 3% of scene — imperceptible)
@@ -1756,11 +1883,21 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     // Scene 12: bus with people, drive in from left
     eff  = opacity;
     zoom = 1;
-    const t = easeInOutCubic(Math.min(1, local / 0.25));
-    busX = local < 0.25 ? ENTRY + t * (CENTER - ENTRY) : CENTER;
+    if (_isMobileCityBus) {
+      // ENTRY is calibrated for the desktop 55vw bus — with the mobile 200vw bus it shows far
+      // more than 30%, so animating ENTRY->CENTER lurches forward then back. Hold at CENTER
+      // instead, same fix as scene===3/4's mobile branches above.
+      busX = CENTER;
+    } else {
+      const t = easeInOutCubic(Math.min(1, local / 0.25));
+      busX = local < 0.25 ? ENTRY + t * (CENTER - ENTRY) : CENTER;
+    }
     // #city-bus's CSS (bottom:30%) is vh-based but .s1215-road is sized off vw — this
-    // correction keeps the bus visually planted on the road at any window height.
-    busY = 0.40 * vh - S1215_ROAD_HEIGHT_VW * vw;
+    // correction keeps the bus visually planted on the road at any window height. Mobile's
+    // .s1215-road is now vh-based too (matches --road-sky-line), so bottom:30% already lands
+    // correctly there without this vw-based correction — applying it anyway pushed the bus
+    // mostly below the viewport.
+    busY = _isMobileCityBus ? 0 : (0.40 * vh - S1215_ROAD_HEIGHT_VW * vw);
     if (cityBus) cityBus.style.transformOrigin = '50% 50%';
     if (local < 0.55) {
       if (cityBusEmpty)  cityBusEmpty.style.opacity  = '0';
@@ -1785,42 +1922,61 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     // At 37% first zoom: pinnedWrap 1x->3x, holds during popups; eased back 3x->1x from 92%
     // (bus slide-up). Computed once and written once (two separate writes forced two layout
     // reflows per frame during 0.92-1.0, causing stutter).
+    // Mobile: popups 1/2 now run all the way to 0.86 (widened so they "stop" and stay
+    // readable instead of the zoom animating underneath them) — so the whole back-half
+    // sequence (2nd zoom, exit shift, popup 3, slide-up) is pushed later on mobile to make
+    // room after them. Desktop keeps its original thresholds untouched.
+    const WRAP_DOWN_START = _isMobileCityBus ? 0.95 : 0.92;
+    const WRAP_DOWN_SPAN  = _isMobileCityBus ? 0.05 : 0.08;
     let wrapScale = 1;
     if (local >= 0.37) {
       const t1 = easeInOutCubic(Math.min(1, (local - 0.37) / 0.21));
       wrapScale = 1 + (3.0 - 1) * t1;
     }
-    if (local >= 0.92) {
-      const tUp92 = easeInOutCubic(Math.min(1, (local - 0.92) / 0.08));
+    if (local >= WRAP_DOWN_START) {
+      const tUp92 = easeInOutCubic(Math.min(1, (local - WRAP_DOWN_START) / WRAP_DOWN_SPAN));
       wrapScale = 3 - (3 - 1) * tUp92;
     }
     if (pinnedWrap && local >= 0.37) {
-      pinnedWrap.style.transformOrigin = `75% ${busCenterY().toFixed(1)}%`;
+      // Same fix as scene 8's own pinnedWrap zoom: desktop's bus sits centered so 75% frames a
+      // point inside it, but mobile only shows the front 30% (flush left) — 75% pulled that
+      // slice off-screen while zooming (and while zooming back out). Origin at 30% keeps it
+      // in view both directions.
+      const zoomOriginX = _isMobileCityBus ? 30 : 75;
+      pinnedWrap.style.transformOrigin = `${zoomOriginX}% ${busCenterY().toFixed(1)}%`;
       pinnedWrap.style.transform = `scale(${wrapScale.toFixed(3)})`;
     }
     // Same road-alignment correction as scene 8, but pre-shrunk by wrapScale since #city-bus's
     // translateY sits inside #pinned-wrap and gets rendered wrapScale× larger as it zooms.
-    const s1215AlignY = (0.40 * vh - S1215_ROAD_HEIGHT_VW * vw) / wrapScale;
+    // Mobile skips it entirely too, same reason as scene 8's own branch above.
+    const s1215AlignY = _isMobileCityBus ? 0 : (0.40 * vh - S1215_ROAD_HEIGHT_VW * vw) / wrapScale;
     busY = s1215AlignY;
-    // After 70%: second zoom on the bus element itself, framing the window area
-    if (local >= 0.70) {
-      const t2 = easeInOutCubic(Math.min(1, (local - 0.70) / 0.15));
+    // Second zoom on the bus element itself, framing the window area — mobile starts this
+    // right after popup 2 closes (0.86) instead of 0.70, so it isn't running while either
+    // popup is still up.
+    const ZOOM2_START = _isMobileCityBus ? 0.86 : 0.70;
+    const ZOOM2_SPAN  = _isMobileCityBus ? 0.04 : 0.15;
+    if (local >= ZOOM2_START) {
+      const t2 = easeInOutCubic(Math.min(1, (local - ZOOM2_START) / ZOOM2_SPAN));
       zoom  = 1 + (4.0 - 1) * t2;
       busY  = s1215AlignY + (-vh * -0.1 * t2);
       if (cityBus) cityBus.style.transformOrigin = '50% 35%';
     }
-    // 85–90%: bus moves slightly right to stop position; 90–92%: fully stopped (popup 3)
+    // Bus moves slightly right to stop position, then fully stopped (popup 3) — mobile shifted
+    // to start right after the second zoom finishes.
     const EXIT_HOLD_X = CENTER + easeInOutCubic(1) * 0.39 * vw;
-    if (local >= 0.85 && local < 0.90) {
-      const tExit = easeInOutCubic((local - 0.85) / 0.05);
+    const EXIT_START = _isMobileCityBus ? 0.90 : 0.85;
+    const EXIT_SPAN  = _isMobileCityBus ? 0.03 : 0.05;
+    if (local >= EXIT_START && local < EXIT_START + EXIT_SPAN) {
+      const tExit = easeInOutCubic((local - EXIT_START) / EXIT_SPAN);
       busX = CENTER + tExit * (EXIT_HOLD_X - CENTER);
-    } else if (local >= 0.90) {
+    } else if (local >= EXIT_START + EXIT_SPAN) {
       busX = EXIT_HOLD_X; // hold X while popup shows then during slide-up
     }
-    // 92%+: slide bus straight up (pinnedWrap's own 3×→1× unscale is handled in the
-    // wrapScale block above, written once instead of twice).
-    if (local >= 0.92) {
-      const tUp = easeInOutCubic(Math.min(1, (local - 0.92) / 0.08));
+    // Slide bus straight up (pinnedWrap's own 3×→1× unscale is handled in the wrapScale
+    // block above, written once instead of twice).
+    if (local >= WRAP_DOWN_START) {
+      const tUp = easeInOutCubic(Math.min(1, (local - WRAP_DOWN_START) / WRAP_DOWN_SPAN));
       busX = EXIT_HOLD_X;
       busY = s1215AlignY + 0.1 * vh - vh * 2 * tUp;
     }
@@ -1853,35 +2009,47 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       panel29Welcome.style.opacity = welcomeT.toFixed(3);
       panel29Welcome.classList.toggle('visible', showWelcome);
     }
+    const _isMobileBus = vw <= 768;
     if (scene === 11) {
       // Drive from off-screen left to center over first 40% of scene 26
       const t = easeInOutCubic(Math.min(1, local / 0.4));
       busX = ENTRY + t * (CENTER - ENTRY);
+      if (!_isMobileBus && _s26EnterTs == null) _s26EnterTs = ts; // desktop only, see show26 below
     } else {
       busX = CENTER;
+      if (!_isMobileBus) _s26EnterTs = null;
     }
-    // Damps choppy scroll input (mouse-wheel/trackpad ticks) into a smooth glide instead of
-    // snapping straight to the raw scroll-driven target every frame — scoped to this scene
-    // range only (_s2630BusDampedX resets to null outside it, at the top of this function).
-    if (_s2630BusDampedX === null) _s2630BusDampedX = busX;
-    _s2630BusDampedX += (busX - _s2630BusDampedX) * 0.25;
-    busX = _s2630BusDampedX;
-    // Scene-26 popups are scroll-position driven, not wall-clock — neither can appear just from
-    // sitting still, only from the user actually scrolling further in. Each has its own
-    // independent start/end (edit these 4 numbers directly) with a gap of "dummy" scroll
-    // between them where neither shows.
-    const PANEL26_1_START = 0.1,  PANEL26_1_END = 0.25;
-    const PANEL26_2_START = 0.3,  PANEL26_2_END = 0.45;
-    const show26_1 = scene === 11 && local >= PANEL26_1_START && local < PANEL26_1_END;
-    const show26_2 = scene === 11 && local >= PANEL26_2_START && local < PANEL26_2_END;
-    // Freezes scroll briefly on open so a fast scroll can't skip past the window — shorter than
-    // the shared POPUP_SCROLL_FREEZE_MS (700ms) since these windows are already fairly wide and
-    // a full 700ms hard stop read as glitchy here.
-    const S26_POPUP_FREEZE_MS = 300;
-    if (show26_1 && !_panel26_1Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
-    if (show26_2 && !_panel26_2Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
-    _panel26_1Shown = show26_1;
-    _panel26_2Shown = show26_2;
+    if (_isMobileBus) {
+      // Mobile only: damps choppy scroll input (mouse-wheel/trackpad ticks) into a smooth
+      // glide instead of snapping straight to the raw scroll-driven target every frame
+      // (_s2630BusDampedX resets to null outside this scene range, at the top of this function).
+      if (_s2630BusDampedX === null) _s2630BusDampedX = busX;
+      _s2630BusDampedX += (busX - _s2630BusDampedX) * 0.25;
+      busX = _s2630BusDampedX;
+    }
+    let show26_1, show26_2;
+    if (_isMobileBus) {
+      // Scroll-position driven, not wall-clock — neither can appear just from sitting still,
+      // only from the user actually scrolling further in. Each has its own independent
+      // start/end (edit these 4 numbers directly) with a gap of "dummy" scroll between them.
+      const PANEL26_1_START = 0.1,  PANEL26_1_END = 0.25;
+      const PANEL26_2_START = 0.3,  PANEL26_2_END = 0.45;
+      show26_1 = scene === 11 && local >= PANEL26_1_START && local < PANEL26_1_END;
+      show26_2 = scene === 11 && local >= PANEL26_2_START && local < PANEL26_2_END;
+      // Freezes scroll briefly on open so a fast scroll can't skip past the window — shorter
+      // than the shared POPUP_SCROLL_FREEZE_MS (700ms) since these windows are already fairly
+      // wide and a full 700ms hard stop read as glitchy here.
+      const S26_POPUP_FREEZE_MS = 300;
+      if (show26_1 && !_panel26_1Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
+      if (show26_2 && !_panel26_2Shown) _scrollFreezeUntil = Date.now() + S26_POPUP_FREEZE_MS;
+      _panel26_1Shown = show26_1;
+      _panel26_2Shown = show26_2;
+    } else {
+      // Desktop original: both open together, 1s after the bus finishes driving in.
+      const show26 = scene === 11 && _s26EnterTs != null && (ts - _s26EnterTs) >= 1000;
+      show26_1 = show26;
+      show26_2 = show26;
+    }
     if (panel26_1) {
       panel26_1.style.opacity = show26_1 ? '1' : '0';
       panel26_1.classList.toggle('visible', show26_1);
@@ -3153,11 +3321,12 @@ document.addEventListener('touchstart', e => {
   touchStartY = e.touches[0].clientY;
 }, { passive: true });
 
+const TOUCH_SCROLL_GAIN = 0.1; // was 1.5 — felt too fast on mobile, lower = slower swipe scroll
 document.addEventListener('touchmove', e => {
   const dx = touchStartX - e.touches[0].clientX;
   const dy = touchStartY - e.touches[0].clientY;
   if (Math.abs(dx) > Math.abs(dy)) {
-    window.scrollBy(0, dx * 1.5);
+    window.scrollBy(0, dx * TOUCH_SCROLL_GAIN);
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
   }
@@ -3259,6 +3428,59 @@ function closeCharBubble() {
   if (_charBubbleHideTimer) { clearTimeout(_charBubbleHideTimer); _charBubbleHideTimer = null; }
 }
 
+// Scene 7 (mobile only) — dedicated stacked-quote widget (#s7-stack, separate from the
+// shared #char-bubble, which only ever shows one thing at a time). As the user scrolls
+// through the frozen window, each interviewee's quote appears and stays — never hidden
+// again — until all 4 are visible together in a scrollable list, then the freeze releases
+// (see S7_STACK_STARTS / S7_FREEZE_RELEASE_START-END, and frame()'s effectiveTx branch).
+const s7Stack       = document.getElementById('s7-stack');
+const s7StackScroll = s7Stack ? s7Stack.querySelector('.s7-stack-scroll') : null;
+const s7StackItems  = s7Stack ? Array.from(s7Stack.querySelectorAll('.s7-stack-item')) : [];
+const s5s8Buildings = document.querySelector('.s5s8-buildings');
+const s5s8Road      = document.querySelector('.s5s8-road');
+const s5s8Clouds    = document.querySelector('.s5s8-clouds');
+const S7_BLUR_PX = 5; // bus/road/buildings blur while the quote stack is up (mobile only)
+function renderS7StackText() {
+  s7StackItems.forEach(el => {
+    const data = tChar(el.dataset.char);
+    el.textContent = (data && data.dialogue) || '';
+  });
+}
+if (s7Stack) renderS7StackText();
+document.addEventListener('i18n:rendered', renderS7StackText);
+
+let _s7StackShownCount = 0;
+function updateS7Stack(currentScene, sceneLocal, _isMobile) {
+  if (!s7Stack) return;
+  // Entirely self-contained within scene 6 — hides all 4 at once at S7_STACK_HIDE_AT, well
+  // before the strip ever reaches scene 8, so there's no overlap risk with scene 8's own
+  // popups and no dependency on its bus-zoom timing.
+  const active = _isMobile && currentScene === 6 && sceneLocal < S7_STACK_HIDE_AT;
+  s7Stack.classList.toggle('visible', active);
+  const blur = active ? `blur(${S7_BLUR_PX}px)` : '';
+  if (cityBus) cityBus.style.filter = blur;
+  if (s5s8Buildings) s5s8Buildings.style.filter = blur;
+  if (s5s8Road) s5s8Road.style.filter = blur;
+  if (s5s8Clouds) s5s8Clouds.style.filter = blur;
+  if (!active) {
+    if (_s7StackShownCount !== 0) {
+      s7StackItems.forEach(el => el.classList.remove('shown'));
+      _s7StackShownCount = 0;
+    }
+    return;
+  }
+  let shownCount = 0;
+  for (let i = 0; i < S7_STACK_STARTS.length; i++) {
+    const shown = sceneLocal >= S7_STACK_STARTS[i];
+    s7StackItems[i].classList.toggle('shown', shown);
+    if (shown) shownCount++;
+  }
+  if (shownCount !== _s7StackShownCount && s7StackScroll) {
+    s7StackScroll.scrollTop = s7StackScroll.scrollHeight;
+  }
+  _s7StackShownCount = shownCount;
+}
+
 document.querySelectorAll('.cross-btn, .plus-btn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
@@ -3308,6 +3530,20 @@ function positionCharBubble(btn) {
   const dir  = btn.dataset.dir || 'right';
   const bw = charBubble.offsetWidth;
   const n = CHAR_BUBBLE_NUDGE[btn.dataset.popup] || { x: 0, y: 0 };
+  if (window.innerWidth <= 768) {
+    // Mobile: a fixed ~255px-wide bubble positioned "next to the button" can never satisfy
+    // the edge-margin check below once the button itself sits in the left/right third of a
+    // narrow screen — that's exactly why scene 12's 3 buttons silently failed to open at all
+    // (closeCharBubble() below fired on every click). Center it instead; no edge case to hit.
+    charBubble.classList.remove('pop-left');
+    charBubble.style.left = ((window.innerWidth - bw) / 2) + 'px';
+    const bh = charBubble.offsetHeight;
+    const rawTop = rect.top + rect.height / 2 - bh / 2;
+    const minTop = 60;
+    const maxTop = window.innerHeight - bh - 20;
+    charBubble.style.top = Math.min(Math.max(rawTop, minTop), maxTop) + 'px';
+    return;
+  }
   if (dir === 'right') {
     charBubble.classList.add('pop-left');
     charBubble.style.left = (rect.left - bw - 12 + n.x) + 'px';
