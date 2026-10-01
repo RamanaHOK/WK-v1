@@ -99,17 +99,22 @@ const S46_ZOOM_MS = 900; // popups' own wall-clock queue timing only
 const S46_HUNIKI_LOCAL_END = 0.23;
 const S46_BIGTECH_LOCAL_END = 0.38;
 // #s45-s48-bg's own left/width from style.css — single source (was duplicated in 2-3 places).
-const S45S48_BG_LEFT_VW = 2250; // must match #s45-s48-bg's `left` in style.css
-const S45S48_BG_WIDTH_VW = 520; // must match #s45-s48-bg's `width` in style.css
+const S45S48_BG_LEFT_VW = 2254; // must match #s45-s48-bg's `left` in style.css — was 2250 (a 4vw
+  // drift that threw off positionCenteredPopup's centering for totomoto/redlady/huniki/bigtech
+  // by a constant 4vw on both platforms; desktop's larger absolute pixels made it easy to miss)
+const S45S48_BG_WIDTH_VW = 500; // must match #s45-s48-bg's `width` in style.css — was 520
 const S46_CHAR_CENTER_VW = 250.5; // .char-s45-wheelchair center, within #s45-s48-bg
 
 // Scenes 26-30: strip freezes at this vw offset past #s26-s30-bg's stripX once the bus parks,
 // holding all interviewees on screen through scene 29. Desktop keeps the original 0.77 (which
 // matches the natural pan exactly at the trigger point, for a seamless snap-to-freeze, so no
 // easing is needed there); mobile uses a shifted value with an eased entry instead of a snap
-// (see S2630_FREEZE_EASE_START/TRIGGER, computed per-frame in frame() below).
+// (see S2630_FREEZE_EASE_START/TRIGGER below).
 const S2630_FREEZE_VW_DESKTOP = 0.77;
 const S2630_FREEZE_VW_MOBILE = 1.10;
+const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in begins (mobile only)
+const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen — also used
+// by animateS26S30's mobile-only background parallax (below) to know where the freeze begins.
 
 // Scene 7 (mobile only) — strip freezes at scene entry so the 4 interviewees stay on screen
 // while their quotes stack up (appear and stay, never hidden again) as the user keeps
@@ -143,9 +148,21 @@ const S12_MOBILE_SCROLL_MULT = 8.0;
 // just drives the bus in beforehand). SCENE_SCROLL[9] = 11.0 is already fairly long, but the
 // zoom/popup sequence packs several distinct beats into fractions of that range, so it still
 // reads as rushed on mobile. Widened here; desktop unaffected (keeps SCENE_SCROLL[9] = 11.0).
-const S13_MOBILE_SCROLL_MULT = 35.0; // bumped from 20 — the freeze fractions below compress
-// the 2nd zoom/exit/slide-up into a smaller share of the scene, so more total length keeps
-// their absolute on-screen duration from feeling rushed.
+const S13_MOBILE_SCROLL_MULT = 55.0; // bumped from 35 — popups were still easy to scroll
+// straight past on a fast flick; more absolute length per fraction gives more margin before
+// a popup's window is fully behind you. The freeze fractions below compress the 2nd
+// zoom/exit/slide-up into a smaller share of the scene, so more total length also keeps their
+// absolute on-screen duration from feeling rushed.
+
+// Scenes 26-30 (mobile only) — the whole group (bus drive-in, the 3 interviewee-pair swaps,
+// then scene 30's zoom + Awa Ly popups) still read as tight/rushed even after the first
+// widening pass, so bumped further and extended to the whole group instead of just scene 26.
+// Desktop unaffected (keeps SCENE_SCROLL[11..15] at their original 2.0/1.3/1.3/1.3/3.5).
+const S26_MOBILE_SCROLL_MULT = 5.1;
+const S27_MOBILE_SCROLL_MULT = 5.7;
+const S28_MOBILE_SCROLL_MULT = 5.7;
+const S29_MOBILE_SCROLL_MULT = 5.7;
+const S30_MOBILE_SCROLL_MULT = 9.6;
 
 // ---- DOM ----
 const pinnedWrap  = document.getElementById('pinned-wrap');
@@ -183,6 +200,7 @@ const panelS13_3 = document.getElementById('panel-s13-3');
 const panel26_1 = document.getElementById('panel-26-1');
 const panel26_2 = document.getElementById('panel-26-2');
 const panel26_3 = document.getElementById('panel-26-3');
+const s26RevolutionSign = document.getElementById('s26-revolution-sign');
 const panelS21Meta1     = document.getElementById('panel-s21-meta-1');
 const panelS21Google1   = document.getElementById('panel-s21-google-1');
 const panelS21Meta2     = document.getElementById('panel-s21-meta-2');
@@ -320,9 +338,21 @@ const char34Kid1       = document.querySelector('.char-s34-kid1'); // lollipop k
 const s4TreesOverlay = document.getElementById('s4-trees');
 const s4TreesPlayer  = document.getElementById('s4-trees-player');
 let _s4TreesPlaying  = false;
-// Reverted per request — was forcing preserveAspectRatio to "slice" (crops sides to fill top/
-// bottom with no gap); now left at its default "meet" (shows the full uncropped image, relying
-// on style.css's overflow:visible so the letterboxed excess isn't clipped instead).
+if (s4TreesPlayer) {
+  // Mobile only: stretch content to fill the exact 750x1600 box edge-to-edge (no letterbox,
+  // no crop) — CSS object-fit doesn't reach into a custom element, so the shadow-DOM svg's own
+  // preserveAspectRatio has to be patched directly, same technique as s8BusTransitionPlayer's
+  // forceSlice above. Desktop keeps the default "meet" (untouched, no width/height override
+  // there either).
+  const forceStretchS4Trees = () => {
+    if (getVw() > 768) return;
+    const svg = s4TreesPlayer.shadowRoot && s4TreesPlayer.shadowRoot.querySelector('svg');
+    if (!svg) return;
+    svg.setAttribute('preserveAspectRatio', 'none');
+  };
+  s4TreesPlayer.addEventListener('ready', forceStretchS4Trees);
+  s4TreesPlayer.addEventListener('load', forceStretchS4Trees);
+}
 // Fixed trees overlay for scene 5 — sits above #city-bus in root stacking context
 const cityTrees5    = document.getElementById('city-trees-5');
 const s1215TreesFront = document.getElementById('s1215-trees-front');
@@ -415,6 +445,11 @@ const s60ZoomExtras = Array.from(document.querySelectorAll('.s60-zoom-extra'));
 const cityOverlay26 = document.getElementById('city-overlay-26');
 const cityOverlay26Behind = document.getElementById('city-overlay-26-behind'); // fruit-lady lottie — stays below #city-bus, see animateS26S30
 const s2630Bg        = document.getElementById('s26-s30-bg');
+const s2630Buildings = document.querySelector('.s2630-buildings');
+const s2630Road      = document.querySelector('.s2630-road');
+const s2630Clouds    = document.querySelector('.s2630-clouds');
+const s26Fruitlady   = document.querySelector('.char-s26-fruitlady2');
+const s26Pigeons1    = document.querySelector('.char-s26-pigeons1');
 
 // Scene 32–43 overlay — 1300vw wide, ambient passengers, translates in sync with the strip
 const cityOverlay32 = document.getElementById('city-overlay-32');
@@ -477,6 +512,8 @@ let _panel26_1Shown = false; // scroll-freeze-on-open tracker, scene-26 popups (
 let _panel26_2Shown = false;
 let _s26EnterTs = null; // desktop only: timestamp scene 26 was last (re)entered — opens both popups 1s later
 let _s2630BusDampedX = null; // damped bus X for scenes 26-30, mobile only, see animateCityBus
+let _s2630BuildingsBaseX = null; // natural (pre-parallax) X + measured box width, captured once per
+let _s2630BuildingsBoxWidth = null; // entry into scenes 26-30 — see animateS26S30's dynamic drift cap
 let _panel55Shown = false; // same, for panel-55/55b/56/57 (scenes 55-57)
 let _panel55bShown = false;
 let _panel56Shown = false;
@@ -580,6 +617,28 @@ function getVw() {
   return document.documentElement.clientWidth || window.innerWidth;
 }
 
+// Mobile only: re-centers an absolutely-positioned element horizontally on the viewport via an
+// extra translateX layered on top of its existing (scroll-strip-relative) position — used for
+// popups nested inside a transformed/moving overlay, where a plain left:50% wouldn't track the
+// viewport. Resets transform first so the measurement reflects the element's natural position,
+// not last frame's correction.
+function centerHorizontallyOnMobile(el) {
+  // Elements using plain .text-panel (no .s8-pop/.pop override) transition `transform` as well
+  // as opacity — resetting to 'none' then immediately back to the real value, every single
+  // frame this runs, kept re-triggering that transition before it could ever finish, so the
+  // element never visually reached its centered position (stuck animating toward a constantly
+  // "just reset" starting point instead). Suspending the transition for this one update avoids
+  // it regardless of what transition (if any) the element has.
+  const prevTransition = el.style.transition;
+  el.style.transition = 'none';
+  el.style.transform = 'none';
+  const r = el.getBoundingClientRect();
+  const deltaX = (window.innerWidth - r.width) / 2 - r.left;
+  el.style.transform = `translateX(${deltaX.toFixed(1)}px)`;
+  el.offsetHeight; // force the above to commit before transition is restored
+  el.style.transition = prevTransition;
+}
+
 // ---- Setup: scroll length ----
 // SCROLL_MAP rescales on resize but window.scrollY doesn't, so capture the logical position
 // (scene + local%) before rebuilding and re-apply it after, or a resize jerks the story backward.
@@ -679,6 +738,11 @@ function buildScrollMap() {
     const sceneScrollMult = (isMobile && i === 6) ? S7_MOBILE_SCROLL_MULT
       : (isMobile && i === 8) ? S12_MOBILE_SCROLL_MULT
       : (isMobile && i === 9) ? S13_MOBILE_SCROLL_MULT
+      : (isMobile && i === 11) ? S26_MOBILE_SCROLL_MULT
+      : (isMobile && i === 12) ? S27_MOBILE_SCROLL_MULT
+      : (isMobile && i === 13) ? S28_MOBILE_SCROLL_MULT
+      : (isMobile && i === 14) ? S29_MOBILE_SCROLL_MULT
+      : (isMobile && i === 15) ? S30_MOBILE_SCROLL_MULT
       : SCENE_SCROLL[i];
     const len    = sceneScrollMult * vw;
     // Scene 21 (i=10): real DOM start is 1165vw (1000vw base + margin-left:165vw) — the extra
@@ -930,8 +994,6 @@ function frame(ts) {
   // Scenes 26-30 freeze position — see S2630_FREEZE_VW_DESKTOP/MOBILE's own comment. Desktop's
   // original value needs no easing (already seamless); mobile's shifted value does.
   const S2630_FREEZE_VW = _isMobile ? S2630_FREEZE_VW_MOBILE : S2630_FREEZE_VW_DESKTOP;
-  const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in begins (mobile only)
-  const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen
 
   // Smooth cursor parallax — 4 tiers, each at a different lerp speed.
   // Active across all city scenes (5–19); lerp target goes to 0 just before the bus exits.
@@ -1784,7 +1846,11 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   // flush at the screen's left edge, instead of fully centered. Used as the bus's resting
   // position across every scene that parks it (5,6,7,8,9,11-15,22-29), not just on entry.
   const CENTER = _isMobileCityBus ? -1.40 * vw : 0.225 * vw;
-  const ENTRY  = -0.1 * vw; // off-screen left (right edge at 0)
+  const ENTRY  = -0.1 * vw; // off-screen left (right edge at 0) — calibrated for the desktop
+  // 55vw bus; with the mobile 200vw bus its right edge sits at 1.9vw, i.e. covering the whole
+  // screen rather than being off it. ENTRY_MOBILE's right edge sits at -0.2vw instead — genuinely
+  // off-screen — for any mobile scene that still wants a real drive-in animation (e.g. scene 26).
+  const ENTRY_MOBILE = -2.2 * vw;
 
   let busY = 0; // vertical offset (px) applied to translateY — tune per-scene
   // .s1215-road's rendered height as a fraction of vw — constant across window sizes since
@@ -2011,9 +2077,15 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     }
     const _isMobileBus = vw <= 768;
     if (scene === 11) {
-      // Drive from off-screen left to center over first 40% of scene 26
-      const t = easeInOutCubic(Math.min(1, local / 0.4));
-      busX = ENTRY + t * (CENTER - ENTRY);
+      // Drive from off-screen left to center over first 40% of scene 26 (55% on mobile — slower,
+      // less abrupt once the bus becomes visible). Mobile uses ENTRY_MOBILE (genuinely off-screen
+      // for the 200vw bus) instead of the desktop-calibrated ENTRY, which used to start the bus
+      // fully covering the screen and "retreat" down to the resting 30% instead of actually
+      // driving in.
+      const ENTRY_DURATION = _isMobileBus ? 0.45 : 0.4;
+      const t = easeInOutCubic(Math.min(1, local / ENTRY_DURATION));
+      const entry = _isMobileBus ? ENTRY_MOBILE : ENTRY;
+      busX = entry + t * (CENTER - entry);
       if (!_isMobileBus && _s26EnterTs == null) _s26EnterTs = ts; // desktop only, see show26 below
     } else {
       busX = CENTER;
@@ -2023,8 +2095,10 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       // Mobile only: damps choppy scroll input (mouse-wheel/trackpad ticks) into a smooth
       // glide instead of snapping straight to the raw scroll-driven target every frame
       // (_s2630BusDampedX resets to null outside this scene range, at the top of this function).
+      // Lower factor = more lag = the bus reads as slower/heavier without touching how much
+      // scroll it takes to complete the drive-in.
       if (_s2630BusDampedX === null) _s2630BusDampedX = busX;
-      _s2630BusDampedX += (busX - _s2630BusDampedX) * 0.25;
+      _s2630BusDampedX += (busX - _s2630BusDampedX) * 0.12;
       busX = _s2630BusDampedX;
     }
     let show26_1, show26_2;
@@ -2032,8 +2106,8 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       // Scroll-position driven, not wall-clock — neither can appear just from sitting still,
       // only from the user actually scrolling further in. Each has its own independent
       // start/end (edit these 4 numbers directly) with a gap of "dummy" scroll between them.
-      const PANEL26_1_START = 0.1,  PANEL26_1_END = 0.25;
-      const PANEL26_2_START = 0.3,  PANEL26_2_END = 0.45;
+      const PANEL26_1_START = 0.5,  PANEL26_1_END = 0.62;
+      const PANEL26_2_START = 0.68, PANEL26_2_END = 0.8;
       show26_1 = scene === 11 && local >= PANEL26_1_START && local < PANEL26_1_END;
       show26_2 = scene === 11 && local >= PANEL26_2_START && local < PANEL26_2_END;
       // Freezes scroll briefly on open so a fast scroll can't skip past the window — shorter
@@ -2050,21 +2124,47 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       show26_1 = show26;
       show26_2 = show26;
     }
+    // Shows a bit earlier now — during the tail of scene 27, ahead of the 2nd pair (Chris &
+    // Kathleen, scene 28) — hides once the 3rd pair starts its own fade-out (busSwapT > 0) so
+    // it hands off to the welcome popup instead of overlapping it.
+    const show263 = swapProg >= 0.6 && busSwapT === 0;
     if (panel26_1) {
       panel26_1.style.opacity = show26_1 ? '1' : '0';
       panel26_1.classList.toggle('visible', show26_1);
+      if (_isMobileBus) {
+        if (show26_1) centerHorizontallyOnMobile(panel26_1);
+        else panel26_1.style.transform = '';
+      }
     }
     if (panel26_2) {
       panel26_2.style.opacity = show26_2 ? '1' : '0';
       panel26_2.classList.toggle('visible', show26_2);
+      if (_isMobileBus) {
+        if (show26_2) centerHorizontallyOnMobile(panel26_2);
+        else panel26_2.style.transform = '';
+      }
     }
     if (panel26_3) {
-      // Shows a bit earlier now — during the tail of scene 27, ahead of the 2nd pair (Chris &
-      // Kathleen, scene 28) — hides once the 3rd pair starts its own fade-out (busSwapT > 0)
-      // so it hands off to the welcome popup instead of overlapping it.
-      const show263 = swapProg >= 0.6 && busSwapT === 0;
       panel26_3.style.opacity = show263 ? '1' : '0';
       panel26_3.classList.toggle('visible', show263);
+      if (_isMobileBus) {
+        if (show263) centerHorizontallyOnMobile(panel26_3);
+        else panel26_3.style.transform = '';
+      }
+    }
+    if (s26RevolutionSign) {
+      // Mobile only: was always on throughout scenes 26-30 — now only lit up alongside whichever
+      // of its 3 popups is currently open, dark the rest of the time, and re-centered on the
+      // viewport while lit (was pinned to a fixed spot on the moving strip). Desktop keeps its
+      // original always-visible, unpositioned behavior.
+      if (_isMobileBus) {
+        const showSign = show26_1 || show26_2 || show263;
+        s26RevolutionSign.style.opacity = showSign ? '1' : '0';
+        if (showSign) centerHorizontallyOnMobile(s26RevolutionSign);
+        else s26RevolutionSign.style.transform = '';
+      } else {
+        s26RevolutionSign.style.opacity = '';
+      }
     }
     // Scene 30: 2 popups play first (no zoom), then zoom-in (34-55%), exterior->interior swap
     // at the peak (55-60%), hold through Awa Ly's message (60-90%, S30_HOLD_END), then zoom
@@ -2112,6 +2212,15 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       const busFadeMul = 1 - busFadeT * 0.2; // floor at 0.8, not 0
       if (cityBusS26)    cityBusS26.style.opacity    = ((1 - insideT) * busFadeMul).toFixed(3);
       if (cityBusInside) cityBusInside.style.opacity = (insideT * busFadeMul).toFixed(3);
+      // #city-bus-inside is sized to 155vw on mobile (see style.css) for a cover-style crop on
+      // a portrait screen — centering a box that width within the viewport (same formula as
+      // the scene-8 CENTER comment above: (100-width)/2) means it overflows and crops evenly
+      // on both sides instead of the desktop-width version leaving empty space on the right.
+      // busX sits inside #pinned-wrap, which is itself scaled by s30Scale around its own
+      // origin — any flat offset placed here gets multiplied by that scale (the same
+      // pinned-wrap gotcha that's bitten positioning elsewhere), so divide it out or a small
+      // intended shift turns into a huge one that pushes the content off-screen entirely.
+      if (_isMobileCityBus && insideT > 0) busX = (-0.35 * vw) / s30Scale; // (1 - 1.70) / 2, scale-corrected
 
       // Awa Ly: fades in standing (62-66%), crossfades to holding the ceiling handle (70-75%).
       // Lives in her own #s30-zoom-people overlay, so busFadeT is applied to her directly.
@@ -2137,7 +2246,11 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
 
       if (cityBus) cityBus.style.transformOrigin = '50% 50%';
       if (pinnedWrap) {
-        const originX = Math.max(0, Math.min(100, 50 + ZOOM_ORIGIN_X_OFFSET));
+        // ZOOM_ORIGIN_X_OFFSET was tuned against desktop's 55vw-wide bus image — on mobile's
+        // 200vw-wide bus, that same percentage-of-pinnedWrap nudge lands in a very different
+        // spot relative to the actual bus content, so #city-bus-inside reads as off-center
+        // instead of centered once PEAK_SCALE (4.5x) amplifies it. True center on mobile only.
+        const originX = _isMobileCityBus ? 50 : Math.max(0, Math.min(100, 50 + ZOOM_ORIGIN_X_OFFSET));
         const originYBase = Math.max(0, Math.min(100, busCenterY() + ZOOM_ORIGIN_Y_OFFSET));
         // Nudges the anchor up as fade-out progresses, so the zoom-out reveals the floor, not the ceiling.
         const originY = Math.max(0, Math.min(100, originYBase - busFadeT * 4.5));
@@ -2459,6 +2572,64 @@ function animateS26S30(scene, local, etx) {
   cityOverlay26.style.opacity = opacity.toFixed(3);
   if (cityOverlay26Behind) cityOverlay26Behind.style.opacity = opacity.toFixed(3);
 
+  // Mobile only: the bus/characters freeze in place from here (S2630_FREEZE_TRIGGER) through
+  // scene 29 so the interviewee popups don't slide away — but that also left the buildings/
+  // road/clouds looking completely static the whole time. Layer a slow, independent parallax
+  // drift on top of their own (already-frozen) position, purely cosmetic — it never touches
+  // effectiveTx, so the bus and characters stay exactly where the freeze puts them.
+  if (getVw() <= 768) {
+    if (scene < 11 || scene > 15) {
+      // Out of range — clear the cached base position so the next entry re-measures fresh
+      // (mirrors _s2630BusDampedX's own reset just above in animateCityBus).
+      _s2630BuildingsBaseX = null;
+      _s2630BuildingsBoxWidth = null;
+    } else if (_s2630BuildingsBaseX === null && s2630Buildings) {
+      // First frame in range: reset to the untransformed position and measure once. The box's
+      // width is height-derived (matches the source SVG's aspect ratio, see style.css) while the
+      // drift below is width-derived, so the safe amount of drift varies by device aspect ratio
+      // (e.g. iPhone SE's shorter screen gives a proportionally narrower box) — measuring the
+      // real rendered box here, instead of assuming a fixed vw amount is always safe, is what
+      // keeps this from running out and exposing blank sky on some devices but not others.
+      s2630Buildings.style.transform = 'translateX(0px)';
+      const r0 = s2630Buildings.getBoundingClientRect();
+      _s2630BuildingsBaseX = r0.x;
+      _s2630BuildingsBoxWidth = r0.width;
+    }
+    const FREEZE_START = 11 + S2630_FREEZE_TRIGGER; // scene 26 at the trigger point
+    const FREEZE_END    = 14 + 0.85;                 // scene 29 at 85% (freeze's own end point)
+    const cur = scene + local;
+    const freezeT = Math.min(1, Math.max(0, (cur - FREEZE_START) / (FREEZE_END - FREEZE_START)));
+    const PARALLAX_VW = 5.5; // desired total drift across the whole frozen stretch, clamped below
+    const SAFETY_MARGIN_PX = 24;
+    const desiredDrift = freezeT * PARALLAX_VW * getVw();
+    const maxSafeDrift = _s2630BuildingsBaseX != null
+      ? Math.max(0, _s2630BuildingsBaseX + _s2630BuildingsBoxWidth - getVw() - SAFETY_MARGIN_PX)
+      : desiredDrift;
+    const parallaxPx = -Math.min(desiredDrift, maxSafeDrift);
+    const parallaxTf = `translateX(${parallaxPx.toFixed(1)}px)`;
+    if (s2630Buildings) s2630Buildings.style.transform = parallaxTf;
+    if (s2630Road)      s2630Road.style.transform      = parallaxTf;
+    if (s2630Clouds)    s2630Clouds.style.transform     = parallaxTf;
+
+    // Fruit-lady/pigeons are positioned via CSS left (see style.css, near the buildings) and
+    // ride the strip exactly like the buildings do — same parallaxTf, no cancellation, no custom
+    // targeting. (Previous attempts computed a "fixed target" by cancelling their natural etx
+    // drift, which matched the buildings' own motion only during the frozen stretch, where the
+    // building ALSO isn't moving except for parallaxPx — before the freeze, the building still
+    // pans naturally with etx while the cancellation held these two artificially still, so they
+    // visibly drifted apart during that pre-freeze window. Using the identical transform removes
+    // the mismatch entirely, in exchange for no longer controlling exactly where on screen they
+    // end up — that's now purely a function of their CSS left position, tuned below.)
+    if (s26Fruitlady) s26Fruitlady.style.transform = parallaxTf;
+    if (s26Pigeons1)  s26Pigeons1.style.transform  = parallaxTf;
+  } else {
+    if (s2630Buildings) s2630Buildings.style.transform = '';
+    if (s2630Road)      s2630Road.style.transform      = '';
+    if (s2630Clouds)    s2630Clouds.style.transform     = '';
+    if (s26Fruitlady)   s26Fruitlady.style.transform    = '';
+    if (s26Pigeons1)    s26Pigeons1.style.transform     = '';
+  }
+
   // #s26-s30-bg stays visible through the scene-30 zoom, only easing out at the very end
   // (95-100%) so the handoff into scene 32's fade-in isn't an instant snap.
   if (s2630Bg) {
@@ -2482,12 +2653,24 @@ function animateS26S30(scene, local, etx) {
   if (!allDone) _s2630BoardFade = 0;
   else          _s2630BoardFade += (1 - _s2630BoardFade) * 0.06; // ~0.8s to full fade
 
+  // Mobile only: no per-pair swap and no fade — every standing figure (group1, all 3 pairs)
+  // hides and every name card (group2) shows together, in one instant step at a single shared
+  // moment (reusing the last pair's own former trigger point), instead of each pair swapping
+  // separately during its own scene. Desktop keeps its original per-pair smooth ramp + LERP
+  // untouched.
+  const _isMobileS2630Swap = getVw() <= 768;
   const LERP = 0.08;
+  const s2630AllSwapped = progress >= 2.5;
   s2630Pairs.forEach(([g1, g2], i) => {
     const b  = s2630Batch[i];
     const t  = Math.min(1, Math.max(0, (progress - (b + 0.3)) / 0.4));
-    s2630G1Op[i] += ((1 - t) - s2630G1Op[i]) * LERP;
-    s2630G2Op[i] += (t       - s2630G2Op[i]) * LERP;
+    if (_isMobileS2630Swap) {
+      s2630G1Op[i] = s2630AllSwapped ? 0 : 1;
+      s2630G2Op[i] = s2630AllSwapped ? 1 : 0;
+    } else {
+      s2630G1Op[i] += ((1 - t) - s2630G1Op[i]) * LERP;
+      s2630G2Op[i] += (t       - s2630G2Op[i]) * LERP;
+    }
     const board = 1 - _s2630BoardFade;
     if (g1) g1.style.opacity = (s2630G1Op[i] * board).toFixed(3);
     if (g2) g2.style.opacity = (s2630G2Op[i] * board).toFixed(3);
@@ -2624,6 +2807,9 @@ function animateS32S43(scene, local, etx, ts) {
     } else {
       s32Scale = 1 + 0.2 * asmelashZoomInT; // zoomed-in phase: Lesan-dismiss through Asmelash + pregnant popups
     }
+    // Mobile only: no zoom in/out at all — stay flat at the starting scale throughout, just pan
+    // (desktop keeps the full 1/1.5/1.2/1.2x zoom choreography above untouched).
+    if (getVw() <= 768) s32Scale = 1;
     const vwPx = getVw() / 100;
     const stripXvw = -etx / vwPx;             // strip coordinate currently at the viewport's left edge
     const viewportCenterVw = stripXvw + 50;   // center of the 100vw viewport, in strip coordinates
@@ -2712,8 +2898,15 @@ function animateS32S43(scene, local, etx, ts) {
   }
 
   // Sadik — plain scroll-position rule, not tied to pregnantZoomT's wall-clock timer (which
-  // could let local advance well past intended before completing).
-  const showSadik = scene > 17 || (scene === 17 && local >= 0.97);
+  // could let local advance well past intended before completing). "scene > 17" has no upper
+  // bound, so on mobile — where #city-overlay-32's own opacity doesn't reset either — Sadik,
+  // the lollipop kid, his popup, and his name plate stayed visible forever once shown, bleeding
+  // into every later scene (confirmed: still on screen next to Toto Moto in scene 44). Desktop
+  // apparently never surfaced this (left untouched); mobile drops back to false once the scene
+  // actually advances past 17 instead of staying permanently true.
+  const showSadik = getVw() <= 768
+    ? (scene === 17 && local >= 0.97)
+    : (scene > 17 || (scene === 17 && local >= 0.97));
   if (char32Sadik) char32Sadik.style.opacity = showSadik ? '1' : '0';
   if (char34Kid1) char34Kid1.style.opacity = showSadik ? '1' : '0'; // lollipop kid, opens/hides together with Sadik per request
 
@@ -2748,6 +2941,20 @@ function animateS32S43(scene, local, etx, ts) {
     panel32Sadik.classList.toggle('visible', showSadik);
   }
   if (soundCaptionSadik) soundCaptionSadik.style.opacity = showSadik ? '1' : '0';
+
+  // Mobile only: center these 8 popups + 3 name plates horizontally on screen, matching
+  // #panel-30-awayly's reference look. They stay position:absolute (see style.css) since
+  // they're nested inside #city-overlay-32, which gets its own transform every frame — a
+  // position:fixed descendant of a transformed ancestor doesn't anchor to the viewport, it
+  // anchors to that ancestor instead, so centering is done via an extra transform (same
+  // technique already used for panel-26-1/2/3) instead of position:fixed.
+  if (getVw() <= 768) {
+    [panel32Intro, panel32Umuganda, panel32Samuel, panel32Asmelash, panel32Asmelash2,
+     panel32PregnantUp, panel32PregnantDown, panel32Sadik,
+     soundCaptionSamuel, soundCaptionAsmelash, soundCaptionSadik].forEach(el => {
+      if (el && el.style.opacity === '1') centerHorizontallyOnMobile(el);
+    });
+  }
 }
 
 // ---- Scene 44: slides down from the top over scene-34 instead of panning in horizontally.
@@ -2765,8 +2972,14 @@ function animateS44(scene, local) {
   s44Overlay.style.transform = `translateY(${translateY.toFixed(2)}%) scale(${scale.toFixed(3)})`;
   s44Overlay.style.opacity = (1 - exitT).toFixed(3);
 
-  // #s45-s48-bg stays hidden until the overlay above starts revealing it (exitT).
-  if (s4548Bg) s4548Bg.style.opacity = exitT.toFixed(3);
+  // #s45-s48-bg stays hidden until the overlay above starts revealing it (exitT). exitT is
+  // unbounded past scene 20 (stays 1 forever, same "no upper bound" pattern as the Sadik bug
+  // fixed earlier) — on mobile only, once we're past scene 22 this was permanently overwriting
+  // the correctly-bounded safety-net check below (currentScene<=22) back to opacity 1 every
+  // frame, so #s45-s48-bg never actually hid behind #s55-s58-bg (confirmed: both visible
+  // simultaneously well into scene 23). Desktop has the same bug but is left untouched per
+  // the same mobile-only scoping used for the Sadik fix.
+  if (s4548Bg && !(getVw() <= 768 && scene > 22)) s4548Bg.style.opacity = exitT.toFixed(3);
 
   // IMPORTANT: must run AFTER animateS32S43 in frame()'s call order — this intentionally
   // overrides #s32-s43-bg's opacity (which animateS32S43 otherwise holds at 1) during the
@@ -2781,6 +2994,13 @@ function animateS44(scene, local) {
     const showPanel44_1 = slideT >= 1;
     panel44_1.style.opacity = showPanel44_1 ? '1' : '0';
     panel44_1.classList.toggle('visible', showPanel44_1);
+    // Mobile only: its own left:31%/transform:translateX(-50%) (see style.css) left it
+    // overflowing off the left edge on a phone — recenter the same way as the scene 32-43
+    // popups instead.
+    if (getVw() <= 768) {
+      if (showPanel44_1) centerHorizontallyOnMobile(panel44_1);
+      else panel44_1.style.transform = '';
+    }
   }
 }
 
@@ -2816,7 +3036,19 @@ function positionNearTruckFront(popupEl, truckEl, winX, winY, behind) {
 
 function positionCenteredPopup(el, show, centerVw) {
   if (!el) return;
-  el.style.left = `${centerVw.toFixed(2)}vw`;
+  // Mobile only: #panel-45-redlady has its own left:420vh!important in style.css — a stray
+  // !important on a stylesheet rule beats a plain (non-important) inline style regardless of
+  // specificity, so that bad value was winning over this function's computed centering
+  // entirely (confirmed: inline left read back as the correct ~222vw, but computed/rendered
+  // left was the broken 420vh). Desktop's pan math happens to land the result roughly on
+  // screen anyway by coincidence, so it's left alone; mobile's didn't, landing thousands of
+  // pixels off-screen. setProperty(...,'important') makes this win the same way !important
+  // CSS would, instead of losing to it.
+  if (getVw() <= 768) {
+    el.style.setProperty('left', `${centerVw.toFixed(2)}vw`, 'important');
+  } else {
+    el.style.left = `${centerVw.toFixed(2)}vw`;
+  }
   el.style.transform = `translateX(-50%) translateY(${show ? '0' : '8px'})`;
   el.style.opacity = show ? '1' : '0';
   el.classList.toggle('visible', show);
@@ -2843,6 +3075,13 @@ function animateS45S48(scene, local, etx, ts) {
   // Toto moto's name plate + quote hand off to the red lady the moment she shows up.
   const showTotoMotoLabel = showTotoMoto && !showRedLadyChar;
   if (soundCaptionTotoMoto) soundCaptionTotoMoto.style.opacity = showTotoMotoLabel ? '1' : '0';
+  // Mobile only: like Kathleen's name plate, this one is positioned via static CSS left (176vw)
+  // with no JS centering at all (unlike totomoto's own popup, which does use
+  // positionCenteredPopup) — same fix.
+  if (getVw() <= 768) {
+    if (soundCaptionTotoMoto && showTotoMotoLabel) centerHorizontallyOnMobile(soundCaptionTotoMoto);
+    else if (soundCaptionTotoMoto) soundCaptionTotoMoto.style.transform = '';
+  }
 
   // Kathleen's quote — same window as Kathleen herself, positioned via CSS not positionCenteredPopup().
   if (panel45Kathleen) {
@@ -2851,6 +3090,15 @@ function animateS45S48(scene, local, etx, ts) {
   }
   // Name plate + sound icon now hide/show together with her quote popup.
   if (soundCaptionKathleen) soundCaptionKathleen.style.opacity = showKathleen ? '1' : '0';
+  // Mobile only: Kathleen's popup + name plate use a static CSS left (158vw/178vw), unlike
+  // totomoto/redlady/huniki/bigtech which get analytically centered by positionCenteredPopup —
+  // center these the same way the scene 32-43 popups are (centerHorizontallyOnMobile).
+  if (getVw() <= 768) {
+    if (panel45Kathleen && showKathleen) centerHorizontallyOnMobile(panel45Kathleen);
+    else if (panel45Kathleen) panel45Kathleen.style.transform = '';
+    if (soundCaptionKathleen && showKathleen) centerHorizontallyOnMobile(soundCaptionKathleen);
+    else if (soundCaptionKathleen) soundCaptionKathleen.style.transform = '';
+  }
 
   // Red lady's quote — shown briefly, hides before toto moto's own popup takes its turn.
   const showRedLady = scene === 20 && local > 0.7 && local < 0.82;
@@ -2866,7 +3114,12 @@ function animateS45S48(scene, local, etx, ts) {
     : scene > 21 ? 1
     : easeInOutCubic(Math.min(1, Math.max(0, (local - S46_HOLD_START) / (S46_ZOOM_END_LOCAL - S46_HOLD_START))));
   if (s4548Visual) {
-    const s46Scale = 1 + 0.5 * wheelchairZoomT;
+    // Mobile only: no zoom in/out — stay flat at the starting scale, same as animateS32S43's
+    // s32Scale fix (desktop keeps the full 1x -> 1.5x zoom-in below untouched). panel-47-newguy
+    // and its name plate have their own fixed scale(0.6667) specifically to counteract this
+    // 1.5x zoom (see style.css) — a mobile override resets those back to scale(1) to match.
+    let s46Scale = 1 + 0.5 * wheelchairZoomT;
+    if (getVw() <= 768) s46Scale = 1;
     // Recomputes origin from viewport center (same technique as animateS32S43's s3243Bg zoom).
     // Scales #s45-s48-visual only, not #s45-s48-bg — popups/nameplates are siblings outside it.
     const originXPct = Math.max(0, Math.min(100, (popupCenterVw / S45S48_BG_WIDTH_VW) * 100));
@@ -3525,12 +3778,23 @@ const CHAR_BUBBLE_NUDGE = {
   's7-granny':   { x: 380, y: 0 },
   's7-green-men':   { x: 380, y: 0 },
 };
+// These 6 interviewee popups open next to their own character on mobile (see style.css's
+// width:auto override for them) instead of centered like every other char-bubble.
+const PEOPLE_POPUP_IDS = ['s27-asmelash', 's27-awayly', 's28-chris', 's28-kathleen', 's29-sadik', 's29-samuel'];
+
 function positionCharBubble(btn) {
   const rect = btn.getBoundingClientRect();
-  const dir  = btn.dataset.dir || 'right';
+  const isPeoplePopup = PEOPLE_POPUP_IDS.includes(btn.dataset.popup);
+  // The interviewees' data-dir="right" (all 6) was tuned for their desktop layout — on mobile
+  // several land in the left half of the screen, where "open to the left" runs off-screen
+  // (and silently closes via the edge-margin check below). Pick the side dynamically instead,
+  // based on where the button actually is.
+  const dir = (window.innerWidth <= 768 && isPeoplePopup)
+    ? (rect.left < window.innerWidth / 2 ? 'left' : 'right')
+    : (btn.dataset.dir || 'right');
   const bw = charBubble.offsetWidth;
   const n = CHAR_BUBBLE_NUDGE[btn.dataset.popup] || { x: 0, y: 0 };
-  if (window.innerWidth <= 768) {
+  if (window.innerWidth <= 768 && !isPeoplePopup) {
     // Mobile: a fixed ~255px-wide bubble positioned "next to the button" can never satisfy
     // the edge-margin check below once the button itself sits in the left/right third of a
     // narrow screen — that's exactly why scene 12's 3 buttons silently failed to open at all

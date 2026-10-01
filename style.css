@@ -4400,8 +4400,16 @@ bottom: 64%;
     max-width: 375px;
     padding: 10px 12px;
   }
-  .text-panel h3, .text-panel p { font-size: 14px; }
+  .text-panel h3, .text-panel p { font-size: 14px !important; }
   .text-panel .bubble__tail { display: none !important; }
+  /* The 4 SCROLLABLE_POPUPS (panel-26-3, panel-32-sadik/asmelash2, panel-45-redlady) cap their
+     text and let you scroll inside the box on desktop — touch scrolling never actually reached
+     that internal scroll (only a 'wheel' listener special-cases it), so on mobile just let the
+     box grow to fit all the text instead. */
+  .popup-scroll {
+    max-height: none !important;
+    overflow-y: visible !important;
+  }
   /* Opt-in, not opt-out: only the popups tied to the bus during its zoom sequences (scene 8's
      panel-8a/8b, scene 13's panel-s13-1/2), plus panel-5 ("All aboard"), get the straight-down
      arrow. Everything else (panel-12, panel-12b, panel-s13-3, the truck popups, etc.) gets
@@ -4470,33 +4478,38 @@ bottom: 64%;
   #jungle-bus img { width: 76vw; }
   #jungle-bus { left: -20vw; } /* bus doubled in size overlaps the text panel at its parked spot — shift it left */
 
-  /* The preserveAspectRatio "slice" fix (scroll.js, forceSliceS4Trees) handles top/bottom
-     coverage on its own. Width needs to be wide enough to reach the right screen edge at
-     EVERY point along this element's own translateX pan (scroll.js's s4vx, scene 4's whole
-     scroll range) — the gap grows from -211px (well covered) at scene start to +179px short
-     at scene end, so 230vw covers the worst case with a little margin. Safe from bleeding
-     into scene 5: the opacity toggle (s4TreesVisible) controls when this disappears,
-     completely independent of this width. */
-  #s4-trees lottie-player, #s4-trees img { width: 130vw; overflow: visible; }
+  /* Exact 750x1600 box, content stretched edge-to-edge (no letterbox, no crop) — the
+     lottie-player's shadow-DOM svg preserveAspectRatio is patched to "none" in scroll.js
+     (forceStretchS4Trees) since CSS object-fit doesn't reach into a custom element; the plain
+     img fallback uses object-fit:fill for the same effect. */
+  #s4-trees lottie-player, #s4-trees img { width: 750px; height: 1600px; overflow: visible; object-fit: fill; }
 
   #scroll-hint { right: 16px; bottom: 16px; font-size: 0.6875rem; }
   div#panel-1-start{top:auto}
 
   /* Scenes 27-29 interviewees — shifted +33vw from their desktop position, mobile only
-     (desktop rules above stay at their original values). */
-  .char-s27-asmelash   { left: 159vw; }
-  .char-s27-asmelash-1 { left: 177vw; }
-  .char-s27-awayly     { left: 138vw; }
-  .char-s27-awayly-1   { left: 177vw; }
-  .char-s28-chris      { left: 152vw; }
-  .char-s28-chris-1    { left: 180vw; }
-  .char-s28-kathleen   { left: 313vw; }
-  .char-s28-kathleen-1 { left: 180vw; }
-  .char-s29-sadik      { left: 165vw; }
-  .char-s29-sadik-1    { left: 177vw; }
-  .char-s29-samuel     { left: 147vw; }
-  .char-s29-samuel-1   { left: 177vw; }
+     (desktop rules above stay at their original values). Also sized up 70% (desktop's 5/7/6vw
+     etc. read as too small on a phone screen) — height:auto already on the desktop rule, so
+     width alone scales each figure proportionally. */
+  .char-s27-asmelash   { left: 169vw; width: 11.5vw; }
+  .char-s27-asmelash-1 { left: 145vw; width: 9.8vw; }
+  .char-s27-awayly     { left: 115vw; width: 14.9vw; }
+  .char-s27-awayly-1   { left: 147vw; width: 8.8vw; }
+  .char-s28-chris      { left: 152vw; width: 10.5vw; }
+  .char-s28-chris-1    { left: 135vw; width: 9.31vw; }
+  .char-s28-kathleen   { left: 194vw; width: 12.2vw; bottom: 16vh !important; }
+  .char-s28-kathleen-1 { left: 130vw; width: 9.5vw; bottom: 17vh; }
+  .char-s29-sadik      { left: 189vw; width: 11.5vw; }
+  .char-s29-sadik-1    { left: 134vw; width: 9.5vw; bottom: 8vh; }
+  .char-s29-samuel     { left: 136vw; width: 11.5vw; }
+  .char-s29-samuel-1   { left: 147vw; width: 8.8vw; }
 
+  .people-group1 .char-s28-chris .plus-btn {
+    right: 26px !important;
+}
+.people-group1 .plus-btn {
+    right: -7px !important;
+}
   /* Scenes 5-8 background + city bus — mobile only, desktop rules above stay untouched. */
   #s5-s8-bg img {
     position: absolute;
@@ -4522,6 +4535,196 @@ bottom: 64%;
   #city-bus img {
     width: 200vw;
   }
+  /* #city-bus-inside (scene 30's interior close-up) needs a cover-style crop on a portrait
+     phone screen, not desktop's raw width — the source SVG is a wide panorama (~3.12:1
+     aspect), so at desktop's 55vw + the 4.5x hold-scale it easily covers a landscape screen,
+     but on a portrait one the same width leaves height uncovered. 155vw is sized so the
+     resulting height clears 100vh at that same 4.5x zoom (with a little margin), same idea as
+     object-fit:cover — width intentionally overflows and crops at the sides. Paired with the
+     matching busX override in animateCityBus that re-centers a box this wide. */
+  #city-bus-inside {
+    width: 170vw !important;
+  }
+
+  /* #panel-30-awayly (Awa Ly's quote during the interior hold) has the same hardcoded
+     min-width:650px!important as the ~26 other popups found earlier — badly overflows a phone
+     screen since it beats the shared .text-panel mobile rule on ID specificity. Same fix. */
+  #panel-30-awayly {
+    width: min(78vw, 340px) !important;
+    min-width: unset !important;
+    max-width: none !important;
+    right: 11vw !important;
+    top: 15%;
+    bottom: auto;
+  }
+    
+element.style {
+}
+.sound-icon-awayly {
+    width: 40px;
+    height: 40px;
+    top: 210px;
+    left: 90%;
+}
+  /* #city-awayly-handle (Awa Ly standing, holding the ceiling handle) uses bottom:-8vh, tuned
+     for desktop's shorter/wider viewport — on mobile's much taller portrait one that pushes her
+     below the visible area entirely. Bring her back on-screen and size/position her to match
+     the interior view's own 170vw/-0.35 recentering (see animateCityBus's busX override for
+     #city-bus-inside) so she lines up with the seats/window instead of the old exterior-scene
+     coordinate space. */
+  #city-awayly-handle {
+    width: 22vw !important;
+    left: 8vw !important;
+    bottom: 4vh !important;
+  }
+
+  /* Scene 32-43 popups — same width/font fix as #panel-30-awayly, but centered via JS
+     (centerHorizontallyOnMobile in scroll.js) instead of position:fixed. These 8 live INSIDE
+     #city-overlay-32, which gets its own transform every frame — a position:fixed descendant
+     of a transformed ancestor doesn't anchor to the viewport, it anchors to that ancestor
+     instead, so position:fixed here would NOT behave like Awa Ly's popup (a true root-level
+     sibling outside any transformed wrapper). Stays position:absolute; replaces each popup's
+     own hardcoded min-width:650/750px!important, which badly overflowed a phone screen the
+     same way the other ~26 popups across the site did. */
+  #panel-32-intro, #panel-32-umuganda, #panel-32-samuel, #panel-32-asmelash,
+  #panel-32-asmelash2, #panel-32-pregnant-up, #panel-32-pregnant-down, #panel-32-sadik {
+    width: min(78vw, 340px) !important;
+    min-width: unset !important;
+    max-width: none !important;
+    top: 10% !important;
+    bottom: auto !important;
+  }
+   #panel-32-samuel,  #panel-32-asmelash{
+    top:16% !important;
+   }
+    #panel-32-sadik {
+    top: 13% !important;
+   }
+
+  /* Name plates (Samuel/Asmelash/Sadik) — same idea: centered via JS, not position:fixed,
+     since these also live inside #city-overlay-32. Name only (role hidden via the shared
+     .sound-caption-s32-role rule below). */
+  #sound-caption-s32, #sound-caption-asmelash, #sound-caption-sadik, #sound-caption-kathleen,
+  #sound-caption-totomoto {
+    min-width: 339px;
+    text-align: center;
+    justify-content: center;
+    font-size: 14px;
+    top: 10% !important;
+    bottom: auto !important;
+    /* The shared .sound-caption-s32 reserves padding-right:50px for the icon's old position
+       (right:-20px, overlapping the box's right edge) — now that the icon sits at
+       top:210px/left:90% instead (see the icon rule below), that reserved space just pushes
+       the centered text left, reading as uneven/more padding on the right. */
+    padding-right: 0 !important;
+  }
+  #sound-caption-totomoto {
+    top: 8% !important;
+  }
+   #sound-caption-sadik {
+    top: 7% !important;
+   }
+  .sound-caption-s32-role { display: none; }
+  .sound-caption-s32-name { font-size: 28px !important; }
+  /* Icons — same relative placement as Awa Ly's (top:210px/left:90% of the now-fixed name
+     banner lands it at the quote popup's top-right corner), overriding each one's own
+     desktop-tuned size/offset. */
+  .sound-icon-samuel, .sound-icon-asmelash, .sound-icon-sadik, .sound-icon-kathleen {
+    width: 40px !important;
+    height: 40px !important;
+    top: 210px !important;
+    left: 90% !important;
+    right: auto !important;
+    bottom: auto !important;
+  }
+  .sound-icon-samuel .sound-icon-state, .sound-icon-asmelash .sound-icon-state, .sound-icon-sadik .sound-icon-state, .sound-icon-kathleen .sound-icon-state {
+    width: 40px !important;
+    height: 40px !important;
+    top: 0 !important;
+    left: 0 !important;
+  }
+   .sound-icon-sadik .sound-icon-state {
+    top: 170px !important;
+   }
+    .sound-icon-asmelash {
+    top: 240px !important;
+   }
+
+  /* Scene 32-43 "people" — all scaled up ~3.36x from their desktop sizes (the same ratio
+     #city-awayly-handle ended up at, 14vw -> 47vw), consistent with each other instead of each
+     being individually small (6-12vw) and easy to miss on a phone screen. */
+  .char-s32-oldlady   { width: 57vw !important; }
+  .char-s33-girlphone { width: 38.5vw !important; height: auto !important; left: 110vw; }
+  .char-s34-kid1      { width: 25vw !important; }
+  .char-s35-pregnant  { width: 28vw !important; }
+  .char-s32-sadik     { width: 36vw !important; }
+  .char-s37-asmelash  { width: 52vw !important; }
+  .char-s37-asmelash2 { width: 52vw !important; }
+  .char-s39-samuel    { width: 30.5vw !important; }
+
+  /* Scene 44 — toto-moto (the "people" here) was entirely missing on mobile: bottom:-73vh is
+     tuned for desktop's shorter viewport, and on mobile's much taller portrait one that pushes
+     him roughly 600px below the bottom of the screen (confirmed: was rendering at y=965 on an
+     844px-tall viewport). Brought back into view. #panel-44-1 gets the same width/position
+     treatment as the scene 32-43 popups (centered via JS in animateS44 — see scroll.js; its own
+     left:31%/transform:translateX(-50%) left it overflowing off the left edge on a phone). */
+  .s44-toto-moto {
+    bottom: 10vh !important;
+  }
+  #panel-44-1 {
+    width: min(78vw, 340px) !important;
+    min-width: unset !important;
+    max-width: none !important;
+    top: 15% !important;
+    bottom: auto !important;
+  }
+
+  /* Scene 45-48 popups — same hardcoded min-width:650px!important overflow bug as the scene
+     32-43 group. #panel-46-huniki/#panel-46-bigtech aren't listed here — they never had a
+     min-width override, so the shared .text-panel mobile rule already sizes them correctly,
+     and they already center properly via positionCenteredPopup (see scroll.js) once their
+     own width fits the screen. */
+  #panel-45-kathleen, #panel-45-totomoto, #panel-45-redlady, #panel-47-newguy {
+    width: min(78vw, 340px) !important;
+    min-width: unset !important;
+    max-width: none !important;
+  }
+  /* Tall (lots of text) — at the shared bottom:60vh its top edge landed a few px above the
+     screen, just under the navbar. Shifted down a bit to clear it. */
+  #panel-45-redlady {
+    top: 10%;
+    bottom: auto !important;
+  }
+  /* Kathleen's popup + name plate are positioned via static CSS left (not positionCenteredPopup
+     like totomoto/redlady/huniki/bigtech — see animateS45S48's own comment), so they're
+     centered via JS instead (centerHorizontallyOnMobile, same technique as the scene 32-43
+     popups) — see the new block added in animateS45S48. */
+
+  /* Scene 45-48 "people" — enlarged the same way as the scene 32-43 cast; these were even
+     smaller (8-11vw) and just as easy to miss on a phone screen. Wheelchair man and newguy get
+     a more modest bump since they're already somewhat larger/get further scaled by the
+     scene-46 zoom. */
+  .char-s45-kathleen  { width: 47vw !important; }
+  .char-s45-totomoto  { width: 35vw !important; }
+  .char-s45-redlady   { width: 36vw !important; left: 205vw;}
+  .char-s45-wheelchair { width: 30vw !important; }
+  .char-s47-newguy    { width: 20vw !important; }
+#panel-46-huniki, #panel-46-bigtech{
+  top:10% !important;
+  bottom: auto;
+}
+  /* #panel-47-newguy and its name plate have a baked-in scale(0.6667) specifically to cancel
+     out #s45-s48-visual's 1.5x wheelchair-zoom (1/1.5 = 0.6667) — now that the zoom is flat at
+     1x on mobile (see animateS45S48's s46Scale), that counter-scale just shrinks them for no
+     reason, so reset it to scale(1). */
+  #panel-47-newguy {
+    transform: translateX(-42%) scale(1) !important;
+    top: 16%;
+    bottom: auto;
+  }
+  #sound-caption-s47newguy {
+    transform: scale(1) !important;
+  }
 
   /* Scenes 12-15 — same treatment as scenes 5-8 above (desktop rules stay untouched). */
   .s1215-buildings {
@@ -4539,12 +4742,47 @@ bottom: 64%;
     object-fit: cover !important;
   }
 
+  /* Scenes 26-30 — same treatment as scenes 5-8/12-15 above (desktop rules stay untouched).
+     Desktop's own .s2630-buildings/.s2630-road already use width:auto + a vh height, which
+     computes an oversized width from the image's intrinsic ratio on mobile (was rendering at
+     4158px/5568px wide) — width:100% + object-fit:cover fixes it the same way. */
+  .s2630-buildings {
+    bottom: 37% !important;
+    top: auto;
+    left: 0 !important;
+    width: 352vh !important; /* matches the source SVG's own aspect ratio at height:50vh below — no vertical crop */
+    height: 50% !important;
+    object-fit: cover !important;
+  }
+  .s2630-road {
+    top: var(--road-sky-line) !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    width: 628vh !important; /* matches the source SVG's own aspect ratio at the 40vh road height below */
+    height: calc(100% - var(--road-sky-line)) !important;
+    object-fit: cover !important;
+    z-index: 1;
+  }
+
   /* Stat mode (black background, used for the "near people" popups) gets no arrow at all on
      mobile — only dialogue mode (white background, scene 7) keeps the straight-down tail. */
   .char-bubble-tail-stat, .char-bubble-tail-dialogue, .char-bubble-tail-stat-mobile { display: none !important; }
   #char-bubble.dialogue .char-bubble-tail-dialogue-mobile { display: block; }
   .char-bubble-stat, .char-bubble-lang { font-size: 14px; }
   #char-bubble.dialogue .char-bubble-lang { font-size: 14px; }
+  /* The 6 interviewee ("people") popups open next to their own character on mobile now,
+     instead of centered like every other char-bubble — width:auto keeps them narrow enough
+     (their content is just a name + org) to actually fit beside the button without tripping
+     positionCharBubble()'s edge-margin safety check. */
+  #char-bubble[data-char="s27-asmelash"],
+  #char-bubble[data-char="s27-awayly"],
+  #char-bubble[data-char="s28-chris"],
+  #char-bubble[data-char="s28-kathleen"],
+  #char-bubble[data-char="s29-sadik"],
+  #char-bubble[data-char="s29-samuel"] {
+    width: auto !important;
+    max-width: 200px;
+  }
 
   #city-overlay-7 .cross-btn { display: none; }
 
@@ -4752,5 +4990,104 @@ bottom: 64%;
 }
  #panel-s21-openai {
     bottom: 19%;
+}
+.char-s26-basket{
+  left: 30vw;
+  width: 17vw;
+}
+#panel-26-1, #panel-26-2{
+  bottom: auto;
+  top: 15%;
+  left: 82vw;;
+}
+ #panel-26-2{
+  left: 42vw;;
+}
+#s26-revolution-sign{
+  top:10%;
+  left: 140vw;
+}
+.s2630-fence{
+  display: none;
+}
+.char-s26-moto{
+  bottom: 10vh;
+  width: 35vw;
+  left: 72vw;
+}
+.char-s26-pigeons1{
+  left: 159vw;
+  width: 15vw;
+}
+.char-s26-fruitlady2{
+  bottom: 34vh;
+  left:237vw;
+}
+.char-s26-oldman{
+  display: none;
+}
+#city-awayly-handle{
+  width: 47vw !important;
+  bottom: 4vh;
+}
+.sound-caption-s32-role{
+  display: none;
+}
+#sound-caption-awayly{
+  text-align: center;
+  top: 10%;
+  bottom: auto;
+  font-size: 14px;
+}
+
+element.style {
+    opacity: 1;
+}
+    #sound-caption-awayly {
+        text-align: center;
+        top: 10%;
+        bottom: auto;
+        font-size: 14px;
+        padding: initial;
+        min-width: 339px;
+        right: auto;
+        margin: auto;
+        left: 12%;
+        justify-content: center;
+    }
+#sound-caption-awayly span{
+  font-size: 28px !important;
+  padding: 5px !important ;
+}
+#s32-s43-bg img{
+  left: -120vw;
+}
+.s4548-interior, .s4548-seats{
+  background-size: cover;
+}
+#panel-45-kathleen{
+  top: 16%;
+  bottom: auto;
+}
+#sound-caption-s47newguy{
+  top: 10%;
+        bottom: auto;
+        left: 324vw;
+        width: 340px;
+        text-align: center;
+        justify-content: center;
+        font-size: 14px;
+        padding-right: 0 !important;
+}
+#sound-caption-s47newguy button.sound-icon-s32.sound-icon-chris {
+    top: 145px;
+    width: 40px !important;
+    height: 40px !important;
+}
+#sound-caption-s47newguy .sound-icon-chris .sound-icon-state {
+    width: 40px !important;
+    height: 40px !important;
+    top: 0 !important;
+    left: 0 !important;
 }
 }
