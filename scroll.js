@@ -338,20 +338,14 @@ const char34Kid1       = document.querySelector('.char-s34-kid1'); // lollipop k
 const s4TreesOverlay = document.getElementById('s4-trees');
 const s4TreesPlayer  = document.getElementById('s4-trees-player');
 let _s4TreesPlaying  = false;
-if (s4TreesPlayer) {
-  // Mobile only: stretch content to fill the exact 750x1600 box edge-to-edge (no letterbox,
-  // no crop) — CSS object-fit doesn't reach into a custom element, so the shadow-DOM svg's own
-  // preserveAspectRatio has to be patched directly, same technique as s8BusTransitionPlayer's
-  // forceSlice above. Desktop keeps the default "meet" (untouched, no width/height override
-  // there either).
-  const forceStretchS4Trees = () => {
-    if (getVw() > 768) return;
-    const svg = s4TreesPlayer.shadowRoot && s4TreesPlayer.shadowRoot.querySelector('svg');
-    if (!svg) return;
-    svg.setAttribute('preserveAspectRatio', 'none');
-  };
-  s4TreesPlayer.addEventListener('ready', forceStretchS4Trees);
-  s4TreesPlayer.addEventListener('load', forceStretchS4Trees);
+if (s4TreesPlayer && getVw() <= 768) {
+  // setAttribute('src', ...) alone doesn't reliably retrigger the player's internal load once it
+  // has already connected with its original HTML src — .load() is the library's own explicit API
+  // for swapping animations and actually fetches the new file. Box ratio (992x1600, see CSS)
+  // matches tree_mob.json's own 528x852 aspect, so default "xMidYMid meet" fills it edge-to-edge
+  // with no crop, no stretch. Desktop untouched.
+  s4TreesPlayer.setAttribute('src', 'assets/lottie/tree_mob.json');
+  if (typeof s4TreesPlayer.load === 'function') s4TreesPlayer.load('assets/lottie/tree_mob.json');
 }
 // Fixed trees overlay for scene 5 — sits above #city-bus in root stacking context
 const cityTrees5    = document.getElementById('city-trees-5');
@@ -438,6 +432,12 @@ const s21vMicrosoft = document.getElementById('s21v-microsoft');
 const s21vOpenAI    = document.getElementById('s21v-openai');
 // Scene-21 clouds — fixed overlay z:2, fade in near end of scene
 const s21cLottie    = document.getElementById('s21c-lottie');
+if (s21cLottie && getVw() <= 768) {
+  // See s4TreesPlayer above — setAttribute alone doesn't reliably retrigger the player's load
+  // once already connected, so call .load() directly too.
+  s21cLottie.setAttribute('src', 'assets/lottie/blue%20cloud_mob.json');
+  if (typeof s21cLottie.load === 'function') s21cLottie.load('assets/lottie/blue%20cloud_mob.json');
+}
 const s5973CloudsLottie = document.getElementById('s5973-clouds-lottie');
 const s60ZoomExtras = Array.from(document.querySelectorAll('.s60-zoom-extra'));
 
@@ -1277,7 +1277,16 @@ function frame(ts) {
     if (frameVisible) {
       // Hard on/off, no cross-fade — snaps to 0 once slid back out past this threshold.
       const FRAME_REVEAL_VW = 5.5 * _vw;
-      s5558TransitionFrameFront.style.opacity   = (frameVx <= FRAME_REVEAL_VW) ? '1' : '0';
+      // Mobile only: frameVx already sits under FRAME_REVEAL_VW right at scene 23's own start
+      // (stripX's offset cancels against effectiveTx there, leaving just the flat 1.22vw), so
+      // this clouds+birds overlay would show fully opaque — covering the bus/car — from the
+      // instant you land on scene 23/24 (55/56), where it's not wanted. But scenes 57-58
+      // (index 25-26) genuinely need it: #s55-s58-bg is only 300vw wide and the pan runs past
+      // its right edge there, leaving a blank gap on a narrow mobile viewport (confirmed via
+      // screenshot) that this frame is specifically meant to cover — see the "still covers
+      // whatever comes after" comment on #s55-s58-bg in style.css. So only suppress for 55/56.
+      const suppressOnMobile = getVw() <= 768 && currentScene < 25;
+      s5558TransitionFrameFront.style.opacity   = (frameVx <= FRAME_REVEAL_VW && !suppressOnMobile) ? '1' : '0';
       s5558TransitionFrameFront.style.transform = `translateX(${Math.max(0, frameVx).toFixed(1)}px)`;
     } else {
       s5558TransitionFrameFront.style.opacity = '0';
@@ -1605,13 +1614,25 @@ function frame(ts) {
     setPanel(panel55b, show55b);
     setPanel(panels[25], show56);
     setPanel(panels[26], show57);
-    if (s55HunikiSign) s55HunikiSign.style.opacity = (show55 || show55b) ? '1' : '0';
+    if (s55HunikiSign) {
+      // Mobile: stay lit through the whole popup sequence (55/55b/56/57) instead of only
+      // flashing on alongside panel-55/55b, per request ("Hunki will display always"), but hide
+      // together with the last popup (57) closing instead of lingering through the rest of
+      // scene 57's scroll, per request ("hide hunki fed also along with last popup"). Desktop
+      // keeps its original popup-gated behavior. Both already position:fixed with a static
+      // left/transform (see the comment above), so no JS centering needed here — the width fix
+      // in style.css's mobile media query is what actually keeps these on-screen.
+      const showSign = getVw() <= 768 ? (inHoldRange && combinedLocal <= PANEL57_END) : (show55 || show55b);
+      s55HunikiSign.style.opacity = showSign ? '1' : '0';
+    }
   }
 
   // -- Scenes 59-73 popups: same dynamic-centering technique as scenes 55-57 (this wrapper is
   // 450vw, too wide for a static CSS left to track the pan). --
   if (SCROLL_MAP[27]) {
-    const S5973_BG_LEFT_VW = 3089; // must match #s59-s73-bg's `left` in style.css (user-tuned)
+    const S5973_BG_LEFT_VW = 3065; // must match #s59-s73-bg's `left` in style.css (user-tuned) —
+    // was 3089, drifted out of sync with the CSS's current 3065vw, throwing popup centering off
+    // by a flat 24vw (panel-59/purple-man/language-justice all affected).
     const vwPx2 = _vw / 100;
     const viewportCenterVw2 = -effectiveTx / vwPx2 + 50;
     const popupCenterVw2 = viewportCenterVw2 - S5973_BG_LEFT_VW;
@@ -2278,12 +2299,23 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       : 0;
     if (cityBus) cityBus.style.transformOrigin = '50% 50%';
     if (cityBusEmpty) cityBusEmpty.style.opacity = '0';
-    if (cityBusS55)   cityBusS55.style.opacity   = '1';
+    // Desktop: this half-visible bus is a small corner-peek (its 55vw width is a small fraction
+    // of a wide desktop screen). On mobile the same flat vw math makes it wide enough to span the
+    // full narrow viewport, so it fully overlapped #s45-s48-bg's content instead of peeking in —
+    // capped to a faint 30% preview on mobile instead of the full fade-in; the real drive-in
+    // starts cleanly at scene 23 below, which already has its own mobile-tuned positioning
+    // (_isMobileCityBus).
+    const _isMobileS47Reveal = getVw() <= 768;
+    if (cityBusS55) cityBusS55.style.opacity = '1';
     zoom = 1;
     // Half of the bus's 55vw width, half on-screen — scene 23 below picks up from this same value.
     busX = -0.275 * vw;
-    eff  = opacity * revealT;
-    if (s5558Car) { s5558Car.style.opacity = (opacity * revealT).toFixed(3); s5558Car.style.transform = `translateX(${(-0.18 * vw).toFixed(1)}px)`; } // half of its own 36vw width
+    // Mobile: the 30% corner-peek used to show here overlapped the interior/crossing-matatu
+    // backdrop mid-scroll (bus windows + seats + crossing bus all visible at once, mismatched
+    // scale). Keep bus/car fully hidden through scene 22 on mobile — scene 23 below still snaps
+    // them in cleanly. Desktop keeps its original small corner-peek, untouched.
+    eff  = _isMobileS47Reveal ? 0 : opacity * revealT;
+    if (s5558Car) { s5558Car.style.opacity = _isMobileS47Reveal ? '0' : (opacity * revealT).toFixed(3); s5558Car.style.transform = `translateX(${(-0.18 * vw).toFixed(1)}px)`; } // half of its own 36vw width
     // White Honda Fit (s5558Car2) stays fully hidden through scene 22 — its own fade-in/slide
     // happens entirely within scene 23 below, for a proper later entrance.
   } else if (scene >= 23 && scene <= 26) {
@@ -2295,11 +2327,22 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     if (cityBusEmpty) cityBusEmpty.style.opacity = '0';
     if (cityBusS55)   cityBusS55.style.opacity   = '1';
     if (scene === 23) {
-      // Continues from the half-visible position scene 22 faded it in at (FAR_ENTRY matches
-      // busX there) — one continuous forward slide into fully parked.
-      const FAR_ENTRY = -0.275 * vw;
-      const t = easeInOutCubic(Math.min(1, local / 1.0));
-      busX = FAR_ENTRY + t * (CENTER - FAR_ENTRY);
+      if (_isMobileCityBus) {
+        // Mobile: no slide — hold steady at the 30%-visible CENTER crop (same "no drive-in"
+        // choice scene 3's mobile branch makes). An earlier version animated the box from a 1%
+        // sliver to CENTER as the user scrolled, but growing the visible crop read as the bus
+        // itself moving. Instead: stay put at CENTER, hidden (opacity 0) until the user has
+        // scrolled at least 1% into the scene, then snap straight to fully visible — no motion
+        // to misread, just appears once scrolling starts.
+        busX = CENTER;
+        eff = local > 0.01 ? opacity : 0;
+      } else {
+        // Continues from the half-visible position scene 22 faded it in at (FAR_ENTRY matches
+        // busX there) — one continuous forward slide into fully parked.
+        const FAR_ENTRY = -0.275 * vw;
+        const t = easeInOutCubic(Math.min(1, local / 1.0));
+        busX = FAR_ENTRY + t * (CENTER - FAR_ENTRY);
+      }
     } else if (scene <= 25) {
       // Scenes 56-57: stays parked
       busX = CENTER;
@@ -2311,11 +2354,20 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     }
     // Companion cars — same drive-in/hold-sway/hide pattern, own timing per car so they don't
     // read as identical clones moving in lockstep.
-    function driveCar(el, { farEntry, ahead, entryWindow, startDelay = 0, swayPhase, swayAmp }) {
+    function driveCar(el, { farEntry, ahead, entryWindow, startDelay = 0, swayPhase, swayAmp, mobileX }) {
       if (!el) return;
       let carX, carEff;
       if (scene === 23) {
-        if (startDelay > 0) {
+        if (_isMobileCityBus) {
+          // Mobile: no slide, same reasoning as the bus above — stays put at its resting spot,
+          // hidden until the user has scrolled at least 1% into the scene, then snaps to fully
+          // visible. Also sidesteps the freeze-interaction problem this car used to have (panel-
+          // 55's popup freezes scroll at local>0.28, which used to catch its old slide mid-motion).
+          // Uses its own mobileX, not CENTER+ahead — CENTER is tuned for the bus's 200vw-wide
+          // mobile crop, so on this much narrower car it landed fully off-screen left.
+          carX   = mobileX;
+          carEff = local > 0.01 ? opacity : 0;
+        } else if (startDelay > 0) {
           // Stays at farEntry until `startDelay`, then slides in late, opacity flat at full.
           const t = easeInOutCubic(Math.min(1, Math.max(0, local - startDelay) / (entryWindow - startDelay)));
           carX   = farEntry + t * (CENTER + ahead - farEntry);
@@ -2329,20 +2381,22 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       } else if (scene <= 25) {
         const holdPhase = (scene - 24) + local + swayPhase;
         const sway = Math.sin(holdPhase * Math.PI * 1.5) * swayAmp;
-        carX   = CENTER + ahead + sway;
+        carX   = (_isMobileCityBus ? mobileX : CENTER + ahead) + sway;
         carEff = opacity;
       } else {
         // Scene 58: same reasoning as the bus above — already hidden by the transition frame.
-        carX   = CENTER + ahead;
+        carX   = _isMobileCityBus ? mobileX : CENTER + ahead;
         carEff = 0;
       }
       el.style.opacity   = carEff.toFixed(3);
       el.style.transform = `translateX(${carX.toFixed(1)}px)`;
     }
     // Leads ahead of the bus; farEntry matches scene 22's half-visible fade-in position.
-    driveCar(s5558Car,  { farEntry: -0.18 * vw, ahead:  0.15 * vw, entryWindow: 0.5,  swayPhase: 0,   swayAmp: 0.015 * vw });
+    // mobileX: bus's visible mobile crop is x:[0, 0.6*vw] (30% of its 200vw width) — this car
+    // sits just past that, in-frame to the right, instead of inheriting the bus's CENTER.
+    driveCar(s5558Car,  { farEntry: -0.18 * vw, ahead:  0.15 * vw, entryWindow: 0.5,  swayPhase: 0,   swayAmp: 0.015 * vw, mobileX: 0.56 * vw });
     // Trails further back, enters slower, delayed until scene 23 is 15% scrolled.
-    driveCar(s5558Car2, { farEntry: -0.15 * vw, ahead: -0.35 * vw, entryWindow: 0.65, startDelay: 0.15, swayPhase: 0.4, swayAmp: 0.02  * vw });
+    driveCar(s5558Car2, { farEntry: -0.15 * vw, ahead: -0.35 * vw, entryWindow: 0.65, startDelay: 0.15, swayPhase: 0.4, swayAmp: 0.02  * vw, mobileX: 0.68 * vw });
     // s5558Car3 (toyota probox) hidden per request — stays at default opacity 0.
   } else if (scene >= 27 && scene <= 29) {
     // Scenes 59-61: closing chapter — bus drives in at scene 59, then keeps a gentle bob
@@ -2358,12 +2412,20 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     // with the bridge/trees/background art once panel-61 has closed.
     zoom = 1 - 0.5 * s61PostZoomT;
     if (scene === 27) {
-      // Drive in already half-visible (bus is 50vw wide, -0.25vw left edge), then hold at
-      // CENTER with a gentle bob for the rest of scene 59.
-      const FAR_ENTRY = -0.25 * vw;
-      const t = easeInOutCubic(Math.min(1, local / S5960_ZOOM_START_PHASE));
       const bob = Math.sin(chapterPhase * Math.PI * 2) * 0.006 * vw;
-      busX = FAR_ENTRY + t * (CENTER + bob - FAR_ENTRY);
+      if (_isMobileCityBus) {
+        // Mobile: no slide, same reasoning as scene 23's bus entry — FAR_ENTRY (-0.25vw) is
+        // nearly fully visible on a narrow screen, while CENTER is the much-further-left 30%-
+        // crop resting spot, so sliding between them read as "bus shows too far forward, then
+        // comes back." Hold steady at CENTER from the start instead.
+        busX = CENTER + bob;
+      } else {
+        // Drive in already half-visible (bus is 50vw wide, -0.25vw left edge), then hold at
+        // CENTER with a gentle bob for the rest of scene 59.
+        const FAR_ENTRY = -0.25 * vw;
+        const t = easeInOutCubic(Math.min(1, local / S5960_ZOOM_START_PHASE));
+        busX = FAR_ENTRY + t * (CENTER + bob - FAR_ENTRY);
+      }
       eff  = opacity; // no fade-in — fully visible (half on-screen) from local:0
     } else if (scene === 28 && s61PostZoomT === 0) {
       // Before the second zoom triggers — same gentle bob as scene 59.
@@ -3213,6 +3275,16 @@ function animateS45S48(scene, local, etx, ts) {
     _s47CrossingSkipDone = false;
     _s47CrossingBackSkipDone = false;
   }
+  // Mobile only: once the crossing bus has fully faded out and the freeze begins, reveal
+  // #s55-s58-bg right away instead of leaving #s45-s48-bg's own (fairly bare) pan position on
+  // screen for the whole freeze — `scene` only reaches 23 on the next real scroll (the auto-skip
+  // above), so without this the freeze shows old scene-47 art with nothing happening. Runs after
+  // animateS44's own opacity assignment (frame() calls animateS44 before animateS45S48), so this
+  // is the one that sticks for the frame. Desktop untouched — same scoping precedent as the
+  // #s45-s48-bg/#s55-s58-bg overlap fix above.
+  if (s4548Bg && getVw() <= 768 && _s47CrossingFreezeTriggered) {
+    s4548Bg.style.opacity = '0';
+  }
   // Bus/frame opacity fades smoothly as the bus finishes crossing — the last stretch of its
   // own crossingT progress (CROSSING_FADE_START_T to 1) maps straight to opacity 1 to 0. No
   // separate wait: it's gone by the time crossingT reaches 1, instead of standing there fully
@@ -3236,8 +3308,12 @@ function animateS45S48(scene, local, etx, ts) {
   }
   if (s47CrossingMatatu) {
     const vw = getVw();
-    const startX = vw;          // fully off-screen right
-    const endX   = -vw * 1.5;   // fully off-screen left — matches the bus's own 137.5vw width (2.5x scale)   // fully off-screen left — matches the bus's own 110vw width (2x scale)
+    // Measured directly instead of a flat vw constant — mobile sizes this bus by height (CSS,
+    // height:85vh) so its rendered width depends on the viewport's own aspect ratio, not a fixed
+    // vw fraction like desktop's width:225.5vw.
+    const busWidthPx = s47CrossingMatatu.getBoundingClientRect().width || vw * 2.255;
+    const startX = vw;            // fully off-screen right
+    const endX   = -busWidthPx;   // fully off-screen left
     const x = startX + (endX - startX) * crossingT;
     s47CrossingMatatu.style.transform = `translateY(-50%) translateX(${x.toFixed(1)}px)`;
     s47CrossingMatatu.style.opacity = crossingOpacity.toFixed(3);

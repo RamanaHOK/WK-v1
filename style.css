@@ -2925,6 +2925,7 @@ div#sound-caption-kathleen .sound-icon-s32 {
   z-index: 1;
 }
 .s5558-railing {
+  display: none; /* re-enabled on mobile only, see @media (max-width:768px) block */
   position: absolute;
   left: 0;
   bottom: 14vh;
@@ -4218,7 +4219,7 @@ bottom: 64%;
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 30px;
+  height: 20px;
   box-sizing: border-box;
   background: var(--pill-bg);
   border-radius: 40px;
@@ -4478,11 +4479,19 @@ bottom: 64%;
   #jungle-bus img { width: 76vw; }
   #jungle-bus { left: -20vw; } /* bus doubled in size overlaps the text panel at its parked spot — shift it left */
 
-  /* Exact 750x1600 box, content stretched edge-to-edge (no letterbox, no crop) — the
-     lottie-player's shadow-DOM svg preserveAspectRatio is patched to "none" in scroll.js
-     (forceStretchS4Trees) since CSS object-fit doesn't reach into a custom element; the plain
-     img fallback uses object-fit:fill for the same effect. */
-  #s4-trees lottie-player, #s4-trees img { width: 750px; height: 1600px; overflow: visible; object-fit: fill; }
+  /* Box ratio matches tree_mob.json's own 528x852 aspect exactly (992/1600 = 528/852), so default
+     "xMidYMid meet" / object-fit:contain fills it edge-to-edge with zero internal crop and zero
+     gap — no mismatch left to compensate for. Oversized vs. any mobile viewport on purpose; the
+     parent #s4-trees has overflow:visible so the excess just extends off-screen, same safety
+     margin as the old 750x1600 box. */
+  #s4-trees lottie-player, #s4-trees img { width: 800px; height: 1600px; overflow: visible; object-fit: contain; }
+
+  /* Desktop's flat 225.5vw width makes this crossing bus ~33% of a mobile screen's height (its
+     own art is a wide 10208x3203 side-view). Height-driven instead, so it covers most of the
+     screen — width follows automatically from the image's own aspect ratio. scroll.js measures
+     the actual rendered width for the crossing start/end positions, so no extra JS constant to
+     keep in sync here. */
+  #s47-crossing-matatu { width: auto; height: 85vh; }
 
   #scroll-hint { right: 16px; bottom: 16px; font-size: 0.6875rem; }
   div#panel-1-start{top:auto}
@@ -4689,6 +4698,105 @@ element.style {
     min-width: unset !important;
     max-width: none !important;
   }
+  /* Same overflow bug (min-width:555-600px!important) as the scene 45-48 group above — these
+     are centered via centerHorizontallyOnMobile in scroll.js's scene-55-57 popup block. */
+  #panel-55, #panel-55b, #panel-56, #panel-57 {
+    width: min(78vw, 340px) !important;
+    min-width: unset !important;
+    max-width: none !important;
+   top: 17%;
+        bottom: auto;
+        left: 50%;
+        width: 85% !important;
+  }
+  /* #s55-s58-bg is only 300vw wide; once the pan runs past its right edge (scenes 57-58) this
+     frame is what's meant to cover the gap (see its comment in style.css), but the lottie's
+     clouds don't fill their own box at every frame, leaving the page's dark #1C2A15 fallback
+     showing through. Solid backing color (matches #s55-s58-bg's own peach) closes that gap. */
+  #s5558-transition-frame-front {
+    background-color: #EFB99B;
+  }
+  #s55-huniki-sign {
+    top: 10%;
+    bottom: auto;
+        font-size: 3rem;
+        left: 50%;
+  }
+  /* Scene 59-61 park/lake trees — background-size was tuned for a wide desktop viewport;
+     at the same vw proportions on a narrow phone the canopy/palms dominate the screen and
+     bury the bus/popup. Scaled down to a reasonable mobile size. */
+  .s5973-trees-top {
+    background-size: auto 70vw;
+    bottom: 34% !important;
+  }
+  #s5973-bridge-front{
+    
+    left: -68vw !important;
+    bottom: -41vh;
+    width: 420vw !important;
+  }
+  .s5973-lake {
+    left: 0vw !important;
+    bottom: -37vh;
+    top: auto;
+    width: 52% ! IMPORTANT;
+    height: 96vh !important;
+    z-index: 1;
+  }
+  #s5973-trees-front {
+    background-size: auto 50%;
+  }
+  .s5973-shadow{
+    top: -5vh !important;
+    width: 150vw !important;
+    left: 145vw !important;
+  }
+  #panel-61{
+    left: 11vw !important;
+  }
+  .s6263-org-marks img{
+    height: 30px;
+  }
+  /* Scene 61 closing cloud-cover — same gap as the scene 57-58 transition frame fixed above:
+     the lottie art doesn't fill its own box edge-to-edge, so even at opacity:1 it only reads
+     as a band across the middle, with the park's green background still showing above/below
+     (confirmed via screenshot) instead of "genuinely covering the scene" per the comment on
+     #s5973-clouds. Backing color goes on the LOTTIE element, not #s5973-clouds itself — that
+     outer container has no opacity toggle at all (always-rendered, fixed, full-viewport), so a
+     background-color there painted solid peach over every scene permanently, not just scene
+     61 (confirmed broke the RESOURCES screen). The lottie-player's own opacity IS toggled by
+     JS every frame, so backing color there only shows while it's actually fading in/out. */
+  #s5973-clouds-lottie {
+    background-color: #EFB99B;
+  }
+  /* Scene 59-61 popups (#s59-s73-bg) — same top-aligned pattern as the scene 55-58 group
+     (panel-55/55b/56/57) instead of each one's own desktop-tuned bottom value. panel-61 (bus-
+     tracking popup, root-level outside #s59-s73-bg) isn't included — it's positioned live via
+     JS to track the bus, not a static top/bottom. */
+  div#panel-59, div#panel-purple-man, div#panel-language-justice {
+    top: 15%;
+    bottom: auto;
+  }
+  /* RESOURCES/CONTACT/CREDITS screen (#panel-62/63) — .s6263-content-panel's 144px flat side
+     padding (and .s6263-resources' own 60px) were sized for desktop and never scaled down, so
+     on a narrow phone they ate most of the width, squeezing the actual list into a tiny column
+     with huge empty margins either side. */
+  .s6263-content-panel {
+    padding: 5vh 16px 10vh;
+  }
+  .s6263-resources {
+    padding: 5vh 16px;
+  }
+  /* Resource list / credits paragraphs double up spacing on mobile — each <li>/<p> has its own
+     margin-bottom AND the flex/grid container around it adds its own gap on top, so the two
+     stack. Desktop's generous 30px/16px/14px values read fine on a wide screen but crowd a
+     narrow phone with a lot of dead space between short bullets. Reduced both sides so there's
+     one clear, tighter gap instead of two compounding ones. */
+  .s6263-resource-columns { gap: 10px; }
+  .s6263-resource-columns ul { gap: 6px; }
+  .s6263-resource-columns li { margin-bottom: 0.6vh; }
+  .s6263-credits-columns > div { gap: 6px; }
+  .s6263-credits-columns p { margin-bottom: 0.6vh; }
   /* Tall (lots of text) — at the shared bottom:60vh its top edge landed a few px above the
      screen, just under the navbar. Shifted down a bit to clear it. */
   #panel-45-redlady {
@@ -4707,7 +4815,7 @@ element.style {
   .char-s45-kathleen  { width: 47vw !important; }
   .char-s45-totomoto  { width: 35vw !important; }
   .char-s45-redlady   { width: 36vw !important; left: 205vw;}
-  .char-s45-wheelchair { width: 30vw !important; }
+  .char-s45-wheelchair { width: 77vw !important; }
   .char-s47-newguy    { width: 20vw !important; }
 #panel-46-huniki, #panel-46-bigtech{
   top:10% !important;
@@ -5007,9 +5115,6 @@ element.style {
   top:10%;
   left: 140vw;
 }
-.s2630-fence{
-  display: none;
-}
 .char-s26-moto{
   bottom: 10vh;
   width: 35vw;
@@ -5090,4 +5195,42 @@ element.style {
     top: 0 !important;
     left: 0 !important;
 }
+.s5558-buildings{
+  width: 160% !important;
+  bottom: 38vh !important;
+  height: auto !important;
+}
+.s5558-pedestrians{
+  left: 92vw !important;
+  bottom: 39vh;
+  width: 13vw !important;
+}
+.s5558-billboard{
+  left: 53vw !important;
+  width: 41vw !important;
+}
+#s5558-seller-front{
+  bottom: -3vh !important;
+  width: 7vh !important;
+}
+#s5558-cones-front{
+  display: none;
+}
+.s5558-railing{
+  display: block;
+  bottom: 0vh;
+}
+.s5558-railing {
+    left: -17vw;
+    width: 300vw;
+    height: 10vh;
+    background-repeat: no-repeat;
+    z-index: 2;
+}
+#s5558-car{
+  left: -80vw;
+  width: 100vw;
+  height: 36vh;
+}
+
 }
