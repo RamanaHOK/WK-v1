@@ -4219,7 +4219,7 @@ bottom: 64%;
   position: relative;
   overflow: hidden;
   width: 100%;
-  height: 20px;
+  height: 30px;
   box-sizing: border-box;
   background: var(--pill-bg);
   border-radius: 40px;
