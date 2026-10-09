@@ -4803,6 +4803,9 @@ element.style {
     top: 10%;
     bottom: auto !important;
   }
+  .navbar {
+  height: 20px;
+  }
   /* Kathleen's popup + name plate are positioned via static CSS left (not positionCenteredPopup
      like totomoto/redlady/huniki/bigtech — see animateS45S48's own comment), so they're
      centered via JS instead (centerHorizontallyOnMobile, same technique as the scene 32-43
