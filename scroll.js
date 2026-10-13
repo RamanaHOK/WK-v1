@@ -1043,6 +1043,19 @@ function frame(ts) {
     }
   }
 
+  // Keeps an open character popup tracking its button's live position every frame. #char-bubble
+  // is position:fixed with left/top computed once (in positionCharBubble, called from
+  // openCharBubble) — the character it points at lives inside the panning strip, so without
+  // this the popup visually detaches and drifts away as soon as scrolling continues. Pre-
+  // existing limitation of the click-to-open system too, but the default-open feature above
+  // makes it far more visible since it fires mid-scroll instead of after a deliberate pause
+  // (confirmed via screenshot: popup stayed put while its character scrolled off to the side).
+  // Applies on both platforms — not scoped to the (desktop-only) default-open feature, since a
+  // manually-clicked popup on either platform has the exact same underlying drift.
+  if (activeCrossBtn && charBubble.classList.contains('visible')) {
+    positionCharBubble(activeCrossBtn);
+  }
+
   // Scenes 26-30 freeze position — see S2630_FREEZE_VW_DESKTOP/MOBILE's own comment. Desktop's
   // original value needs no easing (already seamless); mobile's shifted value does.
   const S2630_FREEZE_VW = _isMobile ? S2630_FREEZE_VW_MOBILE : S2630_FREEZE_VW_DESKTOP;
