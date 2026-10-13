@@ -1054,6 +1054,14 @@ function frame(ts) {
   // manually-clicked popup on either platform has the exact same underlying drift.
   if (activeCrossBtn && charBubble.classList.contains('visible')) {
     positionCharBubble(activeCrossBtn);
+    // Default-opened popups (not a manual click — see _autoOpenedScrollY) close as soon as the
+    // user scrolls a bit further, instead of tracking all the way through the full 5s window —
+    // per request, it should show briefly right where it opened, not chase its character across
+    // the whole scene while drifting past other people's own "+" buttons.
+    const AUTO_OPEN_CLOSE_PX = 0.15 * _vw;
+    if (_autoOpenedScrollY !== null && Math.abs(window.scrollY - _autoOpenedScrollY) > AUTO_OPEN_CLOSE_PX) {
+      closeCharBubble();
+    }
   }
 
   // Scenes 26-30 freeze position — see S2630_FREEZE_VW_DESKTOP/MOBILE's own comment. Desktop's
@@ -3841,10 +3849,17 @@ const bubbleLang    = charBubble.querySelector('.char-bubble-lang');
 let activeCrossBtn  = null;
 let _lastCharBubbleClass = null; // per-character class (char-bubble-<popup-id>), see click handler below
 let _charBubbleHideTimer = null; // 3s auto-hide, see click handler below
+// scrollY at the moment a DESKTOP default-open popup (not a manual click) opened — see
+// openFirstAvailableCharBubble/the per-frame tracking block in frame(). A default-opened popup
+// closes as soon as the user scrolls a bit further, rather than riding the full 5s timer like a
+// deliberate click does — per request: "open near people and hide the same, when I scroll popup
+// should move along with [it, then close]".
+let _autoOpenedScrollY = null;
 
 function closeCharBubble() {
   charBubble.classList.remove('visible', 'dialogue', 'pop-left');
   activeCrossBtn = null;
+  _autoOpenedScrollY = null;
   if (_charBubbleHideTimer) { clearTimeout(_charBubbleHideTimer); _charBubbleHideTimer = null; }
 }
 
@@ -3941,7 +3956,10 @@ function openFirstAvailableCharBubble(candidates) {
   for (const btn of candidates) {
     if (!btn) continue;
     openCharBubble(btn);
-    if (charBubble.classList.contains('visible')) return true;
+    if (charBubble.classList.contains('visible')) {
+      _autoOpenedScrollY = window.scrollY;
+      return true;
+    }
   }
   return false;
 }
@@ -3954,6 +3972,7 @@ document.querySelectorAll('.cross-btn, .plus-btn').forEach(btn => {
       return;
     }
     openCharBubble(btn);
+    _autoOpenedScrollY = null; // a real click always gets the full 5s, not the shorter auto-open window
   });
 });
 
