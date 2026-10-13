@@ -201,6 +201,24 @@ const panel26_1 = document.getElementById('panel-26-1');
 const panel26_2 = document.getElementById('panel-26-2');
 const panel26_3 = document.getElementById('panel-26-3');
 const s26RevolutionSign = document.getElementById('s26-revolution-sign');
+// Desktop-only default-open popups (see openCharBubble/frame() below and animateS26S30's own
+// block for scenes 27-29) — opens one "+" button's popup automatically per multi-character
+// sequence, per visit, so a visitor sees what the buttons do without clicking one first. A list
+// per sequence (not just the first button) because positionCharBubble has its own pre-existing
+// edge-of-screen safety check that silently hides a bubble with nowhere to render — e.g. scene
+// 7's first character (red-girl) sits right at the screen's left edge, so opening HER popup by
+// default would immediately self-hide; openFirstAvailableCharBubble tries each in order and
+// stops at the first one that actually ends up visible.
+const s7CrossBtns  = Array.from(document.querySelectorAll('#city-overlay-7 .cross-btn'));
+const s8CrossBtns  = Array.from(document.querySelectorAll('#city-overlay-8 .cross-btn'));
+const s12CrossBtns = Array.from(document.querySelectorAll('#city-overlay-12 .cross-btn'));
+const s2630DefaultBtns = [
+  [document.querySelector('[data-popup="s27-asmelash"]'), document.querySelector('[data-popup="s27-awayly"]')],
+  [document.querySelector('[data-popup="s28-chris"]'),    document.querySelector('[data-popup="s28-kathleen"]')],
+  [document.querySelector('[data-popup="s29-sadik"]'),    document.querySelector('[data-popup="s29-samuel"]')],
+];
+let _s7DefaultOpened = false, _s8DefaultOpened = false, _s12DefaultOpened = false;
+const _s2630DefaultOpened = [false, false, false]; // one per interviewee batch (0=asmelash/awayly,1=chris/kathleen,2=sadik/samuel)
 const panelS21Meta1     = document.getElementById('panel-s21-meta-1');
 const panelS21Google1   = document.getElementById('panel-s21-google-1');
 const panelS21Meta2     = document.getElementById('panel-s21-meta-2');
@@ -990,6 +1008,40 @@ function frame(ts) {
 
   const _vw = getVw();
   const _isMobile = _vw <= 768; // matches style.css's @media (max-width:768px) breakpoint
+
+  // Desktop-only: auto-open the first character's popup in each multi-character sequence (see
+  // the consts above) once per visit, so the "+" buttons' content is visible without a click.
+  // activeCrossBtn===null guard means it never interrupts a popup the user opened themselves.
+  // Scene 7 is desktop-only by nature too — mobile hides its cross-btns entirely in favor of
+  // #s7-stack's own always-visible progressive reveal.
+  // Marks done only on SUCCESS (openFirstAvailableCharBubble returns true), not merely on
+  // attempting — a direct scroll/dot-nav jump lands here on the very first frame these
+  // fixed-position character overlays are measurable, sometimes still mid-settle, failing
+  // positionCharBubble's edge check for every candidate (confirmed via instrumentation). Retrying
+  // each frame until one actually succeeds is more robust than guessing a fixed settle delay.
+  if (!_isMobile) {
+    if (currentScene === 6) {
+      if (!_s7DefaultOpened && activeCrossBtn === null) {
+        _s7DefaultOpened = openFirstAvailableCharBubble(s7CrossBtns);
+      }
+    } else {
+      _s7DefaultOpened = false;
+    }
+    if (currentScene === 7) {
+      if (!_s8DefaultOpened && activeCrossBtn === null) {
+        _s8DefaultOpened = openFirstAvailableCharBubble(s8CrossBtns);
+      }
+    } else {
+      _s8DefaultOpened = false;
+    }
+    if (currentScene === 8) {
+      if (!_s12DefaultOpened && activeCrossBtn === null) {
+        _s12DefaultOpened = openFirstAvailableCharBubble(s12CrossBtns);
+      }
+    } else {
+      _s12DefaultOpened = false;
+    }
+  }
 
   // Scenes 26-30 freeze position — see S2630_FREEZE_VW_DESKTOP/MOBILE's own comment. Desktop's
   // original value needs no easing (already seamless); mobile's shifted value does.
@@ -2185,6 +2237,7 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
         else s26RevolutionSign.style.transform = '';
       } else {
         s26RevolutionSign.style.opacity = '';
+        // Desktop position is pure CSS (left: calc(...), see style.css) — no JS involved.
       }
     }
     // Scene 30: 2 popups play first (no zoom), then zoom-in (34-55%), exterior->interior swap
@@ -2737,6 +2790,33 @@ function animateS26S30(scene, local, etx) {
     if (g1) g1.style.opacity = (s2630G1Op[i] * board).toFixed(3);
     if (g2) g2.style.opacity = (s2630G2Op[i] * board).toFixed(3);
   });
+
+  // Desktop-only: auto-open the first interviewee's popup in each pair (Asmelash, Chris, Sadik)
+  // shortly after their batch's own scene starts, so the "+" buttons' content is visible
+  // without a click. openAt is EARLY in each batch's window (b+0.1), not late — the s2630G1Op
+  // fade above is a fade-OUT (each standee is at full opacity from b itself, then fades to 0
+  // over [b+0.3, b+0.7] as they board), so triggering at b+0.7 (an earlier version of this)
+  // opened the popup right as the character finished disappearing — a floating box with no one
+  // next to it (confirmed via screenshot). Re-arms once the user scrolls back out of a batch's
+  // own window, so it can fire again on revisit.
+  // Only the ONE batch matching the current progress is ever considered per frame (not a loop
+  // over all 3) — looping over all of them let a jump straight into a later scene satisfy an
+  // earlier batch's openAt too, and since forEach ran batch 0 first, it could claim
+  // activeCrossBtn and block the batch the user actually landed on from ever getting a turn
+  // (confirmed: jumping into scene 28/29 opened Asmelash's scene-27 popup instead of
+  // Chris's/Sadik's).
+  if (!_isMobileS2630Swap && progress >= 0) {
+    const b = Math.min(2, Math.floor(progress));
+    const openAt = b + 0.1;
+    const resetBelow = b - 0.5;
+    if (progress >= openAt) {
+      if (!_s2630DefaultOpened[b] && activeCrossBtn === null) {
+        _s2630DefaultOpened[b] = openFirstAvailableCharBubble(s2630DefaultBtns[b]);
+      }
+    } else if (progress < resetBelow) {
+      _s2630DefaultOpened[b] = false;
+    }
+  }
 }
 
 // ---- Scene 32–43 overlay — 1300vw wide, ambient passengers, slides in sync with the strip ----
@@ -3573,8 +3653,8 @@ function checkNarration() {
 // e.g. "8-11") — not the internal currentScene index — via sceneBeatKeyFor() below. Also folds
 // in #char-bubble stats for "8"/13-20 (that click-popup system isn't a .text-panel, so
 // checkNarration() never picks it up otherwise).
-// Full key list (real-scene grouping, per request): 1-3, 4, 5-6, 7, 8, 9, 10, 11, 12, 13-20,
-// 21-25, 26-31, 32-33, 34-43, 44, 45-47, 48-51, 52, 53-55, 56, 57-58, 59-61, 62-63, 72, 73.
+// Full key list (real-scene grouping, per client storyboard): 1-3, 4, 5-6, 7, 8, 9-10, 11, 12,
+// 13-20, 21-25, 26-31, 32-33, 34-43, 44, 45-47, 48-51, 52-53, 54-57, 58, 59-61, 62-63, 72, 73.
 let _lastExtraKey = null;
 
 // Merges several currentScene indices into one sceneBeats key so they narrate once instead of
@@ -3587,20 +3667,18 @@ const SCENE_BEAT_KEY_MERGE = {
   16: '32-33', 17: '32-33',
   20: '45-47',
   21: '48-51',
-  23: '53-55',
-  25: '57-58', 26: '57-58',
+  23: '54-57', 24: '54-57', 25: '54-57',
   27: '59-61', 28: '59-61',
   29: '62-63',
 };
 
-// idx7 (scene 8) has 4 distinct beats as the viewer scrolls through it — thresholds mirror
-// the popup8a/popup8b show windows so narration switches as each appears/finishes.
-const SCENE8_BEAT_THRESHOLDS = [[0.42, '9'], [0.60, '10'], [0.75, '11']]; // below first = '8'
+// idx7 (scene 8) has 3 distinct beats as the viewer scrolls through it — thresholds mirror
+// the popup8a/popup8b show windows so narration switches as each appears/finishes. 9 and 10
+// share one beat per the client storyboard (Toto Moto's one continuous speech).
+const SCENE8_BEAT_THRESHOLDS = [[0.42, '9-10'], [0.75, '11']]; // below first = '8'
 
-// idx22 (scene 47) splits into 3 beats. 0.6 is an exact anchor matching showChris's own cutoff;
-// 0.72 approximates the crossing sequence's start (deliberately not reusing the mutable
-// _s47PopupHiddenLocal state, to keep narration decoupled from the animation logic).
-const SCENE47_BEAT_THRESHOLDS = [[0, '48-51'], [0.6, '52'], [0.72, '53-55']];
+// idx22 (scene 47) splits into 2 beats. 0.6 is an exact anchor matching showChris's own cutoff.
+const SCENE47_BEAT_THRESHOLDS = [[0, '48-51'], [0.6, '52-53']];
 
 // currentScene index -> its "sceneBeats" key, e.g. 12 -> "13-20" (scenes with no own
 // SCENE_SCROLL entry share their predecessor's slot — see SCENE_LABELS above).
@@ -3810,40 +3888,59 @@ function updateS7Stack(currentScene, sceneLocal, _isMobile) {
   _s7StackShownCount = shownCount;
 }
 
+// Shared by the click handler below and the desktop default-open logic in frame() (opens one
+// popup automatically per multi-character sequence, so a first-time visitor sees what the "+"
+// buttons do without having to click one first).
+function openCharBubble(btn) {
+  const data = tChar(btn.dataset.popup);
+  if (!data) return;
+
+  if (data.dialogue) {
+    bubbleStat.textContent = '';
+    bubbleLang.textContent = data.dialogue;
+    charBubble.classList.add('dialogue');
+  } else {
+    bubbleStat.textContent = data.stat;
+    bubbleLang.textContent = data.lang;
+    charBubble.classList.remove('dialogue');
+  }
+
+  charBubble.classList.add('visible');
+  activeCrossBtn = btn;
+  charBubble.dataset.char = btn.dataset.popup;
+  // Every character gets its own class (char-bubble-<popup-id>), not just s8-, so each
+  // one can have its own style overrides in CSS instead of sharing --bx/--by generically.
+  if (_lastCharBubbleClass) charBubble.classList.remove(_lastCharBubbleClass);
+  _lastCharBubbleClass = 'char-bubble-' + btn.dataset.popup;
+  charBubble.classList.add(_lastCharBubbleClass);
+  positionCharBubble(btn);
+  // Auto-hide 3s after opening, regardless of further interaction.
+  if (_charBubbleHideTimer) clearTimeout(_charBubbleHideTimer);
+  _charBubbleHideTimer = setTimeout(closeCharBubble, 5000);
+}
+
+// Tries each button in order, stopping at the first one whose popup actually ends up visible
+// (positionCharBubble can self-hide a bubble that has nowhere to render near the screen edge —
+// see the comment on s7CrossBtns etc. near the top of this file). Used by the desktop default-
+// open logic in frame()/animateS26S30() only — manual clicks always go through openCharBubble
+// directly, one specific button at a time.
+function openFirstAvailableCharBubble(candidates) {
+  for (const btn of candidates) {
+    if (!btn) continue;
+    openCharBubble(btn);
+    if (charBubble.classList.contains('visible')) return true;
+  }
+  return false;
+}
+
 document.querySelectorAll('.cross-btn, .plus-btn').forEach(btn => {
   btn.addEventListener('click', e => {
     e.stopPropagation();
-
     if (activeCrossBtn === btn) {
       closeCharBubble();
       return;
     }
-
-    const data = tChar(btn.dataset.popup);
-    if (!data) return;
-
-    if (data.dialogue) {
-      bubbleStat.textContent = '';
-      bubbleLang.textContent = data.dialogue;
-      charBubble.classList.add('dialogue');
-    } else {
-      bubbleStat.textContent = data.stat;
-      bubbleLang.textContent = data.lang;
-      charBubble.classList.remove('dialogue');
-    }
-
-    charBubble.classList.add('visible');
-    activeCrossBtn = btn;
-    charBubble.dataset.char = btn.dataset.popup;
-    // Every character gets its own class (char-bubble-<popup-id>), not just s8-, so each
-    // one can have its own style overrides in CSS instead of sharing --bx/--by generically.
-    if (_lastCharBubbleClass) charBubble.classList.remove(_lastCharBubbleClass);
-    _lastCharBubbleClass = 'char-bubble-' + btn.dataset.popup;
-    charBubble.classList.add(_lastCharBubbleClass);
-    positionCharBubble(btn);
-    // Auto-hide 3s after opening, regardless of further interaction.
-    if (_charBubbleHideTimer) clearTimeout(_charBubbleHideTimer);
-    _charBubbleHideTimer = setTimeout(closeCharBubble, 5000);
+    openCharBubble(btn);
   });
 });
 

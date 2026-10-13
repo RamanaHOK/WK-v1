@@ -1713,9 +1713,9 @@ div#panel-1-start {
 }
 #panel-26-2 {
   position: absolute;
-  top: 16vh;
-  bottom: auto;
-  left: 67vw;
+  top: auto;
+  bottom: 10%;
+  left: 37vw;
   right: auto;
   transform: none;
   transition: opacity 0.35s ease;
@@ -1731,7 +1731,7 @@ div#panel-1-start {
   position: absolute;
   bottom: 63%;
   top: auto;
-  left: 143vw;
+  left: 110vw;
   right: auto;
   transform: none;
   transition: opacity 0.35s ease;
@@ -2160,11 +2160,21 @@ div#panel-1-start {
   z-index: 2;
 }
 /* Same technique/style as #s12-avenue-sign — painted on the building facade, moves with it
-   instead of being a fixed popup card. */
+   instead of being a fixed popup card. .s2630-buildings is positioned at left:30vw but SIZED
+   by height:70vh/width:auto (Group 883.svg is 10163x1444, aspect ratio 7.0381) — its rendered
+   width depends only on window height, not width, so a plain vw offset here drifted away from
+   the building whenever only the window's width changed (confirmed via measurement: 26% of the
+   building's width at 1280px wide vs. 39% at 1920px wide, same height). calc() mixing both
+   units fixes this with no JS: the vw term tracks the building's own left edge, the vh term
+   tracks its vh-driven width, so their sum stays at a constant ~30% of the building's width
+   regardless of window size. Derived from this file's 1920x1080 reference convention: original
+   left:113vw placed the sign at offset 1593.6px from the building's left edge at that
+   resolution (113vw - 30vw = 83vw = 1593.6px at 1920w), equal to 147.56vh at 1080 height. */
 #s26-revolution-sign {
   position: absolute;
   top: 16%;
-  left: 113vw;
+  /* left: calc(30vw + 147.56vh); */
+  left: calc(43vw + 147.56vh);
   transition: opacity 0.4s ease;
   color: #9F2222;
   font-family: 'thunderhouse-pro', 'Anton', sans-serif;
@@ -5106,13 +5116,21 @@ element.style {
   left: 30vw;
   width: 17vw;
 }
-#panel-26-1, #panel-26-2{
+#panel-26-1{
   bottom: auto;
   top: 15%;
-  left: 82vw;;
+  left: 82vw;
 }
- #panel-26-2{
-  left: 42vw;;
+/* Mobile-only reposition — desktop keeps its original bottom:10%/left:37vw (panel-26-2) and
+   left:110vw (panel-26-3); these newer values were found applying to desktop too (unscoped),
+   moving it into panel-26-1's spot and causing them to overlap — scoped here instead. */
+#panel-26-2{
+  top: 16vh;
+  bottom: auto;
+  left: 67vw;
+}
+#panel-26-3{
+  left: 143vw;
 }
 #s26-revolution-sign{
   top:10%;
