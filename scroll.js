@@ -3811,6 +3811,15 @@ document.addEventListener('keydown', e => {
   // only treat them as scroll input when focus is elsewhere (e.g. the document body).
   if (SCROLL_KEY_SKIP_TAGS.includes(e.target.tagName)) return;
 
+  // Same freeze the wheel listener already respects (see its own _scrollFreezeUntil check
+  // above) — without this, arrow keys could jump/step straight through an open popup while
+  // frame()'s hard-pin kept resetting scrollY underneath the browser's native smooth-scroll
+  // animation, reading as janky "slow" movement instead of cleanly staying put until the
+  // popup's freeze window ends (per request: "if popup opens then stay"). Also respects an
+  // open character "+" popup (activeCrossBtn), which doesn't use _scrollFreezeUntil at all —
+  // one universal gate for every popup type, not just the scroll-jacked .text-panel ones.
+  if (Date.now() < _scrollFreezeUntil || activeCrossBtn !== null) return;
+
   const jumpForward  = JUMP_FORWARD_KEYS.includes(e.key);
   const jumpBackward = JUMP_BACKWARD_KEYS.includes(e.key);
   const stepBackward = STEP_BACKWARD_KEYS.includes(e.key) || (e.key === ' ' && e.shiftKey);
@@ -3992,12 +4001,12 @@ const CHAR_BUBBLE_NUDGE = {
   's7-granny':   { x: 380, y: 0 },
   's7-green-men':   { x: 380, y: 0 },
   's12-blue-man': { x: 300, y: 0 },
-  's27-asmelash': { x: 0, y: 0 },
-  's27-awayly':   { x: 300, y: 0 },
+  's27-asmelash': { x: 300, y: -50 },
+  's27-awayly':   { x: 300, y: -20 },
   's28-chris':    { x: 0, y: 0 },
   's28-kathleen': { x: 0, y: 0 },
-  's29-sadik':    { x: 0, y: 0 },
-  's29-samuel':   { x: 0, y: 0 },
+  's29-sadik':    { x: 300, y: 0 },
+  's29-samuel':   { x: 300, y: 0 },
 };
 // These 6 interviewee popups open next to their own character on mobile (see style.css's
 // width:auto override for them) instead of centered like every other char-bubble.
