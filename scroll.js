@@ -3743,6 +3743,27 @@ dots.forEach(dot => {
   });
 });
 
+// ---- Nav track (top progress bar): click or drag to seek, same as a video scrubber ----
+const navTrack = document.querySelector('.nav-track');
+if (navTrack) {
+  navTrack.style.cursor = 'pointer';
+  let _navTrackDragging = false;
+  const seekToEvent = (e, smooth) => {
+    const rect = navTrack.getBoundingClientRect();
+    const frac = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
+    window.scrollTo({ top: frac * TOTAL_SCROLL, behavior: smooth ? 'smooth' : 'auto' });
+  };
+  navTrack.addEventListener('mousedown', e => {
+    _navTrackDragging = true;
+    pauseAutoAdvance();
+    seekToEvent(e, true);
+  });
+  window.addEventListener('mousemove', e => {
+    if (_navTrackDragging) seekToEvent(e, false); // instant while dragging, not smoothed/laggy
+  });
+  window.addEventListener('mouseup', () => { _navTrackDragging = false; });
+}
+
 // ---- Touch: horizontal swipe → vertical scroll ----
 let touchStartX = 0;
 let touchStartY = 0;
