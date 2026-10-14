@@ -1054,12 +1054,16 @@ function frame(ts) {
   // manually-clicked popup on either platform has the exact same underlying drift.
   if (activeCrossBtn && charBubble.classList.contains('visible')) {
     positionCharBubble(activeCrossBtn);
-    // Default-opened popups (not a manual click — see _autoOpenedScrollY) close as soon as the
-    // user scrolls a bit further, instead of tracking all the way through the full 5s window —
-    // per request, it should show briefly right where it opened, not chase its character across
-    // the whole scene while drifting past other people's own "+" buttons.
-    const AUTO_OPEN_CLOSE_PX = 0.15 * _vw;
-    if (_autoOpenedScrollY !== null && Math.abs(window.scrollY - _autoOpenedScrollY) > AUTO_OPEN_CLOSE_PX) {
+    // Default-opened popups (not a manual click — see _autoOpenedScrollY) close once the user
+    // has both (a) had it on screen for a minimum stretch AND (b) scrolled a bit further —
+    // instead of riding the full 5s window like a deliberate click. Time-gating this matters:
+    // distance alone closed it within a fraction of a second during a normal-speed scroll, too
+    // quick to read (per request: "it should stay some time, now it's quick hiding").
+    const AUTO_OPEN_MIN_VISIBLE_MS = 1800;
+    const AUTO_OPEN_CLOSE_PX = 0.3 * _vw;
+    if (_autoOpenedScrollY !== null
+        && Date.now() - _autoOpenedTs >= AUTO_OPEN_MIN_VISIBLE_MS
+        && Math.abs(window.scrollY - _autoOpenedScrollY) > AUTO_OPEN_CLOSE_PX) {
       closeCharBubble();
     }
   }
@@ -3849,17 +3853,20 @@ const bubbleLang    = charBubble.querySelector('.char-bubble-lang');
 let activeCrossBtn  = null;
 let _lastCharBubbleClass = null; // per-character class (char-bubble-<popup-id>), see click handler below
 let _charBubbleHideTimer = null; // 3s auto-hide, see click handler below
-// scrollY at the moment a DESKTOP default-open popup (not a manual click) opened — see
-// openFirstAvailableCharBubble/the per-frame tracking block in frame(). A default-opened popup
-// closes as soon as the user scrolls a bit further, rather than riding the full 5s timer like a
-// deliberate click does — per request: "open near people and hide the same, when I scroll popup
-// should move along with [it, then close]".
+// scrollY/timestamp at the moment a DESKTOP default-open popup (not a manual click) opened —
+// see openFirstAvailableCharBubble/the per-frame tracking block in frame(). A default-opened
+// popup closes once BOTH a minimum time has passed AND the user has scrolled a bit further,
+// rather than riding the full 5s timer like a deliberate click does. Time-gating this (not just
+// distance) matters because a fast scroll could otherwise cover the distance threshold within a
+// fraction of a second — too quick to read (per request: it should "stay some time").
 let _autoOpenedScrollY = null;
+let _autoOpenedTs = null;
 
 function closeCharBubble() {
   charBubble.classList.remove('visible', 'dialogue', 'pop-left');
   activeCrossBtn = null;
   _autoOpenedScrollY = null;
+  _autoOpenedTs = null;
   if (_charBubbleHideTimer) { clearTimeout(_charBubbleHideTimer); _charBubbleHideTimer = null; }
 }
 
@@ -3958,6 +3965,7 @@ function openFirstAvailableCharBubble(candidates) {
     openCharBubble(btn);
     if (charBubble.classList.contains('visible')) {
       _autoOpenedScrollY = window.scrollY;
+      _autoOpenedTs = Date.now();
       return true;
     }
   }
@@ -3973,6 +3981,7 @@ document.querySelectorAll('.cross-btn, .plus-btn').forEach(btn => {
     }
     openCharBubble(btn);
     _autoOpenedScrollY = null; // a real click always gets the full 5s, not the shorter auto-open window
+    _autoOpenedTs = null;
   });
 });
 
