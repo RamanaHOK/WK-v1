@@ -1403,9 +1403,12 @@ function frame(ts) {
     cityOverlay7.style.transform = `translateX(${s7vx.toFixed(1)}px)`;
   }
   updateS7Stack(currentScene, sceneLocal, _isMobile);
+  let show8overlay = '1'; // shared with #s5s8-fence-front below, so it hides at the exact same
+  // moment as city-overlay-8's characters (purple-man etc.) instead of drifting out of sync
+  // with that group's own position-based fade vs. the fence's previous separate currentScene check.
   if (cityOverlay8 && SCROLL_MAP[7]) {
     const s8vx = SCROLL_MAP[7].stripX + effectiveTx;
-    const show8overlay = (s8vx < _vw && s8vx > -_vw) ? '1' : '0';
+    show8overlay = (s8vx < _vw && s8vx > -_vw) ? '1' : '0';
     cityOverlay8.style.opacity = show8overlay;
     cityOverlay8.style.transform = `translateX(${s8vx.toFixed(1)}px)`;
     // Sign shows/hides together with panels[8]'s own show condition below (sceneLocal < 0.08).
@@ -1511,7 +1514,11 @@ function frame(ts) {
     // Absolute strip position: #s5-s8-bg's left:400vw + fence's local left:19% of 415vw width.
     const fenceVx = 4.7885 * _vw + effectiveTx;
     s5s8FenceFront.style.transform = `translateX(${fenceVx.toFixed(1)}px)`;
-    s5s8FenceFront.style.opacity   = (currentScene >= 4 && currentScene <= 7) ? '1' : '0';
+    // Scenes 5-7 (currentScene 4-6): always on, unchanged. Scene 8 (currentScene 7): now tied
+    // to city-overlay-8's own show8overlay instead of a flat "still scene 8" check, so the
+    // fence hides at the exact same moment as purple-man/the other scene-8 characters, per request.
+    const fenceVisible = (currentScene >= 4 && currentScene <= 6) || (currentScene === 7 && show8overlay === '1');
+    s5s8FenceFront.style.opacity   = fenceVisible ? '1' : '0';
   }
 
   // Scene 13 popups — position: fixed, screen-space coordinates
