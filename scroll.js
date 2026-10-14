@@ -1447,7 +1447,21 @@ function frame(ts) {
     const signRect = _signRect;
     const busFrontX = _busRect ? _busRect.right : null;
     let show12op = 0;
-    if (currentScene === 8 && signRect && busFrontX != null) {
+    if (_isMobile) {
+      // Mobile: the bus is held static at CENTER here (no slide), so this whole formula's
+      // premise — bus front edge sliding to "catch up" with the sign — never really happens;
+      // only the sign itself pans. Measured the actual numbers: the trigger point this produces
+      // sits right at sceneLocal≈0.98-1.0, a sliver of scroll so narrow normal scrolling skips
+      // right past it, which is why the popup effectively never opened. Simple local-based
+      // fade instead — wide enough to actually land on.
+      if (currentScene === 8) {
+        if (sceneLocal < 0.6) show12op = 0;
+        else if (sceneLocal < 0.65) show12op = (sceneLocal - 0.6) / 0.05;
+        else if (sceneLocal < 0.85) show12op = 1;
+        else if (sceneLocal < 1.0) show12op = 1 - (sceneLocal - 0.85) / 0.15;
+        else show12op = 0;
+      }
+    } else if (currentScene === 8 && signRect && busFrontX != null) {
       const openPx = S12_POPUP_OPEN_VW * _vw;
       const stayPx = S12_POPUP_STAY_VW * _vw;
       const hidePx = S12_POPUP_HIDE_VW * _vw;
@@ -1943,7 +1957,7 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   // (#city-bus img mobile override) — only 30% (60vw) shows, front (right/leading) side,
   // flush at the screen's left edge, instead of fully centered. Used as the bus's resting
   // position across every scene that parks it (5,6,7,8,9,11-15,22-29), not just on entry.
-  const CENTER = _isMobileCityBus ? -1.40 * vw : 0.225 * vw;
+  const CENTER = _isMobileCityBus ? -1.25 * vw : 0.225 * vw;
   const ENTRY  = -0.1 * vw; // off-screen left (right edge at 0) — calibrated for the desktop
   // 55vw bus; with the mobile 200vw bus its right edge sits at 1.9vw, i.e. covering the whole
   // screen rather than being off it. ENTRY_MOBILE's right edge sits at -0.2vw instead — genuinely
