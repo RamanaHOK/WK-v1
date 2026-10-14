@@ -3991,7 +3991,12 @@ const CHAR_BUBBLE_NUDGE = {
   's7-red-girl': { x: 350, y: 0 },
   's7-granny':   { x: 380, y: 0 },
   's7-green-men':   { x: 380, y: 0 },
-  's12-blue-man': { x: 100, y: 0 },
+  's12-blue-man': { x: 300, y: 0 },
+  's27-awayly':   { x: 0, y: 0 },
+  's28-chris':    { x: 0, y: 0 },
+  's28-kathleen': { x: 0, y: 0 },
+  's29-sadik':    { x: 0, y: 0 },
+  's29-samuel':   { x: 0, y: 0 },
 };
 // These 6 interviewee popups open next to their own character on mobile (see style.css's
 // width:auto override for them) instead of centered like every other char-bubble.
