@@ -385,8 +385,8 @@ body {
 #char-bubble[data-char="s8-blue-girl"]   { --bx: 0px;    --by: 0px; }
 #char-bubble[data-char="s8-lime-man"]    { --bx: 0px;    --by: 0px; }
 #char-bubble[data-char="s8-green-man"]   { --bx: 0px;    --by: 0px; }
-#char-bubble[data-char="s12-green-man"]  { left: 61vw !important;     --by: 0px; }
-#char-bubble[data-char="s12-blue-man"]   {     left: 37vw !important;    --by: 0px; }
+#char-bubble[data-char="s12-green-man"]  { --by: 0px; }
+#char-bubble[data-char="s12-blue-man"]   { --by: 0px; }
 #char-bubble[data-char="s12-pink-lady"]  { --bx: 0px;    --by: 0px; }
 #char-bubble[data-char="s12-green-man"] .char-bubble-tail-stat,
 #char-bubble[data-char="s12-blue-man"]  .char-bubble-tail-stat,
