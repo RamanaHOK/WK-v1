@@ -280,6 +280,12 @@ const s5558Car2       = document.getElementById('s5558-car2');
 const s5558Car3       = document.getElementById('s5558-car3');
 const s5558TransitionFrameFront = document.getElementById('s5558-transition-frame-front');
 const s5558TransitionFrameLottie = document.getElementById('s5558-transition-frame-lottie');
+if (s5558TransitionFrameLottie && getVw() <= 768) {
+  // See s4TreesPlayer above — setAttribute alone doesn't reliably retrigger the player's load
+  // once already connected, so call .load() directly too. Desktop untouched.
+  s5558TransitionFrameLottie.setAttribute('src', 'assets/lottie/brown-cloud-mob.json');
+  if (typeof s5558TransitionFrameLottie.load === 'function') s5558TransitionFrameLottie.load('assets/lottie/brown-cloud-mob.json');
+}
 const s4548Bg = document.getElementById('s45-s48-bg');
 // Scenes 59-61 popups — closing chapter, shares #s59-s73-bg with the park/lake art
 const s5973Panels = [59,60,61].map(n => document.getElementById(`panel-${n}`));
@@ -369,6 +375,9 @@ if (s4TreesPlayer && getVw() <= 768) {
 const cityTrees5    = document.getElementById('city-trees-5');
 const s1215TreesFront = document.getElementById('s1215-trees-front');
 const s5s8FenceFront = document.getElementById('s5s8-fence-front');
+let _s5s8FenceStayHidden = false; // mobile: once hidden for the scene-8 "8"/"9" beats, stays
+// hidden for the rest of that scene visit instead of coming back at sceneLocal 0.60 — resets
+// when fully scrolled back out of scene 8 so a later revisit can hide it again.
 // Fixed seller overlay for scenes 55-58 — sits above #s5558-car in root stacking context
 // (see the HTML/CSS comments on #s5558-seller-front for why this can't just be a z-index
 // bump on the in-background .s5558-* version)
@@ -457,6 +466,12 @@ if (s21cLottie && getVw() <= 768) {
   if (typeof s21cLottie.load === 'function') s21cLottie.load('assets/lottie/blue%20cloud_mob.json');
 }
 const s5973CloudsLottie = document.getElementById('s5973-clouds-lottie');
+if (s5973CloudsLottie && getVw() <= 768) {
+  // See s4TreesPlayer above — setAttribute alone doesn't reliably retrigger the player's load
+  // once already connected, so call .load() directly too. Desktop untouched.
+  s5973CloudsLottie.setAttribute('src', 'assets/lottie/brown-cloud-mob.json');
+  if (typeof s5973CloudsLottie.load === 'function') s5973CloudsLottie.load('assets/lottie/brown-cloud-mob.json');
+}
 const s60ZoomExtras = Array.from(document.querySelectorAll('.s60-zoom-extra'));
 
 // Scene 26–30 overlay — 500vw wide, translates in sync with the strip
@@ -924,6 +939,46 @@ if (restartBtn) {
     } else if (SCROLL_MAP[30]) {
       // "RESOURCES" — frame()'s engage logic picks this up next frame and re-locks at index 0.
       window.scrollTo(0, SCROLL_MAP[30].scrollStart + 10);
+    }
+  });
+}
+
+// ---- Scenes 62-64 on-screen controls — same actions as the wheel-gesture/nav-bar paths above,
+// just reachable by a direct click (mobile has no wheel, and both platforms want a visible
+// affordance here). Shown/hidden every frame below, near the slide crossfade. ----
+const s6263StartAgainBtn = document.getElementById('s6263StartAgainBtn');
+if (s6263StartAgainBtn) {
+  s6263StartAgainBtn.addEventListener('click', () => {
+    // Same as restartBtn's "onLastSlide" branch — always jumps to the very start, available on
+    // every slide here (not just the last one restartBtn's nav-bar label switches on).
+    _scrollFreezeUntil = 0;
+    _frozenScrollY = null;
+    _s6263Active = false;
+    _s6263TransT0 = null;
+    window.scrollTo(0, 0);
+  });
+}
+const s6263NextBtn = document.getElementById('s6263NextBtn');
+if (s6263NextBtn) {
+  s6263NextBtn.addEventListener('click', () => {
+    // Same step the wheel-tick handler takes once its gesture count is satisfied — direct, no
+    // tick-counting needed for an explicit click. Hidden/no-op on the last slide (see frame()).
+    if (_s6263Active && _s6263TransT0 === null && _s6263Index < S6263_SLIDE_COUNT - 1) {
+      _s6263FromIndex = _s6263Index;
+      _s6263Index += 1;
+      _s6263TransT0 = performance.now();
+    }
+  });
+}
+const s6263PrevBtn = document.getElementById('s6263PrevBtn');
+if (s6263PrevBtn) {
+  s6263PrevBtn.addEventListener('click', () => {
+    // Mirrors the wheel-tick handler's dir<0 branch. Hidden/no-op on the first slide (see
+    // frame()) — unlike scrolling back past it, a click has no "release the lock" fallback.
+    if (_s6263Active && _s6263TransT0 === null && _s6263Index > 0) {
+      _s6263FromIndex = _s6263Index;
+      _s6263Index -= 1;
+      _s6263TransT0 = performance.now();
     }
   });
 }
@@ -1460,9 +1515,11 @@ function frame(ts) {
       if (currentScene === 8) {
         if (sceneLocal < 0.6) show12op = 0;
         else if (sceneLocal < 0.65) show12op = (sceneLocal - 0.6) / 0.05;
-        else if (sceneLocal < 0.85) show12op = 1;
-        else if (sceneLocal < 1.0) show12op = 1 - (sceneLocal - 0.85) / 0.15;
-        else show12op = 0;
+        else show12op = 1; // stay fully open through the rest of scene 8
+      } else if (currentScene === 9) {
+        // extend the stay into the start of scene 9, then fade out matching the overlay itself
+        if (sceneLocal < 0.18) show12op = 1;
+        else show12op = Math.max(0, 1 - (sceneLocal - 0.18) / 0.10);
       }
     } else if (currentScene === 8 && signRect && busFrontX != null) {
       const openPx = S12_POPUP_OPEN_VW * _vw;
@@ -1508,16 +1565,28 @@ function frame(ts) {
   if (s1215TreesFront) {
     const treesVx = 7.46 * _vw + effectiveTx;
     s1215TreesFront.style.transform = `translateX(${treesVx.toFixed(1)}px)`;
-    s1215TreesFront.style.opacity   = s12s15bg ? s12s15bg.style.opacity : '0';
+    let treesOp = s12s15bg ? s12s15bg.style.opacity : '0';
+    // Mobile only: scene 13's bus zoom starts at sceneLocal 0.37 (animateCityBus, scene===9),
+    // well before s12s15bg's own natural fade (0.70-0.92) — hide the trees as soon as the zoom
+    // starts instead of waiting for that later fade, so they don't hang over the zoomed-in view.
+    if (_isMobile && currentScene === 9 && sceneLocal >= 0.37) treesOp = '0';
+    s1215TreesFront.style.opacity = treesOp;
   }
   if (s5s8FenceFront) {
     // Absolute strip position: #s5-s8-bg's left:400vw + fence's local left:19% of 415vw width.
     const fenceVx = 4.7885 * _vw + effectiveTx;
     s5s8FenceFront.style.transform = `translateX(${fenceVx.toFixed(1)}px)`;
-    // Scenes 5-7 (currentScene 4-6): always on, unchanged. Scene 8 (currentScene 7): now tied
-    // to city-overlay-8's own show8overlay instead of a flat "still scene 8" check, so the
-    // fence hides at the exact same moment as purple-man/the other scene-8 characters, per request.
-    const fenceVisible = (currentScene >= 4 && currentScene <= 6) || (currentScene === 7 && show8overlay === '1');
+    // Desktop: original behavior, untouched (always on through scenes 4-7). Mobile only: hidden
+    // through the "8" and "9" narration sub-beats within this same code scene (SCENE8_BEAT_
+    // THRESHOLDS: "8" is sceneLocal 0-0.42, "9" is 0.42-0.60), and once hidden it STAYS hidden
+    // for the rest of this scene-8 visit (doesn't come back at sceneLocal 0.60) — per request.
+    if (_isMobile && currentScene === 7) {
+      if (sceneLocal < 0.60) _s5s8FenceStayHidden = true;
+    } else if (currentScene < 7) {
+      _s5s8FenceStayHidden = false; // scrolled back out before scene 8 — re-arm for next visit
+    }
+    const inMobileZoom = _isMobile && currentScene === 7 && _s5s8FenceStayHidden;
+    const fenceVisible = (currentScene >= 4 && currentScene <= 7) && !inMobileZoom;
     s5s8FenceFront.style.opacity   = fenceVisible ? '1' : '0';
   }
 
@@ -1740,8 +1809,10 @@ function frame(ts) {
     if (s5973BridgeFront) {
       const bridgeOnScreenVw = S5973_BG_LEFT_VW - viewportCenterVw2 + 50;
       // Same scale as the background art — needs its own copy since it's root-level, not a
-      // child of #s5973BgArt that would inherit the transform automatically.
-      const bridgeScale = 1 - 0.5 * s61PostZoomT;
+      // child of #s5973BgArt that would inherit the transform automatically. Mobile: no
+      // pull-back — stays flat (see the matching override on bgScale/treesScale/the bus's
+      // own zoom below), a straight scene instead of zooming out.
+      const bridgeScale = _isMobile ? 1 : 1 - 0.5 * s61PostZoomT;
       s5973BridgeFront.style.transform = `translateX(${(bridgeOnScreenVw * vwPx2).toFixed(1)}px) scale(${bridgeScale.toFixed(3)})`;
       s5973BridgeFront.style.opacity = (currentScene === 27 || currentScene === 28) ? '1' : '0';
     }
@@ -1749,7 +1820,7 @@ function frame(ts) {
     // Trees — same on-screen-position formula and zoom-out scale as the bridge above.
     if (s5973TreesFront) {
       const treesOnScreenVw = S5973_BG_LEFT_VW - viewportCenterVw2 + 50;
-      const treesScale = 1 - 0.5 * s61PostZoomT;
+      const treesScale = _isMobile ? 1 : 1 - 0.5 * s61PostZoomT;
       s5973TreesFront.style.transform = `translateX(${(treesOnScreenVw * vwPx2).toFixed(1)}px) scale(${treesScale.toFixed(3)})`;
       s5973TreesFront.style.opacity = (currentScene === 27 || currentScene === 28) ? '1' : '0';
     }
@@ -1808,7 +1879,10 @@ function frame(ts) {
     // zoom in animateCityBus. transform-origin tracks the viewport center (popupCenterVw2). --
     if (s5973BgArt) {
       if (currentScene === 27 || currentScene === 28) {
-        const bgScale = 1 - 0.5 * s61PostZoomT; // pull-back: 1.0 -> 0.5, synced with the bus
+        // Mobile: no pull-back — "scene city scene-60"'s bus/road zoom-out isn't wanted there,
+        // stays flat at 1 (scroll-freeze/cloud-reveal timing driven by s61PostZoomT elsewhere
+        // is untouched, only the visual scale is skipped).
+        const bgScale = _isMobile ? 1 : 1 - 0.5 * s61PostZoomT; // pull-back: 1.0 -> 0.5, synced with the bus
         s5973BgArt.style.transformOrigin = `${popupCenterVw2.toFixed(2)}vw 50%`;
         s5973BgArt.style.transform = `scale(${bgScale.toFixed(3)})`;
         s5973BgArt.style.opacity = '1';
@@ -1836,6 +1910,12 @@ function frame(ts) {
       const active = _s6263Active && _s6263TransT0 === null && _s6263Index === i;
       el.style.pointerEvents = active ? 'auto' : 'none';
     });
+    // "START AGAIN" is available on any of the 3 slides; prev/next only while there's a slide
+    // in that direction (prev hidden on Resources, next hidden on Contact) — both platforms.
+    if (s6263StartAgainBtn) s6263StartAgainBtn.classList.toggle('visible', _s6263Active);
+    const s6263NotMidTrans = _s6263Active && _s6263TransT0 === null;
+    if (s6263NextBtn) s6263NextBtn.classList.toggle('visible', s6263NotMidTrans && _s6263Index < S6263_SLIDE_COUNT - 1);
+    if (s6263PrevBtn) s6263PrevBtn.classList.toggle('visible', s6263NotMidTrans && _s6263Index > 0);
   }
 
   // #panel-5: track bus position, `position: fixed`, so it moves with the bus's drive-in.
@@ -2340,6 +2420,12 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
       // origin — any flat offset placed here gets multiplied by that scale (the same
       // pinned-wrap gotcha that's bitten positioning elsewhere), so divide it out or a small
       // intended shift turns into a huge one that pushes the content off-screen entirely.
+      // Mobile: CENTER itself is a large flat -1.25vw crop offset (only 30% of the 200vw bus
+      // shows normally) — left uncorrected here during the exterior zoom-in ramp (before the
+      // interior swap below), that same gotcha drags the crop ~4.5x further off-center as
+      // s30Scale ramps up, so the bus reads as a lopsided, way-too-close crop instead of a
+      // centered zoom. Scale-correct it the same way for this phase too.
+      if (_isMobileCityBus && insideT === 0) busX = CENTER / s30Scale;
       if (_isMobileCityBus && insideT > 0) busX = (-0.35 * vw) / s30Scale; // (1 - 1.70) / 2, scale-corrected
 
       // Awa Ly: fades in standing (62-66%), crossfades to holding the ceiling handle (70-75%).
@@ -2508,8 +2594,9 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     // Continuous phase across all 3 scenes so the bob doesn't jump at scene boundaries.
     const chapterPhase = (scene - 27) + local;
     // Zoom driven purely by s61PostZoomT (the final pull-back) — pulls back 1.0->0.5 in sync
-    // with the bridge/trees/background art once panel-61 has closed.
-    zoom = 1 - 0.5 * s61PostZoomT;
+    // with the bridge/trees/background art once panel-61 has closed. Mobile: stays flat, same
+    // reasoning as the bgScale/bridgeScale/treesScale overrides in frame().
+    zoom = _isMobileCityBus ? 1 : 1 - 0.5 * s61PostZoomT;
     if (scene === 27) {
       const bob = Math.sin(chapterPhase * Math.PI * 2) * 0.006 * vw;
       if (_isMobileCityBus) {

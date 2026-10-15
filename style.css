@@ -1495,7 +1495,7 @@ div#panel-1-start {
   top: 0; left: 0;
   width: 100vw;
   height: 100vh;
-  z-index: 110;
+  z-index: 100;
   pointer-events: none;
   opacity: 0;
 }
@@ -2298,6 +2298,9 @@ div#panel-1-start {
   stroke-width: 1.6px;
   stroke-linecap: butt;
 }
+/* Hidden by default (desktop keeps the diagonal .bubble__tail above) — shown only in the
+   mobile media query, for whichever panels have one of these svgs in their HTML. */
+.bubble__tail-mobile { display: none; }
 
 /* Scene-30 zoom popups — same fixed/top style as #panel-29-welcome, stacked. */
 #panel-30-popup1 {
@@ -3468,8 +3471,11 @@ position: absolute;
   pointer-events: none;
   opacity: 0; /* 0 until the slide-switch zone is entered (JS toggles the .active class) */
   transition: opacity 0.3s ease;
-  z-index: 30; /* beats #city-bus/.text-panel (z:20) so it fully covers the strip underneath;
-    stays below #debug-scale/#dbg-bar (z:200) so debug controls remain usable */
+  z-index: 140; /* beats #city-bus/.text-panel (z:20) so it fully covers the strip underneath —
+    raised from 30 so it also beats stray earlier-scene popups that force pointer-events:auto
+    on mobile even while invisible (e.g. #panel-s13-1/2 at z:50), which otherwise sat in front
+    of this screen's own buttons and silently ate their clicks. Stays below #navbar-wrap (150)
+    so the nav bar remains visible/usable, and below #debug-scale/#dbg-bar (z:200). */
 }
 #s62-s63-bg.active { opacity: 1; }
 /* Each slide is a full, independent 100vw/100vh screen — opacity-crossfaded between by JS
@@ -3483,6 +3489,56 @@ position: absolute;
   background-color: #F8DCD3;
   opacity: 0; /* JS sets the actual crossfaded value every frame */
 }
+
+/* Shared across all 3 slides (siblings of .s6263-slide, not inside one) — visibility/opacity
+   driven every frame in scroll.js (frame()), same _s6263Active/_s6263Index state the slides
+   themselves crossfade on. #s62-s63-bg itself is pointer-events:none, so both re-enable it. */
+.s6263-start-again {
+  position: absolute;
+  /* The gap between each slide's own heading and its content start is narrow and differs
+     slightly per slide (measured desktop: Resources ~144-177px, Credits ~132-165px) — this
+     sits in the shared overlap of both, with a smaller footprint (padding/font below) so it
+     actually fits instead of clipping into either one. */
+  top: 17.3%;
+  left: 12%;
+  z-index: 20; /* beats .s6263-content-panel (z:10), which would otherwise intercept clicks */
+  padding: 3px 10px !important;
+  font-size: 0.75rem !important;
+  line-height: 1.2 !important;
+  pointer-events: auto;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+.s6263-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 20; /* beats .s6263-content-panel (z:10), which would otherwise intercept clicks */
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: none;
+  background: var(--pill-bg);
+  color: var(--maroon);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0;
+  box-shadow: 0px 1.9px 1.9px 0px #00000040;
+  transition: opacity 0.3s ease, transform 0.2s ease;
+}
+.s6263-next-arrow { right: 4%; }
+.s6263-prev-arrow { left: 4%; }
+.s6263-next-arrow:hover { transform: translateY(-50%) scale(1.1); }
+.s6263-prev-arrow:hover { transform: translateY(-50%) scale(1.1); }
+.s6263-arrow svg { width: 22px; height: 22px; }
+.s6263-arrow.hidden,
+.s6263-start-again.hidden { opacity: 0; pointer-events: none; }
+.s6263-arrow.visible,
+.s6263-start-again.visible { opacity: 1; }
+
 .s6263-clouds {
   position: absolute;
   top: 0;
@@ -3659,22 +3715,23 @@ position: absolute;
 }
 .s6263-credits-columns > div { display: flex; flex-direction: column; gap: 14px; }
 .s6263-credits-columns p { margin-bottom: 1.5vh; }
-/* Interviewee name list — much denser than the credits text above (20 names), so its own
-   tighter line-height reads better as a scannable list. */
-.s6263-credits-columns p[data-i18n-html="s6263.creditsInterviewees"] { line-height: 1.6; }
+/* Interviewee names — their own 2-sub-column grid inside the right column (20 names total,
+   10 each), denser line-height than the credits text so it reads as a scannable list. */
+.s6263-interviewees-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 20px;
+}
+.s6263-interviewees-columns p { line-height: 1.6; margin-bottom: 0; }
 
-/* Real org logos (assets/s62-s63/*.png) — sit under the left column only now (nested inside
-   its own <div>, not a full-width block below the grid), so smaller/left-aligned to fit that
-   half-width instead of spread across the whole panel. */
+/* Real org logos (assets/s62-s63/*.png) — full width, below both columns (was nested under
+   the left column only, sized/aligned for a half-width slot). */
 .s6263-org-marks {
   display: flex;
   justify-content: flex-start;
   align-items: center;
   gap: 30px;
   flex-wrap: wrap;
-  margin-top: auto; /* pushes the logos to the bottom of the left column (a flex column,
-    stretched to the grid row's full height by the right column's taller interviewee list),
-    instead of sitting right after the last paragraph regardless of how tall that column is. */
 }
 .s6263-org-marks img { height: 50px; width: auto; }
 
@@ -3695,6 +3752,7 @@ position: absolute;
   .s6263-resources { padding: 5vh 24px; border-radius: 24px; }
   .s6263-resource-columns { grid-template-columns: 1fr; }
   .s6263-credits-columns { grid-template-columns: 1fr; }
+  .s6263-interviewees-columns { grid-template-columns: 1fr; }
   .s6263-contact-columns { flex-direction: column; }
   .s6263-contact-links { text-align: left; }
   .s6263-org-marks { gap: 24px; }
@@ -4414,6 +4472,37 @@ bottom: 64%;
   }
   .text-panel h3, .text-panel p { font-size: 14px !important; }
   .text-panel .bubble__tail { display: none !important; }
+  /* Mobile-only straight-down tails (see .bubble__tail-mobile svgs in index.html) — hidden by
+     default (.bubble__tail-mobile base rule, outside this media query) so desktop never shows
+     them; shown here only for the two popups that asked for one. */
+  #panel-29-welcome .bubble__tail-mobile,
+  #panel-30-popup1  .bubble__tail-mobile {
+    display: block;
+    position: absolute;
+    top: 100%;
+    width: 90px;
+    height: 90px;
+    overflow: visible;
+    pointer-events: none;
+  }
+  #panel-29-welcome .bubble__tail-mobile { left: 16%; }
+  #panel-30-popup1  .bubble__tail-mobile { left: 36%; transform: translateX(-50%); }
+  #panel-29-welcome .bubble__tail-mobile polygon,
+  #panel-30-popup1  .bubble__tail-mobile polygon { fill: #FFFFFFF2; }
+  #panel-29-welcome .bubble__tail-mobile path,
+  #panel-30-popup1  .bubble__tail-mobile path {
+    fill: none;
+    stroke: #9F2222;
+    stroke-width: 1px;
+    stroke-linejoin: round;
+  }
+  #panel-29-welcome .bubble__tail-mobile .bubble__seam,
+  #panel-30-popup1  .bubble__tail-mobile .bubble__seam {
+    stroke: #FFFFFFF2;
+    stroke-width: 1.6px;
+    stroke-linecap: butt;
+  }
+  #panel-30-popup1 { overflow: visible; }
   /* The 4 SCROLLABLE_POPUPS (panel-26-3, panel-32-sadik/asmelash2, panel-45-redlady) cap their
      text and let you scroll inside the box on desktop — touch scrolling never actually reached
      that internal scroll (only a 'wheel' listener special-cases it), so on mobile just let the
@@ -4476,7 +4565,7 @@ bottom: 64%;
   .scene-6 .text-panel { right: 3%; top: 10%; }
 .scene-3 .text-panel {
         top: 15% !important;
-        left: 2vh !important;
+        left: 0vh !important;
     }
     #panel-5{
               left: 14vw !important;
@@ -4553,7 +4642,7 @@ bottom: 64%;
     height: 50% !important;
   }
   #city-bus img {
-    width: 200vw;
+    width: 180vw;
   }
   /* #city-bus-inside (scene 30's interior close-up) needs a cover-style crop on a portrait
      phone screen, not desktop's raw width — the source SVG is a wide panorama (~3.12:1
@@ -4573,9 +4662,12 @@ bottom: 64%;
     width: min(78vw, 340px) !important;
     min-width: unset !important;
     max-width: none !important;
-    right: 11vw !important;
-    top: 15%;
+    right: 10vw !important;
+    top: 17%;
     bottom: auto;
+  }
+  .scene.city.scene-44{
+    background-position: -10px;
   }
     
 element.style {
@@ -4583,8 +4675,12 @@ element.style {
 .sound-icon-awayly {
     width: 40px;
     height: 40px;
-    top: 210px;
+    top: 7px;
     left: 90%;
+}
+.sound-icon-awayly .sound-icon-state{
+  width: 40px;
+  height: 40px;
 }
   /* #city-awayly-handle (Awa Ly standing, holding the ceiling handle) uses bottom:-8vh, tuned
      for desktop's shorter/wider viewport — on mobile's much taller portrait one that pushes her
@@ -4607,7 +4703,7 @@ element.style {
      own hardcoded min-width:650/750px!important, which badly overflowed a phone screen the
      same way the other ~26 popups across the site did. */
   #panel-32-intro, #panel-32-umuganda, #panel-32-samuel, #panel-32-asmelash,
-  #panel-32-asmelash2, #panel-32-pregnant-up, #panel-32-pregnant-down, #panel-32-sadik {
+  #panel-32-asmelash2, #panel-32-pregnant-up, #panel-32-pregnant-down, #panel-32-sadik, #panel-32-lesan {
     width: min(78vw, 340px) !important;
     min-width: unset !important;
     max-width: none !important;
@@ -4615,10 +4711,14 @@ element.style {
     bottom: auto !important;
   }
    #panel-32-samuel,  #panel-32-asmelash{
-    top:16% !important;
+    top:17% !important;
    }
     #panel-32-sadik {
-    top: 13% !important;
+    top: 14% !important;
+   }
+   #panel-32-lesan{
+    left: 112vw;
+     top:10% !important;
    }
 
   /* Name plates (Samuel/Asmelash/Sadik) — same idea: centered via JS, not position:fixed,
@@ -4626,7 +4726,7 @@ element.style {
      .sound-caption-s32-role rule below). */
   #sound-caption-s32, #sound-caption-asmelash, #sound-caption-sadik, #sound-caption-kathleen,
   #sound-caption-totomoto {
-    min-width: 339px;
+    width: min(78vw, 340px) !important;
     text-align: center;
     justify-content: center;
     font-size: 14px;
@@ -4652,8 +4752,8 @@ element.style {
   .sound-icon-samuel, .sound-icon-asmelash, .sound-icon-sadik, .sound-icon-kathleen {
     width: 40px !important;
     height: 40px !important;
-    top: 210px !important;
-    left: 90% !important;
+    top: 7px !important;
+    left: 94% !important;
     right: auto !important;
     bottom: auto !important;
   }
@@ -4664,17 +4764,17 @@ element.style {
     left: 0 !important;
   }
    .sound-icon-sadik .sound-icon-state {
-    top: 170px !important;
+    top: 7px !important;
    }
     .sound-icon-asmelash {
-    top: 240px !important;
+    top: 7px !important;
    }
 
   /* Scene 32-43 "people" — all scaled up ~3.36x from their desktop sizes (the same ratio
      #city-awayly-handle ended up at, 14vw -> 47vw), consistent with each other instead of each
      being individually small (6-12vw) and easy to miss on a phone screen. */
-  .char-s32-oldlady   { width: 57vw !important; }
-  .char-s33-girlphone { width: 38.5vw !important; height: auto !important; left: 110vw; }
+  .char-s32-oldlady   { width: 57vw !important; bottom: 0 !important; }
+  .char-s33-girlphone { width: 38.5vw !important; height: auto !important; left: 110vw;bottom: -5vh; }
   .char-s34-kid1      { width: 25vw !important; }
   .char-s35-pregnant  { width: 28vw !important; }
   .char-s32-sadik     { width: 36vw !important; }
@@ -4709,6 +4809,10 @@ element.style {
     min-width: unset !important;
     max-width: none !important;
   }
+   #panel-45-totomoto{
+    top: 15%;
+    bottom: auto;
+   }
   /* Same overflow bug (min-width:555-600px!important) as the scene 45-48 group above — these
      are centered via centerHorizontallyOnMobile in scroll.js's scene-55-57 popup block. */
   #panel-55, #panel-55b, #panel-56, #panel-57 {
@@ -4808,6 +4912,23 @@ element.style {
   .s6263-resource-columns li { margin-bottom: 0.6vh; }
   .s6263-credits-columns > div { gap: 6px; }
   .s6263-credits-columns p { margin-bottom: 0.6vh; }
+  /* Desktop's top:17.3% lands inside the content here — mobile's heading sits much closer to
+     the top, and the gap differs slightly per slide (measured: Resources heading-bottom ~12.4%,
+     content-start ~16.4%; Credits heading-bottom ~10.9%, content-start ~14.9%) — this sits in
+     the shared overlap of both, same reasoning as the desktop value. */
+  .s6263-start-again {
+    top: 12.4%;
+    left: 16px;
+    padding: 4px 10px;
+    font-size: 11px !important;
+  }
+  .s6263-arrow {
+    width: 36px;
+    height: 36px;
+  }
+  .s6263-next-arrow { right: 3%; }
+  .s6263-prev-arrow { left: 3%; }
+  .s6263-arrow svg { width: 18px; height: 18px; }
   /* Tall (lots of text) — at the shared bottom:60vh its top edge landed a few px above the
      screen, just under the navbar. Shifted down a bit to clear it. */
   #panel-45-redlady {
@@ -4841,7 +4962,7 @@ element.style {
      reason, so reset it to scale(1). */
   #panel-47-newguy {
     transform: translateX(-42%) scale(1) !important;
-    top: 16%;
+    top: 17%;
     bottom: auto;
   }
   #sound-caption-s47newguy {
@@ -5119,7 +5240,7 @@ element.style {
 }
 #panel-26-1{
   bottom: auto;
-  top: 15%;
+  top: 16%;
   left: 82vw;
 }
 /* Mobile-only reposition — desktop keeps its original bottom:10%/left:37vw (panel-26-2) and
@@ -5132,10 +5253,14 @@ element.style {
 }
 #panel-26-3{
   left: 143vw;
+  top: 16%;
+  bottom: auto;
 }
 #s26-revolution-sign{
   top:10%;
   left: 140vw;
+  font-size: 28px;
+  line-height: normal;
 }
 .char-s26-moto{
   bottom: 10vh;
@@ -5176,7 +5301,7 @@ element.style {
         bottom: auto;
         font-size: 14px;
         padding: initial;
-        min-width: 339px;
+        width: min(78vw, 340px) !important;
         right: auto;
         margin: auto;
         left: 12%;
@@ -5184,7 +5309,7 @@ element.style {
     }
 #sound-caption-awayly span{
   font-size: 28px !important;
-  padding: 5px !important ;
+  padding: 10px !important ;
 }
 #s32-s43-bg img{
   left: -120vw;
@@ -5193,21 +5318,21 @@ element.style {
   background-size: cover;
 }
 #panel-45-kathleen{
-  top: 16%;
+  top: 17%;
   bottom: auto;
 }
 #sound-caption-s47newguy{
   top: 10%;
         bottom: auto;
         left: 324vw;
-        width: 340px;
+        width: min(78vw, 340px) !important;
         text-align: center;
         justify-content: center;
         font-size: 14px;
         padding-right: 0 !important;
 }
 #sound-caption-s47newguy button.sound-icon-s32.sound-icon-chris {
-    top: 145px;
+    top: 7px;
     width: 40px !important;
     height: 40px !important;
 }
@@ -5254,5 +5379,11 @@ element.style {
   width: 100vw;
   height: 36vh;
 }
-
+div#panel-1-start {
+    bottom: 40%;
+    left: 25% !important;
+}
+#s12-s15-bg{
+  left: 800vw;
+}
 }

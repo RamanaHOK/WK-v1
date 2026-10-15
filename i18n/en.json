@@ -122,6 +122,7 @@
     "panel-47-newguy": "<p>&ldquo;I think when people understand more about data licensing and sharing, it helps them make better decisions. It&rsquo;s no longer just open source versus non-open source. Because even open source is a very complex thing. It has different aspects of it.&rdquo;</p>"
   },
   "s6263": {
+    "startAgain": "START AGAIN",
     "resourcesHeading": "RESOURCES",
     "resourceItem1": "Download our comprehensive report <a href=\"#\" target=\"_blank\" rel=\"noopener\">\"African Languages and Digital Justice: A Mapping Study on Community-Centered Language Technologies\"</a>",
     "resourceItem2": "Download our <a href=\"#\" target=\"_blank\" rel=\"noopener\">\"Community-Centered Language Technology: Best Practices Guideline\"</a> to explore how this kind of tech work can be adopted and expanded by others",
@@ -138,14 +139,15 @@
     "creditsHeading": "CREDITS",
     "creditsCol1Item1": "This work was made possible through the generous support of The Internet Society Foundation (<a href=\"#\" target=\"_blank\" rel=\"noopener\">ISOC</a>).",
     "creditsCol1Item2": "Research-in-action process conducted by <a href=\"#\" target=\"_blank\" rel=\"noopener\">Whose Knowledge?</a> and the Distributed AI Research Institute (<a href=\"#\" target=\"_blank\" rel=\"noopener\">DAIR</a>).",
-    "creditsCol1Item3": "Written by Claudia Pozo and Maari Zwick-Maitreyi with edits from Grusha Dhawan",
+    "creditsCol1Item3": "Written by Claudia Pozo and Maari Zwick-Maitreyi with creative development by Grusha Dhawan",
     "creditsCol2Item1": "Website by <a href=\"#\" target=\"_blank\" rel=\"noopener\">Studio Ping Pong</a>",
     "creditsCol2Item2": "Development by <a href=\"#\" target=\"_blank\" rel=\"noopener\">House of Katha</a>",
     "creditsCol2Item3": "Creative representation advisory by Anisa Ali",
     "creditsCol2Item4": "Tigrinya translation and proofreading by Berhane Achame and Fekadu Gebregziabher.",
     "creditsCol2Item5": "Kishwahili translation and proofreading by Melchior Shukuru and Exuper Njau",
     "creditsInterviewsIntro": "This report is profoundly indebted to the many interviewees who generously shared their time, expertise, and lived experiences. Their insights are the heart of these findings. We feature some of them below:",
-    "creditsInterviewees": "Alexander Andrason, University of Cape Town<br>Amrit Sufi, Wikimedian<br>Anushah Hossain, Script Encoding Initiative (SEI)<br>Asmelash Teka Hadgu, LesanAI<br>Awa Ly, GalsenAI<br>Digital Umuganda<br>E.M Lewis-Jong, Mozilla Data Collective<br>Eddie Avila, Rising Voices<br>EthioNLP<br>Kalika Bali, Microsoft Research India<br>Kathleen Siminyu, Distributed AI Research (DAIR)<br>Lanfrica Labs<br>Mariana Fossatti, Whose Knowledge?<br>Meseret Alemayehu, RDLS Ethiopia<br>Pau Giner, Wikimedia Foundation<br>Paul Azunre, GhanaNLP<br>Sadik Shahadu, Dagbani Wikimedians User Group<br>Seid Muhie Yimam, EthioNLP<br>Shamsuddeen Hassan Muhammad, HausaNLP<br>Subhashish Panigrahi, Openspeaks",
+    "creditsInterviewees1": "Alexander Andrason, University of Cape Town<br>Amrit Sufi, Wikimedian<br>Anushah Hossain, Script Encoding Initiative (SEI)<br>Asmelash Teka Hadgu, LesanAI<br>Awa Ly, GalsenAI<br>Digital Umuganda<br>E.M Lewis-Jong, Mozilla Data Collective<br>Eddie Avila, Rising Voices<br>EthioNLP<br>Kalika Bali, Microsoft Research India",
+    "creditsInterviewees2": "Kathleen Siminyu, Distributed AI Research (DAIR)<br>Lanfrica Labs<br>Mariana Fossatti, Whose Knowledge?<br>Meseret Alemayehu, RDLS Ethiopia<br>Pau Giner, Wikimedia Foundation<br>Paul Azunre, GhanaNLP<br>Sadik Shahadu, Dagbani Wikimedians User Group<br>Seid Muhie Yimam, EthioNLP<br>Shamsuddeen Hassan Muhammad, HausaNLP<br>Subhashish Panigrahi, Openspeaks",
     "licenseText": "<a href=\"#\" target=\"_blank\" rel=\"noopener\">Unless otherwise stated</a>, this work is licensed under a <a href=\"#\" target=\"_blank\" rel=\"noopener\">Creative Commons Attribution-ShareAlike 4.0 International License.</a> 2026"
   },
   "chars": {
