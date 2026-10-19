@@ -3490,6 +3490,9 @@ position: absolute;
   pointer-events: none;
   opacity: 0; /* 0 until the slide-switch zone is entered (JS toggles the .active class) */
   transition: opacity 0.3s ease;
+  background-color: #F8DCD3; /* matches --s6263-bg — without its own fill, the 0.3s opacity
+    fade (and each slide's own crossfade) briefly exposed body's #1C2A15 dark fallback
+    underneath, reading as a black flash during the fade-in. */
   z-index: 140; /* beats #city-bus/.text-panel (z:20) so it fully covers the strip underneath —
     raised from 30 so it also beats stray earlier-scene popups that force pointer-events:auto
     on mobile even while invisible (e.g. #panel-s13-1/2 at z:50), which otherwise sat in front
