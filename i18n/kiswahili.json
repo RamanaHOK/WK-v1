@@ -206,5 +206,35 @@
   },
   "images": {
     "billboard5558": "assets/s55-s58/billaboard-kisw.svg"
+  },
+  "s6263": {
+    "startAgain": "ANZA UPYA",
+    "resourcesHeading": "MAKTABA",
+    "resourceItem1": "<a class=\"s6263-resource-action\" href=\"#\" target=\"_blank\" rel=\"noopener\">Pakua</a> ripoti yetu ya kina \"African Languages and Digital Justice: A Mapping Study on Community-Led Language Technologies\"",
+    "resourceItem2": "<a class=\"s6263-resource-action\" href=\"#\" target=\"_blank\" rel=\"noopener\">Pakua</a> \"Community-Led Language Technology: Best Practices Guideline\" ili kuchunguza jinsi aina hii ya kazi ya kiteknolojia inaweza kupokelewa na kupanuliwa na wengine.",
+    "resourceItem3": "<a class=\"s6263-resource-action\" href=\"https://internetslanguages.org\" target=\"_blank\" rel=\"noopener\">Soma</a> utafiti wetu wa awali wa msingi wa utafiti-katika-hatua kuhusu lugha za intaneti mtandaoni: internetslanguages.org",
+    "resourceItem4": "<a class=\"s6263-resource-action\" href=\"#\" target=\"_blank\" rel=\"noopener\">Tazama</a> jukwaa la LesanAI, kampuni ya akili unde inayolenga kutengeneza zana za tafsiri ya kompyuta kwa kuzingatia lugha za Ethiopia na Eritrea.",
+    "resourceItem5": "Tulirekebisha kwa mafunzo maalum modeli ya Meta ya Massively Multilingual Speech (MMS) kwa kutumia data za Mozilla Common Voice za Kiswahili ili kuunda modeli za utambuzi wa sauti kiotomatiki za Kiswahili zilizobobea na zilizoboreshwa kwa muktadha mahususi. <a href=\"#\" target=\"_blank\" rel=\"noopener\">Unaweza kupakua modeli hapa.</a>",
+    "resourceItem6": "Tulirekebisha kwa mafunzo maalum modeli ya OpenAI ya Whisper kwa kutumia data za Mozilla Common Voice za Kiswahili ili kuunda modeli za utambuzi wa sauti za kiotomatiki za kiswahili zilizobobea na zilizoboreshwa kwa muktadha mahususi. <a href=\"#\" target=\"_blank\" rel=\"noopener\">Unaweza kupakua modeli hapa.</a>",
+    "resourceItem7": "Watengenezaji wa maudhui wa Kitigrinya waliweza kuunda makala 62 kwenye wiki ya DAIR kwa kutumia mchanganyiko wa zana za tafsiri ya kompyuta na utambuzi wa sauti kiotomatiki. <a href=\"#\" target=\"_blank\" rel=\"noopener\">Orodha ya makala hizo utaipata hapa.</a>",
+    "resourceItem8": "Watengenezaji wa maudhui wa Kiswahili waliweza kuunda makala 46 kwenye wiki ya DAIR kwa kutumia mchanganyiko wa zana za tafsiri ya kompyuta na utambuzi wa sauti kiotomatiki. <a href=\"#\" target=\"_blank\" rel=\"noopener\">Orodha ya makala hizo utaipata hapa.</a>",
+    "resourceItem9": "<a class=\"s6263-resource-action\" href=\"#\" target=\"_blank\" rel=\"noopener\">Soma</a> makala ya jarida yameandikwa kwa ushirikiano na Hellina Nigatu na Kathleen Siminyu: \"Zaidi ya Msururu wa Herufi: Tofauti za Lugha na Mahitaji ya Jamii katika Uundaji wa Makala Mtandaoni kwa Lugha Zisizo na Rasilimali za Kutosha\"",
+    "contactHeading": "WASILIANA NASI",
+    "contactIntro": "Wasiliana nasi ili kutupa maoni na kushirikisha mawazo yako, utujulishe kuhusu mipango ya Afrika/Ulimwengu wa Waliowengi inayofanya kazi kwenye masuala haya, au pendekeza mtu ambaye tunapaswa kuzungumza naye!",
+    "contactEmail": "languages@whoseknowledge.org",
+    "contactSite": "www.whoseknowledge.org",
+    "creditsHeading": "SHUKURANI",
+    "creditsCol1Item1": "Kazi hii imewezekana kupitia msaada wa ukarimu wa '<a href=\"#\" target=\"_blank\" rel=\"noopener\">The Internet Society Foundation</a>' (<a href=\"#\" target=\"_blank\" rel=\"noopener\">ISOC</a>).",
+    "creditsCol1Item2": "Mchakato wa utafiti-katika-hatua umefanywa na <a href=\"#\" target=\"_blank\" rel=\"noopener\">Whose Knowledge?</a> na Distributed AI Research Institute (<a href=\"#\" target=\"_blank\" rel=\"noopener\">DAIR</a>).",
+    "creditsCol1Item3": "Imeandikwa na Claudia Pozo na Maari Zwick-Maitreyi, na kuhaririwa na Grusha Dhawan.",
+    "creditsCol2Item1": "Tovuti imebuniwa na <a href=\"#\" target=\"_blank\" rel=\"noopener\">Studio Ping Pong</a>.",
+    "creditsCol2Item2": "Maendeleo na <a href=\"#\" target=\"_blank\" rel=\"noopener\">Nyumba ya Katha</a>.",
+    "creditsCol2Item3": "Ushauri wa uwakilishi wa ubunifu umetolewa na Anisa Ali.",
+    "creditsCol2Item4": "Tafsiri ya Kitigrinya na kuhariri kumefanywa na Berhane Achame na Fekadu Gebregziabher.",
+    "creditsCol2Item5": "Tafsiri ya Kiswahili na kuhariri kumefanywa na Melchior Shukuru na Exuper Njau.",
+    "creditsInterviewsIntro": "Ripoti hii ina deni kubwa la shukurani kwa wahojiwa wengi walioshirikisha kwa ukarimu wa muda wao, utaalamu wao, na uzoefu wao wa maisha. Maarifa yao ndiyo kiini cha matokeo haya. Baadhi yao tumewaandika hapa chini:",
+    "creditsInterviewees1": "<li>Alexander Andrason, Chuo Kikuu cha Cape Town</li><li>Amrit Sufi, Mdau wa Wikimedia</li><li>Anushah Hossain, Script Encoding Initiative (SEI)</li><li>Asmelash Teka Hadgu, LesanAI</li><li>Awa Ly, GalsenAI</li><li>Digital Umuganda</li><li>E.M Lewis-Jong, Mozilla Data Collective</li><li>Eddie Avila, Rising Voices</li><li>EthioNLP</li><li>Kalika Bali, Microsoft Research India</li>",
+    "creditsInterviewees2": "<li>Kathleen Siminyu, Distributed AI Research (DAIR)</li><li>Lanfrica Labs</li><li>Mariana Fossatti, Whose Knowledge?</li><li>Meseret Alemayehu, RDLS Ethiopia</li><li>Pau Giner, Wikimedia Foundation</li><li>Paul Azunre, GhanaNLP</li><li>Sadik Shahadu, Dagbani Wikimedians User Group</li><li>Seid Muhie Yimam, EthioNLP</li><li>Shamsuddeen Hassan Muhammad, HausaNLP</li><li>Subhashish Panigrahi, Openspeaks</li>",
+    "licenseText": "<a href=\"#\" target=\"_blank\" rel=\"noopener\">Isipokuwa pale ambapo imeelezwa vinginevyo</a>, kazi hii ina leseni ya <a href=\"#\" target=\"_blank\" rel=\"noopener\">Creative Commons Attribution-ShareAlike 4.0 International License.</a> 2026"
   }
 }

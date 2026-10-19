@@ -164,6 +164,30 @@ const S28_MOBILE_SCROLL_MULT = 5.7;
 const S29_MOBILE_SCROLL_MULT = 5.7;
 const S30_MOBILE_SCROLL_MULT = 9.6;
 
+// Scenes 56-58 (mobile only) — SCENE_SCROLL[24..26] (0.01/0.4/0.3) is only ~4px/156px/117px of
+// actual mobile scroll, which is why the #s5558-transition-frame-front cloud reveal (see
+// frame()) needed its whole buildup/peak/hold sequence squeezed into such a tight budget and
+// borrowed runway across scene boundaries just to avoid a hard mid-animation cut. Widened here
+// so that reveal has genuine room to play out as its own gradual scroll, not a near-instant
+// flash — same pattern as S26-S30 above. Desktop unaffected (keeps SCENE_SCROLL[24..26] at
+// their original 0.01/0.4/0.3). The cloud timing constants themselves (S5558_START_LOCAL etc.)
+// are scene-fraction based, not pixel based, so they don't need retuning for this.
+const S56_MOBILE_SCROLL_MULT = 0.8;
+const S57_MOBILE_SCROLL_MULT = 1.5;
+const S58_MOBILE_SCROLL_MULT = 1.5;
+
+// Scene 60 (mobile only) — requested explicitly: the bus should keep scrolling/holding on
+// screen longer before the pull-back-zoom + cloud-cover sequence (S61_POSTZOOM_TRIGGER_LOCAL_
+// MOBILE) takes over, reading like it travels all the way through to where "scene 62" (a real
+// DOM div, .scene-62, but with no scroll budget of its own — folded into this same index, see
+// combinedLocal5973's comment) would be. The bus's own gentle bob here is intentional by design
+// ("never exits", see animateCityBus's scene===28 branch) — not a literal left/right slide — so
+// more scroll distance simply means more time spent at that bob before the trigger fires,
+// without touching the bus's movement logic itself. Desktop unaffected (keeps SCENE_SCROLL[28]
+// = 2.3). The trigger constant is scene-fraction based, not pixel based, so it still lands at
+// the same relative point — just much later in real scroll distance.
+const S60_MOBILE_SCROLL_MULT = 5.5;
+
 // ---- DOM ----
 const pinnedWrap  = document.getElementById('pinned-wrap');
 const scrollX     = document.getElementById('scroll-x');
@@ -278,6 +302,7 @@ if (s8BusTransitionPlayer) {
 const s5558Car        = document.getElementById('s5558-car');
 const s5558Car2       = document.getElementById('s5558-car2');
 const s5558Car3       = document.getElementById('s5558-car3');
+const s5558CloudsImg   = document.getElementById('s5558-clouds-img');
 const s5558TransitionFrameFront = document.getElementById('s5558-transition-frame-front');
 const s5558TransitionFrameLottie = document.getElementById('s5558-transition-frame-lottie');
 if (s5558TransitionFrameLottie && getVw() <= 768) {
@@ -522,6 +547,15 @@ let _s61PostZoomReverseT0 = null;      // wall-clock timestamp the REVERSE (zoom
 let _s61PostZoomReverseFrozenTx = null; // pan held stable for the whole reverse sequence
 
 const S61_POSTZOOM_TRIGGER_LOCAL = 1.2; // combinedLocal5973 point where panel-61 has closed — must match show61's own close bound above
+// Mobile only: delays the whole pull-back-zoom + cloud-cover sequence further (requested
+// explicitly) — on mobile panel-61 stayed open only briefly before the zoom/clouds took over.
+// Desktop keeps the original 1.2 trigger untouched. show61's own close bound and cloudStart
+// below both read this mobile-aware value too, so panel-61's open window and the cloud
+// reveal's start stay in sync with the later trigger, same relationship as before.
+const S61_POSTZOOM_TRIGGER_LOCAL_MOBILE = 1.8; // pushed further out (was 1.5) — still too early,
+  // requested again. 1.8 is close to scene-63's own start (combinedLocal5973 = 2.0, the only
+  // other real boundary in this zone — scenes 61/62 have no scroll budget of their own, see the
+  // combinedLocal5973 comment above), leaving minimal runway before the closing message begins.
 const S61_POSTZOOM_TOTAL_MS = 2000; // duration of the pull-back's auto-play, either direction
 // Reverse trigger point — deliberately lower than S61_POSTZOOM_TRIGGER_LOCAL (hysteresis gap).
 const S61_POSTZOOM_REVERSE_TRIGGER_LOCAL = 0.9;
@@ -776,6 +810,10 @@ function buildScrollMap() {
       : (isMobile && i === 13) ? S28_MOBILE_SCROLL_MULT
       : (isMobile && i === 14) ? S29_MOBILE_SCROLL_MULT
       : (isMobile && i === 15) ? S30_MOBILE_SCROLL_MULT
+      : (isMobile && i === 24) ? S56_MOBILE_SCROLL_MULT
+      : (isMobile && i === 25) ? S57_MOBILE_SCROLL_MULT
+      : (isMobile && i === 26) ? S58_MOBILE_SCROLL_MULT
+      : (isMobile && i === 28) ? S60_MOBILE_SCROLL_MULT
       : SCENE_SCROLL[i];
     const len    = sceneScrollMult * vw;
     // Scene 21 (i=10): real DOM start is 1165vw (1000vw base + margin-left:165vw) — the extra
@@ -1308,7 +1346,7 @@ function frame(ts) {
     // Mid REVERSE wall-clock sequence — same freeze-pan technique, mirror-image zoom-in.
     if (_s61PostZoomReverseFrozenTx === null) { _s61PostZoomReverseFrozenTx = tx; }
     effectiveTx = _s61PostZoomReverseFrozenTx;
-  } else if (currentScene >= 27 && currentScene <= 29 && ((currentScene - 27) + sceneLocal) >= S61_POSTZOOM_TRIGGER_LOCAL && _scrollingForward && _s61PostZoomT0 === null && _s61PostZoomReverseT0 === null) {
+  } else if (currentScene >= 27 && currentScene <= 29 && ((currentScene - 27) + sceneLocal) >= (getVw() <= 768 ? S61_POSTZOOM_TRIGGER_LOCAL_MOBILE : S61_POSTZOOM_TRIGGER_LOCAL) && _scrollingForward && _s61PostZoomT0 === null && _s61PostZoomReverseT0 === null) {
     // FORWARD trigger — only while actually scrolling forward, and not mid-reverse.
     _s61PostZoomT0 = ts;
     _s61PostZoomReverseT0 = null; // mutually exclusive with the reverse sequence
@@ -1405,30 +1443,72 @@ function frame(ts) {
   // of the scene — frameVx is recomputed live so scrolling back naturally un-freezes it. --
   if (s5558TransitionFrameFront && SCROLL_MAP[23]) {
     const frameVx = SCROLL_MAP[23].stripX + 1.22 * _vw + effectiveTx;
-    const frameVisible = currentScene >= 23 && currentScene <= 26;
+    // Mobile only: simple — no clouds at all through scenes 55-56, buildup starts right at
+    // scene 57 and reaches (holds) peak density inside scene 58. combinedS5558: 0 at scene-55
+    // start, 1 at scene-56 start, 2 at scene-57 start, 3 at scene-58 start, 4 at scene-58 end —
+    // spans scenes 55-58, never scene 59. Also used by the lottie scrub below (shared, hence
+    // hoisted out of the if(frameVisible) block).
+    const S5558_START_LOCAL = 2;   // buildup runway starts right at scene 57's own beginning
+    const S5558_PEAK_LOCAL = 3.9;  // lottie reaches (and holds) its peak-density frame around
+                                    // 90% into scene 58
+    const S5558_HIDE_LOCAL = 4.0;  // cover disappears exactly at scene 58's end
+    const inS5558Range = getVw() <= 768 && currentScene >= 23 && currentScene <= 26;
+    const combinedS5558 = inS5558Range ? (currentScene - 23) + sceneLocal : -1;
+    const frameVisible = inS5558Range
+      ? combinedS5558 < S5558_HIDE_LOCAL
+      : (currentScene >= 23 && currentScene <= 26); // desktop/non-mobile: original range, untouched
     if (frameVisible) {
-      // Hard on/off, no cross-fade — snaps to 0 once slid back out past this threshold.
+      // Hard on/off, no cross-fade — snaps to 0 once slid back out past this threshold. Same
+      // check on mobile and desktop now (no more mobile-only suppression).
       const FRAME_REVEAL_VW = 5.5 * _vw;
-      // Mobile only: frameVx already sits under FRAME_REVEAL_VW right at scene 23's own start
-      // (stripX's offset cancels against effectiveTx there, leaving just the flat 1.22vw), so
-      // this clouds+birds overlay would show fully opaque — covering the bus/car — from the
-      // instant you land on scene 23/24 (55/56), where it's not wanted. But scenes 57-58
-      // (index 25-26) genuinely need it: #s55-s58-bg is only 300vw wide and the pan runs past
-      // its right edge there, leaving a blank gap on a narrow mobile viewport (confirmed via
-      // screenshot) that this frame is specifically meant to cover — see the "still covers
-      // whatever comes after" comment on #s55-s58-bg in style.css. So only suppress for 55/56.
-      const suppressOnMobile = getVw() <= 768 && currentScene < 25;
-      s5558TransitionFrameFront.style.opacity   = (frameVx <= FRAME_REVEAL_VW && !suppressOnMobile) ? '1' : '0';
+      s5558TransitionFrameFront.style.opacity   = (frameVx <= FRAME_REVEAL_VW) ? '1' : '0';
       s5558TransitionFrameFront.style.transform = `translateX(${Math.max(0, frameVx).toFixed(1)}px)`;
     } else {
       s5558TransitionFrameFront.style.opacity = '0';
     }
+    // Solid peach backing color only once the lottie buildup itself starts (scene 57 onward,
+    // combinedS5558 >= 2) — not during scenes 55-56, where the real background art is still
+    // fully visible and a flat rectangle behind the lottie would show as a hard, out-of-place
+    // edge on top of it.
+    // Delayed well past S5558_START_LOCAL (2) itself — a short 0.3 delay still handed off to the
+    // backing color around frame 5, which has almost no visible cloud texture of its own
+    // (confirmed via frame-by-frame screenshot), so it still read as a flat empty wall even
+    // though technically "correct". Pushed further out, to around frame 16 — genuinely textured,
+    // recognizable as clouds — before the backing takes over, so the real scene art visibly
+    // gives way to clouds forming instead of flat color appearing first and texture catching up.
+    if (inS5558Range) {
+      s5558TransitionFrameFront.style.backgroundColor = combinedS5558 >= 2.9 ? '#EFB99B' : 'transparent';
+    } else if (s5558TransitionFrameFront.style.backgroundColor) {
+      s5558TransitionFrameFront.style.backgroundColor = '';
+    }
+    // Ambient decorative sky clouds (.s5558-clouds, always-present background art, unrelated to
+    // the transition lottie above) — hidden through scenes 55-56 too, so the sky reads fully
+    // clear until scene 57 begins, matching the lottie's own start.
+    if (s5558CloudsImg) {
+      const hideAmbientClouds = getVw() <= 768 && currentScene >= 23 && currentScene <= 24;
+      s5558CloudsImg.style.opacity = hideAmbientClouds ? '0' : '1';
+    }
     // Lottie plays as a function of scroll (not autoplay/loop) — scrubbed across scenes
-    // 23-26 overall progress, same technique as #s5973-clouds-lottie below.
+    // 23-26 overall progress, same technique as #s5973-clouds-lottie below. Mobile scrub target
+    // is capped at S5558_PEAK_FRAME, not the lottie's last frame: the source animation's clouds
+    // are densest around frame 34/79 and then thin back out toward frame 78 (confirmed via
+    // direct frame-by-frame screenshot — frame 78 is nearly empty, just a sliver). Reaching
+    // frame 34 by S5558_PEAK_LOCAL and holding there (instead of continuing to scrub toward the
+    // sparse end) keeps the dense look for the whole remaining hold through scene 58. Desktop's
+    // own formula/ceiling (the lottie's actual last frame) is untouched.
+    const S5558_PEAK_FRAME = 34;
     if (s5558TransitionFrameLottie && typeof s5558TransitionFrameLottie.getLottie === 'function') {
-      const frameProgress = Math.max(0, Math.min(1, ((currentScene - 23) + sceneLocal) / 3));
+      let frameProgress;
+      if (inS5558Range) {
+        frameProgress = Math.max(0, Math.min(1, (combinedS5558 - S5558_START_LOCAL) / (S5558_PEAK_LOCAL - S5558_START_LOCAL)));
+      } else {
+        frameProgress = Math.max(0, Math.min(1, ((currentScene - 23) + sceneLocal) / 3));
+      }
       const lottie = s5558TransitionFrameLottie.getLottie();
-      if (lottie && lottie.totalFrames) lottie.goToAndStop(frameProgress * (lottie.totalFrames - 1), true);
+      if (lottie && lottie.totalFrames) {
+        const targetFrame = inS5558Range ? frameProgress * S5558_PEAK_FRAME : frameProgress * (lottie.totalFrames - 1);
+        lottie.goToAndStop(targetFrame, true);
+      }
     }
   }
 
@@ -1833,7 +1913,8 @@ function frame(ts) {
     const show59              = inHoldRange5973 && combinedLocal5973 > 0.15 && combinedLocal5973 < 0.45;
     const showPurpleMan       = inHoldRange5973 && combinedLocal5973 > 0.45 && combinedLocal5973 < 0.7;
     const showLanguageJustice = inHoldRange5973 && combinedLocal5973 > 0.7  && combinedLocal5973 < 1.0;
-    const show61              = inHoldRange5973 && combinedLocal5973 > 1.02 && combinedLocal5973 < 1.2;
+    const s61PostZoomTriggerLocal = getVw() <= 768 ? S61_POSTZOOM_TRIGGER_LOCAL_MOBILE : S61_POSTZOOM_TRIGGER_LOCAL;
+    const show61              = inHoldRange5973 && combinedLocal5973 > 1.02 && combinedLocal5973 < s61PostZoomTriggerLocal;
 
     positionCenteredPopup(s5973Panels[0], show59, popupCenterVw2);
     if (panelPurpleMan) positionCenteredPopup(panelPurpleMan, showPurpleMan, popupCenterVw2);
@@ -1860,7 +1941,7 @@ function frame(ts) {
 
     // Scenes 60-61 cloud cover — scrubbed frame-by-frame from combinedLocal5973 (not
     // autoplaying), triggered where the pull-back (s61PostZoomT) finishes.
-    const cloudStart = S61_POSTZOOM_TRIGGER_LOCAL;
+    const cloudStart = s61PostZoomTriggerLocal;
     const CLOUD_REVEAL_SPAN = 0.6; // smaller = clouds fully cover over less scroll (faster)
     const cloudSpan = CLOUD_REVEAL_SPAN;
     // Multiplied by s61PostZoomT (not gated by a hard >=1 check) so scrolling back fades the

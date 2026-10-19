@@ -205,5 +205,31 @@
   },
   "images": {
     "billboard5558": "assets/s55-s58/billaboard-tigri.svg"
+  },
+  "s6263": {
+    "resourceItem1": "ሓፈሻዊ ፀብፃብና፥ “ቋንቋታት ኣፍሪካን ዲጂታል ፍትሕን፡ መፅናዕቲ ምምማይ ብማሕበረሰብ ዝምራሓ ቴክኖሎጂታት ቋንቋ” ኣውርዱዎ።",
+    "resourceItem2": "ከምዚ ዝበለ ቴክኖሎጂ ብኻልኦት ተቐባልነት ክረክብን ክሰፋፋሕን ከምዘለዎ ንምድህሳስ ፥ ናትና ”ማሕበረሰብ ዝመርሖ ቴክኖሎጂ ቋንቋ፡ መምርሒ ብሉፃት ተመክሮታት” ኣውርዱዎ።",
+    "resourceItem3": "ኣብ ዝሓለፈ ብዛዕባ ቋንቋታት ፥ መሰረታዊ ምርምር ብተግባር ንዘካየድናዮም ስራሕቲ፣ ኣብ መስመር ኢንተርኔት፡ <a href=\"https://internetlanguages.org/en/\" target=\"_blank\" rel=\"noopener\">internetslanguages.org</a> ኣንብቡ።",
+  "resourceItem4": "መድረኽ <a href=\"https://lesan.ai/\" target=\"_blank\" rel=\"noopener\">LesanAI</a> ፥ ትኹረቱ ኣብ ቋንቋታት ኢትዮጵያን ኤርትራን ገይሩ፥ መጋበርያታት ትርጉም ማሺን ኣብ ምምዕባል ዘሎ ጀማሪ ፕሮጀክት፥ ፈትሹ።",
+    "resourceItem5": "ኣብ ቋንቋ ስዋሂሊ፣ ዝለዓለ ፍሉይነትን ተጠቃምነትን ዘለዎም ሞዴላት መሳርሒ ባዕላዊ ምልላይ ድምፂ (ASR) ንምፍጣር፣ ንቡኽራ መረዳእታ ሞዚላ ኮመን ቮይስ (Mozilla Common Voice) ስዋሂሊ ተጠቒምና ከምኡ እውን ሜታ (Meta) ንዝውንኖ ፕሮጀክት ሰፊሕን ዘረባ ብብዙሓት ቋንቋታትን (Massively Multilingual Speech - MMS) ኣስተኻኪልናዮ ኢና። ነቲ ሞዴል ኣብዚ ክተውርዱዎ (download ) ትኽእሉ ኢኹም።",
+    "resourceItem6": "ኣብ ቋንቋ ስዋሂሊ፣ ዝለዓለ ፍሉይነትን ተጠቃምነትን ዘለዎም ሞዴላት መሳርሒ ባዕላዊ ምልላይ ድምፂ (ASR) ንምፍጣር፣ ኣብ ቡኽራ መረዳእታ ሞዚላ ኮመን ቮይስ (Mozilla Common Voice) ስዋሂሊ ንዝርከብ ክፉት ሰብ ሰራሕ ኣሰተብህሎ ዊስፐር (OpenAI's Whisper) ኣስተኻኪልናዮ ኢና። ነቲ ሞዴል ኣብዚ ክተውርደዎዎ (download ) ትኽእሉ ኢኹም።",
+    "resourceItem7": "ፈጠርቲ ትሕዝቶ ትግርኛ (Content Creators)፣ ማሽን ተርጐምን መሳርሕታት ባዕላዊ ምልላይ ድምፂ (ASR) ብምውህሃድ ኣብ ዊኪ ዝተዘርገሐ ምርምር ሰብ ሰራሕ ኣሰተብህሎ ዲኤኣይኣር (DAIR’s Wiki) 62 ምርምራዊ ፅሑፋት ከዳልዉ ክኢሎም እዮም። ዝርዝር እቶም ምርምራዊ ፅሑፋት ኣብዚ ክረአ ይኽእል።",
+    "resourceItem8": "ፈጠርቲ ትሕዝቶ ስዋሂሊ (Kiswahili Content Creators)፣ ትርጉም ማሽንን መሳርሕታት ባዕላዊ ምልላይ ድምፂ (ASR) ብምውህሃድ ኣብ ዊኪ ዝተዘርገሐ ምርምር ሰብ ሰራሕ ኣሰተብህሎ ዲኤኣይኣር (DAIR’s Wiki) 46 ምርምራዊ ፅሑፋት ከዳልዉ ክኢሎም እዮም። ዝርዝር እቶም ምርምራዊ ፅሑፋት ኣብዚ ክረአ ይኽእል።",
+    "resourceItem9": "ህሊና ንጋቱን ካትሊን ሲሚንዩን ብሓባር ዝፀሓፈኦ ፅሑፍ ምርምር (journal paper) ኣንብቡ። ርእሲ ፅሑፈን፦ “ክንዮ ዝተኣሳሰሩ መግለፂታት/ፊደላት ፦ ንውሑዳት ቋንቋታት ኣብ ኦንላይን ጽሑፋት ምፍጣር፤ ኣፈላላይ ቋንቋን ድሌታት ማሕበረሰብን ኣብ ቀጥታዊ መዝርጋሕ ምርምራዊ ፅሑፍ ትሑት ሃብተ−ገነት ንዘለዎም ቋንቋታት” ይብል።",
+    "contactIntro": "ብዛዕባ እዘን ጉዳያት፥ ግብረመልሲ ክትህቡናን ሓሳባትኩም ከተካፍሉን፣ ኣብዚአን ኣብ ምስራሕ ዘለዋ ኣፍሪካዊ/ኣብዝሓ ዓለማዊ ተበግሶታት ኣፍልጡና፤ ወይ ከኣ ከነዛርቦ እንኽእል ሓደ ሰብ ንምሕባር ሓገዝኩም ኣይፈለየና።",
+    "contactEmail": "languages@whoseknowledge.org",
+    "contactSite": "www.whoseknowledge.org",
+    "creditsCol1Item1": "እዚ ስራሕ ክስራሕ ዝተኻእለ፥ ብደገፍ ልግስና ትካል ማሕበር ኢንተርኔት (<a href=\"https://www.isocfoundation.org/\" target=\"_blank\" rel=\"noopener\">ISOC</a>) እዩ።",
+    "creditsCol1Item2": "ከይዲ ምርምር ብተግባር ብ <a href=\"https://whoseknowledge.org/\" target=\"_blank\" rel=\"noopener\">Whose Knowledge?</a> ን ብትካል ምርምር ዝተዘርገሐ ሰብሰራሕ ኣስተውዕሎ (<a href=\"https://dair-institute.org/\" target=\"_blank\" rel=\"noopener\">DAIR</a>) ዝተመርሐ እዩ፡",
+    "creditsCol1Item3": "ብክላውዲያ ፖዞን ብማሪ ዝዊክ-ማይትረይን ተፃሒፉ፥ ብግሩሻ ዳዋን ዝተኣረመ፡",
+    "creditsCol2Item1": "መርበብ ሓበሬታ ብስቱድዮ ፒንግ ፖንግ፡",
+    "creditsCol2Item2": "ምዕባለ፡ ቤተ ካታ፡",
+    "creditsCol2Item3": "ምምኻር ፈጠራዊ ውክልና ብኣኒሳ ዓሊ፡",
+    "creditsCol2Item4": "ትርጉምን ምእራም ፅሑፍን ትግርኛ ብብርሃነ ኣቻሜን ፍቓዱ ገብረእግዚኣብሄርን፡",
+    "creditsCol2Item5": "ትርጉምን ምእራም ፅሑፍን ኪሲዋሂሊ ብመልኪዮር ሹኩሩን ብኢግዙፔር እንጃውን፡",
+    "creditsInterviewsIntro": "እዚ ፀብፃብ፥ ግዜኦም፣ ሞያኦምን ዝሓለፍዎ ተሞክሮታትን ንዘካፈሉና፣ ቃለመጠይቕ ንዝተገበረሎም ተሳተፍቲ ምርምር ልዑል ምስጋና ኣለዎ። ዓሚቕ ርድኢታቶም ቀንዲ ኣካል እዞም ውፅኢታት እዩ። ገለ ውሱናት ኣብ ታሕቲ ተዘርዚሮም ኣለዉ፡",
+    "creditsInterviewees1": "<li>ኣሌክሳንደር ኣንድራሰን ፣ ካብ ዩኒቨርሲቲ ኬፕ ታውን</li><li>ኣምሪት ሱፊ፣ ዊኪሚድያዊ</li><li>ኣኑሻ ሆሰይን፣ ስክሪፕት ኢንኮዲንግ ኢኒሼቲቭ (SEI)</li><li>ኣስመላሽ ተካ ሓድጉ፣ (ሰብሰራሕ ኣስተብህሎ ልሳን)</li><li>ኣዋ ልይ፣ (ሰብሰራሕ ኣስተብህሎ ጋልሰን)</li><li>ዲጂታል ኡሙጋንዳ</li><li>ኢ.ኤም. ሉዊስ-ጆንግ፥ ሞዚላ ዳታ ኮሌክቲቭ</li><li>ኤዲ ኣቪላ፥ ራይዚንግ ቮይስስ</li><li>ኢትዮ ኤን ኤል ፒ (EthioNLP)</li><li>ካሊካ ባሊ፥ ምርምር ማይክሮሶፍት ህንዲ</li>",
+    "creditsInterviewees2": "<li>ካትሊን ሲሚንዩ፥ ዝተዘርግሐ መፅናዕቲ ሰብ ሰራሕ ኣሰተብህሎ (DAIR)</li><li>ላንፍሪካ ላብስ</li><li>ማሪያና ፎሳቲ፥ ሁዝ ኖውለጅ?</li><li>መሰረት ኣለማየሁ፥ ኣርዲኤልኤስ ኢትዮጵያ</li><li>ፓው ካይነር፥ ትካል ዊኪሚዲያ</li><li>ፖል ኣዙንረ፥ ጋና ኤንኤልፒ (GhanaNLP)</li><li>ሳዲቅ ሻሃዱ፥ ዳግባኒ ዊኪሜዲያንስ ዩዘርስ ጉሩፕ</li><li>ሰይድ ሙሒ ይማም፥ ኢትዮ ኤንኤልፒ (EthioNLP)</li><li>ሻምሱዲን ሃሰን ሙሓመድ፥ ሃውሳ ኤንኤልፒ (HausaNLP)</li><li>ሱባሺሽ ፓኒግራሂ፥ ኦፐንትስፒክስ (Openspeaks)</li>",
+    "licenseText": "ብኻልእ ኩነታት ክሳብ ዘይተጠቕሰ፥ እዚ ስራሕ እዚ ፍቓድ እተዋህቦ ኣብ ትሕቲ <a href=\"https://creativecommons.org/licenses/by-sa/4.0/deed.en\" target=\"_blank\" rel=\"noopener\">Creative Commons Attribution-ShareAlike 4.0 International License</a> እዩ. 2026"
   }
 }
