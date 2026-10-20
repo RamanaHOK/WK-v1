@@ -7,7 +7,8 @@
     "s8PlazaSign": "PROBLEM PLAZA",
     "s12AvenueSign": "ALGORITHM AVENUE",
     "s26RevolutionSign": "REVOLUTION ROAD",
-    "s55HunikiSign": "THE HUNIKI FEDERATION"
+    "s55HunikiSign": "THE HUNIKI FEDERATION",
+    "busPassengerLang": "ENGLISH"
   },
   "alt": {
     "truckMeta": "Meta truck billowing smoke, overtaking on Algorithm Avenue",

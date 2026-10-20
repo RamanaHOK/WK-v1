@@ -297,6 +297,7 @@ const cityBusEmpty  = document.getElementById('city-bus-empty');
 const cityBusPeople = document.getElementById('city-bus-people');
 const cityBusFull    = document.getElementById('city-bus-full');
 const cityBusPeople1 = document.getElementById('city-bus-people1');
+const busPeople1Labels = document.getElementById('bus-people1-labels');
 const cityBusS26     = document.getElementById('city-bus-s26');
 const cityBusInside  = document.getElementById('city-bus-inside');
 const cityBusS55     = document.getElementById('city-bus-s55');
@@ -2279,6 +2280,7 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
   if (cityBusPeople)  cityBusPeople.style.opacity  = '0';
   if (cityBusFull)    cityBusFull.style.opacity    = '0';
   if (cityBusPeople1) cityBusPeople1.style.opacity = '0';
+  if (busPeople1Labels) busPeople1Labels.style.opacity = '0';
   if (cityBusS26)     cityBusS26.style.opacity     = '0';
   if (cityBusInside)  cityBusInside.style.opacity  = '0';
   if (cityBusS55)     cityBusS55.style.opacity     = '0';
@@ -2414,6 +2416,7 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     const t13 = Math.min(1, Math.max(0, (local - 0.18) / 0.10));
     if (cityBusFull)    cityBusFull.style.opacity    = (1 - t13).toFixed(3);
     if (cityBusPeople1) cityBusPeople1.style.opacity = t13.toFixed(3);
+    if (busPeople1Labels) busPeople1Labels.style.opacity = t13.toFixed(3);
     if (cityBusEmpty)   cityBusEmpty.style.opacity   = '0';
     if (cityBusPeople)  cityBusPeople.style.opacity  = '0';
     // At 37% first zoom: pinnedWrap 1x->3x, holds during popups; eased back 3x->1x from 92%
@@ -2490,6 +2493,7 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     if (cityBusEmpty)   cityBusEmpty.style.opacity   = '0';
     if (cityBusPeople)  cityBusPeople.style.opacity  = '0';
     if (cityBusPeople1) cityBusPeople1.style.opacity = '0';
+    if (busPeople1Labels) busPeople1Labels.style.opacity = '0';
     // Bus variant: full-toto-moto until all 3 batches swapped, then cross-fade to interviewees
     // (kept in sync with the progress/threshold used in animateS26S30)
     const swapProg = scene < 12 ? -1 : scene > 14 ? 3 : (scene - 12) + local;

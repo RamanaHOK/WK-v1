@@ -2,14 +2,15 @@
   "_readme": "Kiswahili translations. Fill in any string below — leave a value as \"\" to keep showing the English text for that item until translated. Keys must match i18n/en.json exactly.",
   "_altNote": "The 'alt' and 'sceneBeats' sections below are AI-drafted machine translations (not yet reviewed by Melchior Shukuru / Exuper Njau, credited for the rest of the Kiswahili translation). Treat as placeholders pending their proofread, same as the rest of this file.",
   "ui": {
-    "resources": "",
+    "resources": "Maktaba",
     "restart": "",
     "scrollHint": "",
     "sceneIntroDesc": "",
     "s8PlazaSign": "UWANJA WA DHIKI",
     "s12AvenueSign": "MTAA WA ALGORITHIMU",
     "s26RevolutionSign": "BARABARA YA MAPINDUZI",
-    "s55HunikiSign": "SHIRIKISHO LA HUNIKI"
+    "s55HunikiSign": "SHIRIKISHO LA HUNIKI",
+    "busPassengerLang": "KISWAHILI"
   },
   "alt": {
     "truckMeta": "Lori la Meta likitoa moshi, likipita kwenye Algorithm Avenue",

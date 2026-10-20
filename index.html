@@ -27,7 +27,7 @@
     </div>
   </nav>
   <div class="nav-actions">
-    <button class="nav-btn" id="restartBtn">RESOURCES</button>
+    <button class="nav-btn" id="restartBtn" data-i18n="ui.resources">RESOURCES</button>
     <div class="lang-wrapper" id="langWrapper">
       <button class="nav-btn lang-btn" id="langToggle">
         <span id="langLabel">ENGLISH</span>
@@ -422,6 +422,13 @@
       <img id="city-bus-people"   src="assets/Matatu-with-people.svg"                          alt="The Prevailer matatu with passengers boarding" data-i18n-alt="alt.busWithPeople">
       <img id="city-bus-full"     src="assets/s12-s15/Matatu%20with%20full%20toto%20moto.svg"  alt="The Prevailer matatu full of passengers" data-i18n-alt="alt.busFull">
       <img id="city-bus-people1"  src="assets/s12-s15/Matatu%20with%20people1.svg"             alt="The Prevailer matatu with more passengers aboard" data-i18n-alt="alt.busWithPeople1">
+      <!-- 3 seated passengers' language labels, positioned over their windows in the image
+           above — opacity synced to #city-bus-people1's own crossfade in animateCityBus. -->
+      <div id="bus-people1-labels" aria-hidden="true">
+        <span class="bus-passenger-label bus-passenger-label-1" data-i18n="ui.busPassengerLang">ENGLISH</span>
+        <span class="bus-passenger-label bus-passenger-label-2" data-i18n="ui.busPassengerLang">ENGLISH</span>
+        <span class="bus-passenger-label bus-passenger-label-3" data-i18n="ui.busPassengerLang">ENGLISH</span>
+      </div>
       <img id="city-bus-s26"      src="assets/s26-s30/Matatu%20with%20interviewees.svg"        alt="The Prevailer matatu with the interviewees aboard" data-i18n-alt="alt.busInterviewees">
       <img id="city-bus-inside"   src="assets/s32-s43/Matatu-inside.svg"                       alt="Inside view of the Prevailer matatu, seats and handles" data-i18n-alt="alt.busInside">
       <img id="city-bus-s55"      src="assets/s55-s58/Matatu%20with%20Full%20Bus.svg"          alt="The Prevailer matatu parked outside the Municipal Federation building" data-i18n-alt="alt.busMunicipal">

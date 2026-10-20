@@ -2,14 +2,15 @@
   "_readme": "Tigrinya (ትግርኛ) translations. Fill in any string below — leave a value as \"\" to keep showing the English text for that item until translated. Keys must match i18n/en.json exactly.",
   "_altNote": "The 'alt' and 'sceneBeats' sections below are AI-drafted machine translations, lower-confidence than the Kiswahili draft since Tigrinya is a harder language for automated translation. They have NOT been reviewed by Berhane Achame / Fekadu Gebregziabher (credited for the rest of the Tigrinya translation). Prioritise their review of these sections before treating them as final.",
   "ui": {
-    "resources": "",
+    "resources": "ሃብትታት",
     "restart": "",
     "scrollHint": "",
     "sceneIntroDesc": "",
     "s8PlazaSign": "ኣደባባይ ሽግር",
     "s12AvenueSign": "ጎደና ኣልጎሪዝም",
     "s26RevolutionSign": "መንገዲ ኣብዮት",
-    "s55HunikiSign": "ፌደረሽን ሁኒኪ"
+    "s55HunikiSign": "ፌደረሽን ሁኒኪ",
+    "busPassengerLang": "ትግርኛ"
   },
   "alt": {
     "truckMeta": "ናይ ሜታ መኪና ትኪ እናውጽአት ኣብ Algorithm Avenue ትሓልፍ ኣላ",

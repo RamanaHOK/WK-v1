@@ -712,6 +712,34 @@ body {
   opacity: 0;
 }
 
+/* 3 seated passengers' language labels, overlaid on #city-bus-people1's own window
+   positions — opacity synced to that image's crossfade in animateCityBus (scroll.js). */
+#bus-people1-labels {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  pointer-events: none;
+}
+.bus-passenger-label {
+  position: absolute;
+  top: 18%;
+  transform: translate(-50%, -100%);
+  background: #000;
+  color: #fff;
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 700;
+  font-size: 0.65vw;
+  white-space: nowrap;
+  padding: 0.25vw 0.6vw;
+  border-radius: 4px;
+}
+.bus-passenger-label-1 { left: 51.5%; }
+.bus-passenger-label-2 { left: 67.5%; top: 35% }
+.bus-passenger-label-3 { left: 76.5%; }
+
 /* Scene 55-58 companion car — trails #city-bus along the street. Same fixed pattern,
    lower z-index (renders under the bus) and closer to the road since it's a smaller
    vehicle. Transform/opacity driven from JS in sync with the bus (see animateCityBus). */
