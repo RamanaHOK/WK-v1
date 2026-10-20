@@ -116,6 +116,23 @@ const S2630_FREEZE_EASE_START = 0.50; // sceneLocal (scene 26) where the ease-in
 const S2630_FREEZE_TRIGGER = 0.77;    // sceneLocal (scene 26) where it's fully frozen — also used
 // by animateS26S30's mobile-only background parallax (below) to know where the freeze begins.
 
+// Scene 13 (mobile only) — #s1213-stack, same idea as #s2729-stack for scenes 27-29. Reuses the
+// EXISTING strip freeze (sceneLocal >= 0.37, see the effectiveTx branch for currentScene===9)
+// instead of adding a new one, and finishes with room to spare before panel-s13-1 at 0.64.
+const S1213_STACK_START = 0.37;
+const S1213_STACK_ITEM_GAP = 0.07; // 3 items -> last one shown at 0.51
+const S1213_STACK_HIDE_AT = 0.61;  // sticky hold from 0.51-0.61, then hides
+
+// Scene 8 (mobile only) — #s8-stack, same idea again. Moved early (right after panel-8's own
+// 0-0.08 window) per request — this means it now overlaps the bus's INITIAL zoom-in ramp
+// (local 0 to ZOOM_END=0.36, see animateCityBus's scene===7 block) instead of the close-up/
+// exit phase it used to sit near, so that's the ramp that needs pausing during this window
+// (see effZoomStart/ZOOM1_PAUSE_SPAN below) — BUS_CLOSE/BUS_SCROLL_START (0.75/0.80) are no
+// longer anywhere near this window and are back to their normal, untouched values.
+const S8_STACK_START = 0.05;
+const S8_STACK_ITEM_GAP = 0.035; // 4 items -> last one shown at 0.205
+const S8_STACK_HIDE_AT = 0.255;  // sticky hold from 0.205-0.255, then hides
+
 // Scene 7 (mobile only) — strip freezes at scene entry so the 4 interviewees stay on screen
 // while their quotes stack up (appear and stay, never hidden again) as the user keeps
 // scrolling; desktop keeps its original click-to-open '+' icons and natural pan, untouched
@@ -415,6 +432,9 @@ const s8PlazaSign   = document.getElementById('s8-plaza-sign');
 const cityOverlay9   = document.getElementById('city-overlay-9');
 const cityOverlay12  = document.getElementById('city-overlay-12');
 const s12AvenueSign  = document.getElementById('s12-avenue-sign');
+const s1215Buildings = document.querySelector('.s1215-buildings');
+const s1215Road      = document.querySelector('.s1215-road');
+const s1215Clouds    = document.querySelector('.s1215-clouds');
 const s55HunikiSign  = document.getElementById('s55-huniki-sign');
 const panel12b       = document.getElementById('panel-12b');
 
@@ -508,6 +528,8 @@ const s2630Road      = document.querySelector('.s2630-road');
 const s2630Clouds    = document.querySelector('.s2630-clouds');
 const s26Fruitlady   = document.querySelector('.char-s26-fruitlady2');
 const s26Pigeons1    = document.querySelector('.char-s26-pigeons1');
+const s26Oldman      = document.querySelector('.char-s26-oldman');
+const s26PeopleGroup1 = document.querySelector('.people-group1');
 
 // Scene 32–43 overlay — 1300vw wide, ambient passengers, translates in sync with the strip
 const cityOverlay32 = document.getElementById('city-overlay-32');
@@ -577,6 +599,7 @@ let _s46ReleaseStartLocal = null; // sceneLocal captured at the exact moment of 
 
 let _panel26_1Shown = false; // scroll-freeze-on-open tracker, scene-26 popups (mobile)
 let _panel26_2Shown = false;
+let _s2729FrozenParallaxTf = null; // background parallax transform captured while the s2729 stack is up, held static
 let _s26EnterTs = null; // desktop only: timestamp scene 26 was last (re)entered — opens both popups 1s later
 let _s2630BusDampedX = null; // damped bus X for scenes 26-30, mobile only, see animateCityBus
 let _s2630BuildingsBaseX = null; // natural (pre-parallax) X + measured box width, captured once per
@@ -1194,8 +1217,20 @@ function frame(ts) {
   } else if (currentScene === 7 && SCROLL_MAP[7]) {
     const freezeX = -SCROLL_MAP[7].stripX;
     const holdX   = freezeX + S8_PAN_MAX * _vw;
-    if (sceneLocal <= ZOOM_END) {
-      const t = easeInOutCubic(sceneLocal / ZOOM_END);
+    // Mobile: pause this ease for #s8-stack's window too (same technique as animateCityBus's
+    // zoomRampLocal) — otherwise the strip kept panning underneath the frozen bus zoom, visibly
+    // sliding the background while the cards were supposedly "frozen" (read as the scene
+    // drifting/going backward relative to the paused zoom).
+    let panLocal = sceneLocal;
+    if (_isMobile) {
+      if (sceneLocal >= S8_STACK_START && sceneLocal < S8_STACK_HIDE_AT) {
+        panLocal = S8_STACK_START;
+      } else if (sceneLocal >= S8_STACK_HIDE_AT) {
+        panLocal = sceneLocal - (S8_STACK_HIDE_AT - S8_STACK_START);
+      }
+    }
+    if (panLocal <= ZOOM_END) {
+      const t = easeInOutCubic(Math.max(0, panLocal) / ZOOM_END);
       effectiveTx = freezeX + t * S8_PAN_MAX * _vw;
     } else {
       effectiveTx = holdX;
@@ -1553,6 +1588,58 @@ function frame(ts) {
       s8PlazaSign.style.opacity = signOpacity.toFixed(3);
     }
   }
+  if (_isMobile && s8Stack) {
+    // Same pattern as #s1213-stack: scene 8's strip is already frozen from ZOOM_END (0.36)
+    // onward, so just reveal the 4 cards one at a time in the gap after panel-8b (0.68) closes.
+    const stackActive8 = currentScene === 7 && sceneLocal >= S8_STACK_START && sceneLocal < S8_STACK_HIDE_AT;
+    s8Stack.classList.toggle('visible', stackActive8);
+    const blur8 = stackActive8 ? `blur(${S2729_BLUR_PX}px)` : '';
+    // s5s8Buildings/Road/Clouds/cityBus are shared with scene 7's own #s7-stack blur
+    // (updateS7Stack, called earlier this same frame) — only touch them while actually IN
+    // scene 8, or this would stomp on scene 7's blur state every frame even when scene 8 has
+    // nothing active. s8PlazaSign is scene-8-only, no such guard needed, but kept alongside for
+    // one single blur8 write. S8_STACK_START now overlaps the sign's own visible window
+    // (sceneLocal<0.08) and the bus is on-screen throughout, so both need to blur too, not just
+    // the static background layers.
+    if (currentScene === 7) {
+      [s5s8Buildings, s5s8Road, s5s8Clouds, s8PlazaSign].forEach(el => {
+        if (el) el.style.filter = blur8;
+      });
+      // cityBus gets its transform/opacity/clipPath rewritten every single frame by
+      // animateCityBus (called later this same frame) — in testing, an inline .style.filter
+      // set here was reliably wiped by the very next animation frame despite nothing else in
+      // the codebase writing to it, while the other (far less frequently touched) elements in
+      // this same forEach held their blur fine. Using a dedicated CSS class instead of inline
+      // style sidesteps whatever that interaction is.
+      cityBus.classList.toggle('s8-bus-blur', stackActive8);
+      cityBus.style.setProperty('--s8-blur-px', S2729_BLUR_PX + 'px');
+    }
+    if (!stackActive8) {
+      if (_s8StackShownCount !== 0) {
+        s8StackItems.forEach(el => el.classList.remove('shown'));
+        _s8StackShownCount = 0;
+      }
+      s8Portraits.forEach(p => { if (p) p.style.filter = ''; });
+    } else {
+      let shownCount8 = 0;
+      for (let i = 0; i < s8StackItems.length; i++) {
+        const shown = sceneLocal >= S8_STACK_START + i * S8_STACK_ITEM_GAP;
+        if (shown && !s8StackItems[i].classList.contains('shown')) {
+          _scrollFreezeUntil = Date.now() + 300;
+        }
+        s8StackItems[i].classList.toggle('shown', shown);
+        if (shown) shownCount8++;
+        if (s8Portraits[i]) s8Portraits[i].style.filter = shown ? '' : blur8;
+      }
+      if (shownCount8 !== _s8StackShownCount && s8StackScroll) {
+        s8StackScroll.scrollTop = s8StackScroll.scrollHeight;
+      }
+      _s8StackShownCount = shownCount8;
+    }
+  } else if (s8Stack) {
+    s8Stack.classList.remove('visible');
+    s8Portraits.forEach(p => { if (p) p.style.filter = ''; });
+  }
   if (cityOverlay9 && SCROLL_MAP[8]) {
     const s9vx = SCROLL_MAP[8].stripX + effectiveTx;
     cityOverlay9.style.opacity = (s9vx < _vw && s9vx > -_vw) ? '1' : '0';
@@ -1567,7 +1654,16 @@ function frame(ts) {
       // Position-based, like city-overlay-7/8/9 — eases in as scrolling brings it on screen.
       ov12Op = (s12vx < _vw && s12vx > -_vw) ? 1 : 0;
     } else if (currentScene === 9) {
-      if (sceneLocal < 0.18) {
+      if (_isMobile) {
+        // Mobile only: stay visible through the #s1213-stack window below (the strip is
+        // already frozen from sceneLocal 0.37 — see the effectiveTx branch — right up to
+        // panel-s13-1 at 0.64) instead of fading out at 0.18-0.28 like desktop.
+        if (sceneLocal < S1213_STACK_HIDE_AT) {
+          ov12Op = 1;
+        } else {
+          ov12Op = Math.max(0, 1 - (sceneLocal - S1213_STACK_HIDE_AT) / 0.05);
+        }
+      } else if (sceneLocal < 0.18) {
         ov12Op = 1;
       } else {
         // fade out over 10% of the scene
@@ -1575,6 +1671,47 @@ function frame(ts) {
       }
     }
     cityOverlay12.style.opacity = ov12Op.toFixed(3);
+
+    if (_isMobile && s1213Stack) {
+      // Same idea as #s2729-stack for scenes 27-29: once the strip is frozen (0.37+), the 3
+      // people's cards reveal one at a time as the user keeps scrolling, scene blurred behind
+      // them, each portrait released (un-blurred) as its own card appears — then a sticky hold,
+      // then a clean hide before panel-s13-1 takes over at 0.64.
+      const stackActive12 = currentScene === 9 && sceneLocal >= S1213_STACK_START && sceneLocal < S1213_STACK_HIDE_AT;
+      s1213Stack.classList.toggle('visible', stackActive12);
+      const blur12 = stackActive12 ? `blur(${S2729_BLUR_PX}px)` : '';
+      [s1215Buildings, s1215Road, s1215Clouds, s12AvenueSign].forEach(el => {
+        if (el) el.style.filter = blur12;
+      });
+      if (!stackActive12) {
+        if (_s1213StackShownCount !== 0) {
+          s1213StackItems.forEach(el => el.classList.remove('shown'));
+          _s1213StackShownCount = 0;
+        }
+        s1213Portraits.forEach(p => { if (p) p.style.filter = ''; });
+      } else {
+        let shownCount12 = 0;
+        for (let i = 0; i < s1213StackItems.length; i++) {
+          const shown = sceneLocal >= S1213_STACK_START + i * S1213_STACK_ITEM_GAP;
+          if (shown && !s1213StackItems[i].classList.contains('shown')) {
+            _scrollFreezeUntil = Date.now() + 300;
+          }
+          s1213StackItems[i].classList.toggle('shown', shown);
+          if (shown) shownCount12++;
+          if (s1213Portraits[i]) s1213Portraits[i].style.filter = shown ? '' : blur12;
+        }
+        if (shownCount12 !== _s1213StackShownCount && s1213StackScroll) {
+          s1213StackScroll.scrollTop = s1213StackScroll.scrollHeight;
+        }
+        _s1213StackShownCount = shownCount12;
+      }
+    } else if (s1213Stack) {
+      s1213Stack.classList.remove('visible');
+      [s1215Buildings, s1215Road, s1215Clouds, s12AvenueSign].forEach(el => {
+        if (el) el.style.filter = '';
+      });
+      s1213Portraits.forEach(p => { if (p) p.style.filter = ''; });
+    }
 
     // Tied to the bus's front edge approaching the ALGORITHM AVENUE sign: OPEN (fade in) ->
     // STAY (fully open) -> HIDE (fade out) zones, delayed past the sign by S12_POPUP_DELAY_VW.
@@ -1758,7 +1895,7 @@ function frame(ts) {
   animateMatatu(currentScene, sceneLocal, tx, junglePhase, busOpacity);
   animateCityBus(currentScene, sceneLocal, busOpacity, ts, s61PostZoomT);
   animateS21Vehicles(currentScene, sceneLocal, ts);
-  animateS26S30(currentScene, sceneLocal, effectiveTx);
+  animateS26S30(currentScene, sceneLocal, effectiveTx, ts);
   animateS32S43(currentScene, sceneLocal, effectiveTx, ts);
   animateS44(currentScene, sceneLocal);
   animateS45S48(currentScene, sceneLocal, effectiveTx, ts);
@@ -2189,9 +2326,21 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     busX = CENTER;
     zoom = 1;
     const zoomMax = s8BusZoom();
+    // Mobile: #s8-stack's window (S8_STACK_START..S8_STACK_HIDE_AT) sits inside the initial
+    // zoom-in ramp (0..ZOOM_END) — pause the ramp's progress for that stretch so the bus isn't
+    // visibly growing while the cards are up, then resume from the same point afterward (the
+    // whole ramp just ends up taking S8_STACK_HIDE_AT-S8_STACK_START longer in real scroll terms).
+    let zoomRampLocal = local;
+    if (_isMobileCityBus) {
+      if (local >= S8_STACK_START && local < S8_STACK_HIDE_AT) {
+        zoomRampLocal = S8_STACK_START;
+      } else if (local >= S8_STACK_HIDE_AT) {
+        zoomRampLocal = local - (S8_STACK_HIDE_AT - S8_STACK_START);
+      }
+    }
     let targetZoom;
-    if (local <= ZOOM_END) {
-      targetZoom = 1 + (zoomMax - 1) * easeInOutCubic(local / ZOOM_END);
+    if (zoomRampLocal <= ZOOM_END) {
+      targetZoom = 1 + (zoomMax - 1) * easeInOutCubic(Math.max(0, zoomRampLocal) / ZOOM_END);
     } else if (local >= BUS_SCROLL_START) {
       // Stays zoomed in for the exit slide — reset to 1x by the currentScene!==7 safety net elsewhere.
       targetZoom = zoomMax;
@@ -2212,6 +2361,8 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     if (cityBusEmpty)  cityBusEmpty.style.opacity  = (1 - peopleT).toFixed(3);
     if (cityBusPeople) cityBusPeople.style.opacity = peopleT.toFixed(3);
 
+    // #s8-stack no longer sits near this close-up/exit phase (moved earlier, into the zoom-in
+    // ramp instead — see zoomRampLocal above), so this is back to the original, untouched timing.
     if (local >= BUS_CLOSE) {
       if (local < BUS_SCROLL_START) {
         const closeT = easeInOutCubic((local - BUS_CLOSE) / (BUS_SCROLL_START - BUS_CLOSE));
@@ -2274,16 +2425,20 @@ function animateCityBus(scene, local, opacity, ts, s61PostZoomT = 0) {
     // room after them. Desktop keeps its original thresholds untouched.
     const WRAP_DOWN_START = _isMobileCityBus ? 0.95 : 0.92;
     const WRAP_DOWN_SPAN  = _isMobileCityBus ? 0.05 : 0.08;
+    // Mobile: delayed past S1213_STACK_HIDE_AT so the bus doesn't visibly zoom in while
+    // #s1213-stack's cards are up — the scene should read as fully still/frozen then. Desktop
+    // (no stack feature) keeps the original 0.37 start, untouched.
+    const ZOOM1_START = _isMobileCityBus ? S1213_STACK_HIDE_AT : 0.37;
     let wrapScale = 1;
-    if (local >= 0.37) {
-      const t1 = easeInOutCubic(Math.min(1, (local - 0.37) / 0.21));
+    if (local >= ZOOM1_START) {
+      const t1 = easeInOutCubic(Math.min(1, (local - ZOOM1_START) / 0.21));
       wrapScale = 1 + (3.0 - 1) * t1;
     }
     if (local >= WRAP_DOWN_START) {
       const tUp92 = easeInOutCubic(Math.min(1, (local - WRAP_DOWN_START) / WRAP_DOWN_SPAN));
       wrapScale = 3 - (3 - 1) * tUp92;
     }
-    if (pinnedWrap && local >= 0.37) {
+    if (pinnedWrap && local >= ZOOM1_START) {
       // Same fix as scene 8's own pinnedWrap zoom: desktop's bus sits centered so 75% frames a
       // point inside it, but mobile only shows the front 30% (flush left) — 75% pulled that
       // slice off-screen while zooming (and while zooming back out). Origin at 30% keeps it
@@ -2885,7 +3040,7 @@ function animateS21Vehicles(scene, sceneLocal, ts) {
 }
 
 // ---- Scene 26–30 overlay — 500vw wide, slides in sync with the strip ----
-function animateS26S30(scene, local, etx) {
+function animateS26S30(scene, local, etx, ts) {
   if (!cityOverlay26 || !SCROLL_MAP[11]) return;
   const s26vx = SCROLL_MAP[11].stripX + etx;
   cityOverlay26.style.transform = `translateX(${s26vx.toFixed(1)}px)`;
@@ -2928,6 +3083,80 @@ function animateS26S30(scene, local, etx) {
     const FREEZE_END    = 14 + 0.85;                 // scene 29 at 85% (freeze's own end point)
     const cur = scene + local;
     const freezeT = Math.min(1, Math.max(0, (cur - FREEZE_START) / (FREEZE_END - FREEZE_START)));
+
+    // Mobile only: the 6 interviewee portraits (.people-group1) used to be visible the whole
+    // time the bus drives through scene 26 — reveal them instead right as panel-26-3 ("Would
+    // you like to hear from them...") first appears (see animateCityBus: show263 starts once
+    // swapProg >= 0.6, i.e. scene+local = 12+0.6 = 12.6). Tying this to panel-26-3's own hide
+    // point (14.7) landed too late — nearly the whole scene-26-30 arc had to scroll by first.
+    const PEOPLE_SHOW_POINT = 14.15;
+    const PEOPLE_FADE_WINDOW = 0.05; // portrait crossfade, scroll-driven like everything else here
+    const inRange = scene >= 11 && scene <= 15;
+    const peopleT = !inRange ? 0
+      : Math.min(1, Math.max(0, (cur - PEOPLE_SHOW_POINT) / PEOPLE_FADE_WINDOW));
+    if (s26PeopleGroup1) {
+      s26PeopleGroup1.style.opacity = peopleT.toFixed(3);
+      s26PeopleGroup1.style.pointerEvents = peopleT > 0.5 ? '' : 'none';
+    }
+    // Complementary handoff: the ambient street people (fruit-lady/old-man/pigeons) are the
+    // "other people" visible while the bus is still driving — once the interviewees fade in
+    // above, fade these back out instead of leaving both groups on screen together.
+    const streetPeopleT = 1 - peopleT;
+    [s26Fruitlady, s26Oldman, s26Pigeons1].forEach(el => {
+      if (el) el.style.opacity = streetPeopleT.toFixed(3);
+    });
+
+    // Once the portraits are fully in, the stack of 6 black "stat" cards (name + org) reveals
+    // one at a time as the user keeps scrolling — same manual-scroll feel as #s7-stack in
+    // scene 7 (the strip itself is already visually frozen through this whole range by the
+    // bus-park mechanic above, so nothing pans even though scene/local keep advancing). Each
+    // newly-revealed card gets a brief anti-skip freeze (same S26_POPUP_FREEZE_MS idea as
+    // panel-26-1/26-2) so a fast flick can't blow past more than one at a time; it's short
+    // enough that normal scrolling is never blocked for long.
+    // Mirrors #s7-stack's own fill -> hold -> release shape (S7_STACK_STARTS / HIDE_AT /
+    // FREEZE_RELEASE): fill (STACK_START..STACK_ALL_SHOWN_AT), a sticky hold once all 6 are up
+    // (STACK_ALL_SHOWN_AT..STACK_HIDE_AT) where nothing changes, then the stack/blur clear so
+    // the scene reads as "back to normal" before scene 30 takes over.
+    const STACK_ITEM_COUNT = s2729StackItems.length;
+    const STACK_START = PEOPLE_SHOW_POINT + PEOPLE_FADE_WINDOW;
+    const STACK_ITEM_GAP = 0.05;
+    const STACK_ALL_SHOWN_AT = STACK_START + (STACK_ITEM_COUNT - 1) * STACK_ITEM_GAP;
+    const STACK_HOLD = 0.10; // sticky dwell once every card is up, before it hides
+    const STACK_HIDE_AT = STACK_ALL_SHOWN_AT + STACK_HOLD;
+    const STACK_REVEAL_FREEZE_MS = 300;
+    const stackActive = inRange && peopleT >= 1 && cur < STACK_HIDE_AT;
+    if (s2729Stack) {
+      s2729Stack.classList.toggle('visible', stackActive);
+      // Blur the whole scene behind the stack, same idea as scene 7's S7_BLUR_PX.
+      const blur = stackActive ? `blur(${S2729_BLUR_PX}px)` : '';
+      [cityBus, s2630Buildings, s2630Road, s2630Clouds, s26RevolutionSign, panel26_3].forEach(el => {
+        if (el) el.style.filter = blur;
+      });
+      if (!stackActive) {
+        if (_s2729StackShownCount !== 0) {
+          s2729StackItems.forEach(el => el.classList.remove('shown'));
+          _s2729StackShownCount = 0;
+        }
+        s2729Portraits.forEach(p => { if (p) p.style.filter = ''; });
+      } else {
+        let shownCount = 0;
+        for (let i = 0; i < STACK_ITEM_COUNT; i++) {
+          const shown = cur >= STACK_START + i * STACK_ITEM_GAP;
+          if (shown && !s2729StackItems[i].classList.contains('shown')) {
+            _scrollFreezeUntil = Date.now() + STACK_REVEAL_FREEZE_MS;
+          }
+          s2729StackItems[i].classList.toggle('shown', shown);
+          if (shown) shownCount++;
+          // Blurred until their own card shows, then released — so it's visually clear which
+          // person each card belongs to instead of all 6 standing there equally sharp/blurred.
+          if (s2729Portraits[i]) s2729Portraits[i].style.filter = shown ? '' : blur;
+        }
+        if (shownCount !== _s2729StackShownCount && s2729StackScroll) {
+          s2729StackScroll.scrollTop = s2729StackScroll.scrollHeight;
+        }
+        _s2729StackShownCount = shownCount;
+      }
+    }
     const PARALLAX_VW = 5.5; // desired total drift across the whole frozen stretch, clamped below
     const SAFETY_MARGIN_PX = 24;
     const desiredDrift = freezeT * PARALLAX_VW * getVw();
@@ -2935,7 +3164,16 @@ function animateS26S30(scene, local, etx) {
       ? Math.max(0, _s2630BuildingsBaseX + _s2630BuildingsBoxWidth - getVw() - SAFETY_MARGIN_PX)
       : desiredDrift;
     const parallaxPx = -Math.min(desiredDrift, maxSafeDrift);
-    const parallaxTf = `translateX(${parallaxPx.toFixed(1)}px)`;
+    let parallaxTf = `translateX(${parallaxPx.toFixed(1)}px)`;
+    // While the black-popup stack is up, freeze this cosmetic drift too — it never touched
+    // effectiveTx (the bus/characters were already frozen), but the background behind the
+    // people kept slowly sliding the whole time the popups were open, undercutting the freeze.
+    if (stackActive) {
+      if (_s2729FrozenParallaxTf === null) _s2729FrozenParallaxTf = parallaxTf;
+      parallaxTf = _s2729FrozenParallaxTf;
+    } else {
+      _s2729FrozenParallaxTf = null;
+    }
     if (s2630Buildings) s2630Buildings.style.transform = parallaxTf;
     if (s2630Road)      s2630Road.style.transform      = parallaxTf;
     if (s2630Clouds)    s2630Clouds.style.transform     = parallaxTf;
@@ -2957,6 +3195,18 @@ function animateS26S30(scene, local, etx) {
     if (s2630Clouds)    s2630Clouds.style.transform     = '';
     if (s26Fruitlady)   s26Fruitlady.style.transform    = '';
     if (s26Pigeons1)    s26Pigeons1.style.transform     = '';
+    [s26Fruitlady, s26Oldman, s26Pigeons1].forEach(el => {
+      if (el) el.style.opacity = '';
+    });
+    if (s26PeopleGroup1) {
+      s26PeopleGroup1.style.opacity = '';
+      s26PeopleGroup1.style.pointerEvents = '';
+    }
+    if (s2729Stack) s2729Stack.classList.remove('visible');
+    [cityBus, s2630Buildings, s2630Road, s2630Clouds, s26RevolutionSign, panel26_3].forEach(el => {
+      if (el) el.style.filter = '';
+    });
+    s2729Portraits.forEach(p => { if (p) p.style.filter = ''; });
   }
 
   // #s26-s30-bg stays visible through the scene-30 zoom, only easing out at the very end
@@ -4109,6 +4359,67 @@ function renderS7StackText() {
 }
 if (s7Stack) renderS7StackText();
 document.addEventListener('i18n:rendered', renderS7StackText);
+
+// Scenes 27-29 (mobile only) — same pattern as #s7-stack above, black "stat" cards (name +
+// org) instead of white dialogue quotes, revealed as the user scrolls (see animateS26S30).
+const S2729_BLUR_PX = 2; // scene blur while the stack is up, same value as scene 7's S7_BLUR_PX
+const s2729Stack       = document.getElementById('s2729-stack');
+const s2729StackScroll = s2729Stack ? s2729Stack.querySelector('.s2729-stack-scroll') : null;
+const s2729StackItems  = s2729Stack ? Array.from(s2729Stack.querySelectorAll('.s2729-stack-item')) : [];
+// Same order as s2729StackItems — lets animateS26S30 release (un-blur) each person's own
+// portrait in sync with their card appearing, instead of blurring/releasing all 6 at once.
+const s2729Portraits = s2729StackItems.map(el => document.querySelector('.char-wrap.char-' + el.dataset.char));
+function renderS2729StackText() {
+  s2729StackItems.forEach(el => {
+    const data = tChar(el.dataset.char);
+    const nameEl = el.querySelector('.s2729-stack-name');
+    const orgEl = el.querySelector('.s2729-stack-org');
+    if (nameEl) nameEl.textContent = (data && data.stat) || '';
+    if (orgEl) orgEl.textContent = (data && data.lang) || '';
+  });
+}
+if (s2729Stack) renderS2729StackText();
+document.addEventListener('i18n:rendered', renderS2729StackText);
+let _s2729StackShownCount = 0;
+
+// Scene 12-13 (ALGORITHM AVENUE) — same pattern as #s2729-stack just above, 3 people instead
+// of 6, reusing its card styling. "stat"/"lang" here hold speaker counts/language names, not
+// name/org, but the same data shape (tChar) and render path work unchanged.
+const s1213Stack       = document.getElementById('s1213-stack');
+const s1213StackScroll = s1213Stack ? s1213Stack.querySelector('.s2729-stack-scroll') : null;
+const s1213StackItems  = s1213Stack ? Array.from(s1213Stack.querySelectorAll('.s2729-stack-item')) : [];
+const s1213Portraits = s1213StackItems.map(el => document.querySelector('.char-wrap.char-' + el.dataset.char));
+function renderS1213StackText() {
+  s1213StackItems.forEach(el => {
+    const data = tChar(el.dataset.char);
+    const nameEl = el.querySelector('.s2729-stack-name');
+    const orgEl = el.querySelector('.s2729-stack-org');
+    if (nameEl) nameEl.textContent = (data && data.stat) || '';
+    if (orgEl) orgEl.textContent = (data && data.lang) || '';
+  });
+}
+if (s1213Stack) renderS1213StackText();
+document.addEventListener('i18n:rendered', renderS1213StackText);
+let _s1213StackShownCount = 0;
+
+// Scene 8 (PROBLEM PLAZA) — same pattern again, 4 people this time. "stat" holds the
+// language list + speaker count, "lang" is empty for these 4 — org line just renders blank.
+const s8Stack       = document.getElementById('s8-stack');
+const s8StackScroll = s8Stack ? s8Stack.querySelector('.s2729-stack-scroll') : null;
+const s8StackItems  = s8Stack ? Array.from(s8Stack.querySelectorAll('.s2729-stack-item')) : [];
+const s8Portraits = s8StackItems.map(el => document.querySelector('.char-wrap.char-' + el.dataset.char));
+function renderS8StackText() {
+  s8StackItems.forEach(el => {
+    const data = tChar(el.dataset.char);
+    const nameEl = el.querySelector('.s2729-stack-name');
+    const orgEl = el.querySelector('.s2729-stack-org');
+    if (nameEl) nameEl.textContent = (data && data.stat) || '';
+    if (orgEl) orgEl.textContent = (data && data.lang) || '';
+  });
+}
+if (s8Stack) renderS8StackText();
+document.addEventListener('i18n:rendered', renderS8StackText);
+let _s8StackShownCount = 0;
 
 let _s7StackShownCount = 0;
 function updateS7Stack(currentScene, sceneLocal, _isMobile) {

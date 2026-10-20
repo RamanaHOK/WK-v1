@@ -355,6 +355,11 @@ body {
 }
 #char-bubble.visible { display: flex; }
 #char-bubble { transform: translate(var(--bx, 0px), var(--by, 0px)); }
+/* Mobile-only widget (see @media max-width:768px below for its real layout/.visible rule) —
+   hidden by default so it doesn't render as a plain block on desktop. */
+#s2729-stack { display: none; }
+#s1213-stack { display: none; }
+#s8-stack { display: none; }
 #char-bubble[data-char="s7-red-girl"]    { margin-top: -40px !important; }
 #char-bubble[data-char="s7-red-girl"].pop-left .char-bubble-tail-dialogue{
   transform: translate(-408px, -71px)  !important;
@@ -1406,7 +1411,7 @@ div#panel-1-start {
 #panel-8a .bubble__tail {
   position: absolute;
   left: 100%;
-  top: 28%;
+  top: 2%;
   width: 90px;
   height: 90px;
   overflow: visible;
@@ -3889,6 +3894,7 @@ text-decoration-skip-ink: auto;
   .s6263-interviewees-columns { grid-template-columns: 1fr; }
   .s6263-contact-columns { flex-direction: column; }
   .s6263-contact-links { text-align: left; }
+  .s6263-contact-glow { width: 100%; padding: 32px 16px; }
   .s6263-org-marks { gap: 24px; }
   .s6263-credits-footer { flex-direction: column; align-items: flex-start; }
 }
@@ -4606,6 +4612,15 @@ bottom: 64%;
   }
   .text-panel h3, .text-panel p { font-size: 14px !important; }
   .text-panel .bubble__tail { display: none !important; }
+  /* #panel-8a's own tail, shown on mobile with its own position/tilt (desktop uses
+     left:100%/top:28%, see style.css:1406). */
+  #panel-8a .bubble__tail {
+    display: block !important;
+    left: auto;
+    right: -10px;
+    top: 85%;
+    transform: rotate(-60deg);
+  }
   /* Mobile-only straight-down tails (see .bubble__tail-mobile svgs in index.html) — hidden by
      default (.bubble__tail-mobile base rule, outside this media query) so desktop never shows
      them; shown here only for the two popups that asked for one. */
@@ -5206,6 +5221,91 @@ element.style {
     box-shadow: 0px 4px 6px 0px #0000004D;
   }
   .s7-stack-item.shown { display: block; }
+
+  /* Scenes 27-29 interviewee stack — same mechanics as #s7-stack above, styled like the
+     black "stat" popup (#char-bubble's default mode) instead of the white dialogue card. */
+  .people-group1 .plus-btn { display: none; } /* replaced by the auto-stack below */
+  #s2729-stack {
+    position: fixed;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    width: min(78vw, 340px);
+    z-index: 500;
+    pointer-events: none;
+  }
+  #s2729-stack.visible { display: block; }
+  .s2729-stack-scroll {
+    max-height: 55vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    pointer-events: auto;
+  }
+  .s2729-stack-item {
+    display: none;
+    flex-direction: column;
+    gap: 2px;
+    background: #000000;
+    border-radius: 8px;
+    padding: 14px 16px;
+    box-shadow: 0px 4px 6px 0px #0000004D;
+  }
+  .s2729-stack-item.shown { display: flex; }
+  .s2729-stack-name {
+    font-family: 'Noto Sans Ethiopic', sans-serif;
+    font-weight: 900;
+    font-size: 1rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    color: #fff;
+  }
+  .s2729-stack-org {
+    font-family: 'Noto Sans Ethiopic', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    line-height: 1.2;
+    color: #fff;
+  }
+
+  /* Scene 12-13 (ALGORITHM AVENUE) stack — same card styling as #s2729-stack above (shares
+     its .s2729-stack-item/-name/-org classes), own container/position rule only. */
+     
+  .char-s12-green-man .cross-btn,
+  .char-s12-blue-man  .cross-btn,
+  .char-s12-pink-lady .cross-btn { display: none; } /* replaced by the auto-stack below */
+  #s1213-stack {
+    position: fixed;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    width: min(78vw, 340px);
+    z-index: 500;
+    pointer-events: none;
+  }
+  #s1213-stack.visible { display: block; }
+
+  /* Scene 8 (PROBLEM PLAZA) stack — same card styling, own container/position rule only. */
+  .char-s8-purple-man .cross-btn,
+  .char-s8-blue-girl  .cross-btn,
+  .char-s8-lime-man   .cross-btn,
+  .char-s8-green-man  .cross-btn { display: none; } /* replaced by the auto-stack below */
+  #s8-stack {
+    position: fixed;
+    left: 50%;
+    top: 15%;
+    transform: translateX(-50%);
+    width: min(78vw, 340px);
+    z-index: 500;
+    pointer-events: none;
+  }
+  #s8-stack.visible { display: block; }
+  /* Class-based blur for #city-bus specifically — see scroll.js's comment on cityBus.classList
+     .toggle('s8-bus-blur', ...) for why this one needs a class instead of inline style.filter
+     like its siblings (s5s8Buildings/Road/Clouds/s8PlazaSign). */
+  #city-bus.s8-bus-blur { filter: blur(var(--s8-blur-px, 2px)); }
   .char-s7-red-girl {
     height: 30vh;
     left: 7%;
@@ -5296,17 +5396,17 @@ element.style {
     .char-s12-green-man {
     height: 21vh;
     bottom: 20%;
-    left: 90% !important;
+    left: 110% !important;
 }
 .char-s12-blue-man {
     height: 21vh;
     bottom: 8%;
-    left: 20%;
+    left: 50%;
 }
 .char-s12-pink-lady {
     height: 19vh;
     bottom: 3%;
-    left: 61%;
+    left: 81%;
 }
 .char-s12-pink-lady button {
     right: 70px;
@@ -5535,5 +5635,8 @@ div#panel-1-start {
 }
 #s12-s15-bg{
   left: 800vw;
+}
+.s2630-fence{
+  display: none;
 }
 }
