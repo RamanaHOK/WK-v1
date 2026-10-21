@@ -1106,6 +1106,10 @@ function frame(ts) {
     // t() can return undefined briefly before i18n.js's fetch resolves — keep the HTML fallback.
     const label = t(onLastSlide ? 'ui.restart' : 'ui.resources');
     if (label != null) restartBtn.textContent = label;
+    // Mobile only: hidden while already inside Resources/Credits/Contact — redundant there,
+    // and the slides already have their own #s6263-start-again button for the restart action.
+    // (getVw(), not _isMobile — that const isn't declared yet at this point in frame().)
+    restartBtn.style.opacity = (getVw() <= 768 && _s6263Active) ? '0' : '';
   }
 
   // Scenes 62-64 — continuous "position" across all slides (0=Resources, 1=Credits, 2=Contact),
@@ -4229,19 +4233,8 @@ document.addEventListener('touchmove', e => {
 }, { passive: true });
 
 // ---- Scroll navigation: shared by keyboard input and the Previous/Next story buttons ----
-// jumpScroll: full scene skip. stepScroll: incremental move, clamped to what's left in the
-// current scene, so nothing gated on sceneLocal (trees reveal, popups) gets skipped entirely.
-function jumpScroll(dir) {
-  const { currentScene } = scrollToState(window.scrollY);
-  if (dir > 0 && currentScene < SCENES - 1) {
-    const targetY = SCROLL_MAP[currentScene + 1] ? SCROLL_MAP[currentScene + 1].scrollStart + 10 : TOTAL_SCROLL;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-  } else if (dir < 0 && currentScene > 0) {
-    const targetY = SCROLL_MAP[currentScene - 1] ? SCROLL_MAP[currentScene - 1].scrollStart + 10 : 0;
-    window.scrollTo({ top: targetY, behavior: 'smooth' });
-  }
-}
-
+// stepScroll: incremental move, clamped to what's left in the current scene, so nothing gated
+// on sceneLocal (trees reveal, popups) gets skipped entirely.
 const STEP_LINE = 80;                          // px per small step
 const STEP_PAGE = () => window.innerHeight * 0.9; // px per large (page) step
 
@@ -4261,12 +4254,12 @@ function stepScroll(dir, big) {
 }
 
 // ---- Keyboard: arrow navigation ----
-// ArrowRight/Left jump to the next/previous scene's start; Down/PageDown/Space and
-// Up/PageUp/Shift+Space step scrollY incrementally instead, like a normal page.
-const JUMP_FORWARD_KEYS  = ['ArrowRight'];
-const JUMP_BACKWARD_KEYS = ['ArrowLeft'];
-const STEP_FORWARD_KEYS  = ['ArrowDown', 'PageDown', ' '];
-const STEP_BACKWARD_KEYS = ['ArrowUp', 'PageUp'];
+// Right/Down/PageDown/Space step forward, Left/Up/PageUp/Shift+Space step backward — all by
+// the same small/controlled increment (see STEP_LINE/STEP_PAGE above). Right/Left used to jump
+// straight to the next/previous scene's start instead, which read as "too fast" since a scene
+// can span thousands of px of scroll — now they match Up/Down's pace exactly.
+const STEP_FORWARD_KEYS  = ['ArrowDown', 'ArrowRight', 'PageDown', ' '];
+const STEP_BACKWARD_KEYS = ['ArrowUp', 'ArrowLeft', 'PageUp'];
 
 const SCROLL_KEY_SKIP_TAGS = ['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA'];
 
@@ -4284,21 +4277,15 @@ document.addEventListener('keydown', e => {
   // one universal gate for every popup type, not just the scroll-jacked .text-panel ones.
   if (Date.now() < _scrollFreezeUntil || activeCrossBtn !== null) return;
 
-  const jumpForward  = JUMP_FORWARD_KEYS.includes(e.key);
-  const jumpBackward = JUMP_BACKWARD_KEYS.includes(e.key);
   const stepBackward = STEP_BACKWARD_KEYS.includes(e.key) || (e.key === ' ' && e.shiftKey);
   const stepForward  = STEP_FORWARD_KEYS.includes(e.key) && !(e.key === ' ' && e.shiftKey);
 
-  if (!jumpForward && !jumpBackward && !stepForward && !stepBackward) return;
+  if (!stepForward && !stepBackward) return;
   pauseAutoAdvance(); // manual scroll input — user is taking control themselves
 
-  if (jumpForward)       { e.preventDefault(); jumpScroll(1); }
-  else if (jumpBackward) { e.preventDefault(); jumpScroll(-1); }
-  else {
-    e.preventDefault();
-    const big = e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp';
-    stepScroll(stepForward ? 1 : -1, big);
-  }
+  e.preventDefault();
+  const big = e.key === ' ' || e.key === 'PageDown' || e.key === 'PageUp';
+  stepScroll(stepForward ? 1 : -1, big);
 });
 
 // ---- Story Previous/Next buttons — always-focusable real controls for screen reader users,

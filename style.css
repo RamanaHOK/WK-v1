@@ -5671,4 +5671,17 @@ div#panel-1-start {
 .s2630-fence{
   display: none;
 }
+.bus-passenger-label {
+  font-size: 16px;
+
+}
+.s6263-heading{
+  font-size: 6vmax;
+}
+.s6263-start-again.visible{
+  margin-top: -15px;
+}
+.s6263-credits-footer{
+  gap: 20px;
+}
 }
