@@ -958,6 +958,10 @@ div#panel-1-start {
     letter-spacing: 0%;
     text-align: center;
 }
+div#panel-1-start h3{
+
+    color: #D3C164;
+}
 /* Scene 1 panel: mixed-case, no uppercase transform. No font-size override needed here —
    all popup text (.text-panel h3 and p alike) is a uniform 16px now. */
 #panel-1 h3, #panel-1-start h3 { text-transform: none; }
